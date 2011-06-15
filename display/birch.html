@@ -1,0 +1,38 @@
+<html>
+<head><title>BiRCH Test Bench</title></head>
+<link rel="stylesheet" type="text/css" href="birch.css" /> 
+<script src="birch.js" type="text/javascript"></script>
+<script type="text/javascript">
+function main() {
+	var bg = {};
+
+	bg.names = ["a","b","c","d"];
+
+	bg.region = {control: "0"};
+
+	bg.region.children = [
+		{children: [], links: ["a"], control: "X"},
+		{children: [
+			{children: [], links: ["b","c"], control: "Y"},
+			{children: [
+				{children: [], links: ["d"], control: "A"},
+				{children: [], links: ["a","c"], control: "B"},
+				{children: [], links: [], control: "0", hole: true}
+			],
+			links: [],
+			control: "Z"}
+		],
+		links: [],
+		control: "W"}
+	];
+	
+	displayBigraph('bgcanvas',bg);
+}
+</script>
+<body>
+<canvas id="bgcanvas" width="500" height="500">
+
+</canvas><br/>
+<button onclick="main()">Draw</button>
+</body>
+</html>
