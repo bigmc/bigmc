@@ -1,18 +1,28 @@
 BIN=../bin
 CPP=g++
-LIBS=
-INCLUDE=-I../include/
+PEG=../lib/peg-0.1.4/peg
+LIBS=-L/opt/local/lib -lreadline
+INCLUDE=-I../include/ -I/opt/local/include/
 BINARY=$(BIN)/bigmc
 DEPS=main.o bigraph.o \
-	match.o node.o edge.o
+	match.o node.o edge.o \
+	parsenode.o 
+
+PARSERDEPS=parser/parser.o
+
+.PHONY: parser clean
 
 all: $(BINARY)
 
-$(BINARY): $(DEPS)
-	$(CPP) -o $(BINARY) $(LIBS) $(INCLUDE) $(DEPS)
+$(BINARY): $(DEPS) parser
+	$(CPP) -o $(BINARY) $(LIBS) $(INCLUDE) $(DEPS) $(PARSERDEPS)
+
+parser:
+	make -C parser
 
 %.o: %.cpp
 	$(CPP) -c $(INCLUDE) -Wall -o $@ $<
 
 clean:
 	rm -f *.o $(BINARY)
+	make -C parser clean

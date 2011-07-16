@@ -9,9 +9,10 @@ using namespace std;
 
 void print_usage(char **argv) {
 	fprintf(stderr,
-	"Usage: %s [-hvV] <modelfile>\n"
+	"Usage: %s [-hvV] [-m <max memory>] <modelfile>\n"
 	"\t-h\t\tDisplay this help and exit\n"
 	"\t-V\t\tPrint verbose debugging output\n"
+	"\t-m x\t\tSpecify x megabytes as the maximum usable memory\n"
 	"\t-v\t\tPrint version information and exit\n",
 	argv[0]);
 }
@@ -24,8 +25,9 @@ void print_version() {
 int main(int argc, char**argv) {
 	int c;
 	int verbose = 0;
+	int maxmem = 0;
 	
-	while ((c = getopt (argc, argv, "hvV")) != -1)
+	while ((c = getopt (argc, argv, "hvVm:")) != -1)
 		switch (c) {
 		case 'h':
 			print_usage(argv);
@@ -36,6 +38,9 @@ int main(int argc, char**argv) {
 		case 'v':
 			print_version();
 			return 0;
+		case 'm':
+			maxmem = atoi(optarg);
+			break;
 		case '?':
 			if (isprint (optopt))
 				fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -48,17 +53,28 @@ int main(int argc, char**argv) {
 
 	int index;
 	char *modelfile = NULL;
+	parser *p = NULL;
+
 	for (index = optind; index < argc; index++) {
-		printf ("Model file: %s\n", argv[index]);
 		modelfile = argv[index];
 	}
 
 	if(!modelfile) {
-		fprintf(stderr, "Error: Missing model file\n");
-		print_usage(argv);
-		return 1;
+		p = new parser(NULL);
+	} else {
+		FILE *fp = fopen(modelfile, "r");
+		if(fp == NULL) {
+			perror("Cannot read model file");
+			return 1;
+		} else
+			fclose(fp);
+
+		p = new parser(modelfile);
 	}
-	
+
+	p->parse();
+
+	delete p;
 
 	return 0;
 }

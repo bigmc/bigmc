@@ -4,11 +4,10 @@
 // Bigraph is (V,E,ctrl,prnt,link) : <n,K> -> <m,L>
 class bigraph {
 	node *root;
-	set<edge> e;
 	int nholes;
 	int nregions;
-	set<string> inner;
-	set<string> outer;
+	set<name> inner;
+	set<name> outer;
 
 public:
 	bigraph(int roots);
@@ -19,5 +18,12 @@ public:
 	long hash();
 	
 };
+
+struct control_map_entry {
+	int arity;
+	bool active;
+};
+
+extern map<control,control_map_entry> g_control_map;
 
 #endif

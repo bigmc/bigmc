@@ -1,0 +1,49 @@
+# PEG grammar for our BRS model term language
+# Gian Perrone, 2011
+
+%{
+#include <iostream>
+#include "bigmc.h"
+#define YYSTYPE parsenode*
+
+vector<parsenode *> g_declarations;
+%}
+
+model		= d:dec _ ';'				{ cout << "d1: " << d->to_string() << endl; $$ = d; }
+		| d:dec					{ cout << "d2: " << d->to_string() << endl; $$ = d; }
+		| _ 					
+
+
+dec		= '%inner' nsp i:id			{ $$ = new interfacenode(i,false); }
+		| '%outer' nsp i:id			{ $$ = new interfacenode(i,true); }
+		| '%active' nsp i:id _ ':'_ < [0-9]+ >	{ $$ = new signaturenode(i,true,atoi(yytext)); }
+		| '%passive' nsp i:id _ ':'_ < [0-9]+ >	{ $$ = new signaturenode(i,false,atoi(yytext));}
+ 		| !'%' r:reaction				{ $$ = r; }
+		| !'%' e:exp					{ $$ = e; }
+
+reaction	= e1:exp _ '->' _ e2: exp	{ $$ = new reactionnode(e1,e2); }
+
+exp		= e:expel _ '|' _ e2:exp	{ $$ = new parallelnode(e,e2); }
+		| e1:expel _ '.' _ e2:exp	{ $$ = new prefixnode(e1,e2); }
+		| e1:expel			{ $$ = e1; }
+
+expel		= _ i:id _'('_ n:names _')'	{ $$ = new controlnode(i,n); }
+		| _ i:id			{ $$ = new controlnode(i,NULL); }
+		| _ '$' < [0-9]+ >		{ $$ = new holenode(atoi(yytext)); }
+		| _ '(' _ e:exp _ ')'		{ $$ = e; }
+
+names		= _ i:id _ ',' _ n:names	{ $$ = new seqnode(i,n); }
+		| _ i:id			{ $$ = i; }
+
+id		= < [a-zA-Z][a-zA-Z0-9_]* >	{ $$ = new namenode(yytext); }
+
+nsp		= [ \r\n\t]+
+sp		= [ \r\n\t]*
+_		= comment _ 
+		| sp
+
+comment		= '(*' commentc '*)'
+commentc	= !'*)' . commentc
+		
+
+
