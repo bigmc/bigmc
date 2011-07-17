@@ -1,6 +1,9 @@
 #ifndef _NODE_H
 #define _NODE_H
 
+#include <string>
+#include <sstream>
+
 class node {
 	control ctrl;
 	node *parent;
@@ -30,7 +33,7 @@ public:
 	hole(int id);
 	~hole();
 	void add(node *n);
-	string to_string();
+	string to_string(); 
 };
 
 #endif

@@ -22,5 +22,6 @@ string hole::to_string() {
 	std::string s;
 	std::stringstream out;
 	out << index;
+	return "THIS IS A HOLE";
 	return "$" + out.str();
 }
