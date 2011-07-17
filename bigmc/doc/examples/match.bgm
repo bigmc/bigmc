@@ -6,6 +6,6 @@
 
 a.b.c.a.b.c.a.b.c.d.a.b;
 
-a.b.c -> c.b.a;
+a.b.c.$0 -> c.$0;
 
 %check

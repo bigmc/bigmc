@@ -3,6 +3,6 @@
 %outer a;
 %outer b;
 (send(a).recv(b)) | (recv(a).send(b));
-(send(x).$0) | (recv(x).$1) -> ($0 | $1);
+((send(x).$0) | (recv(x).$1)) -> ($0 | $1);
 
 %check

@@ -5,11 +5,14 @@ using namespace std;
 
 #include <bigmc.h>
 
+int node::u_node = 1;
+
 node::node() {
 	parent = NULL;
 	ctrl = NULL;
 	arity = 0;
 	active = false;
+	id = u_node++;
 }
 
 node::node(control c) {
@@ -29,6 +32,12 @@ node::~node() {
 void node::add(node *n) {
 	children.insert(n);
 	n->set_parent(this);
+}
+
+void node::add(set<node *> s) {
+	for(set<node *>::iterator i = s.begin(); i!=s.end(); ++i) {
+		add(*i);
+	}
 }
 
 node *node::get_parent() {
@@ -61,7 +70,7 @@ string node::to_string() {
 	if(ctrl == 0) {
 		nm = "Region_0";
 	} else {
-		nm = bigraph::control_to_string(ctrl) + " : " + (active ? "act" : "pas");
+		nm = bigraph::control_to_string(ctrl);
 	}
 
 	string s = nm;
@@ -79,18 +88,25 @@ string node::to_string() {
 
 	set<node *> ch = get_children();
 	if(get_children().size() == 0) return s + prt;
+	
 
+	if(get_children().size() == 1) {
+		s += ".";
+		set<node *>::iterator it = ch.begin();
+		s += (*it)->to_string();
+		return s;
+	}
 
 	
-	s += prt + " { ";
+	s += prt + ".(";
 
 	set<node *>::iterator it = ch.begin();
 	while(it != ch.end()) {
-		s += (*it)->to_string() + ", ";
+		s += (*it)->to_string() + " | ";
 		++it;
 	}
 
-	return s + "}";
+	return s + ")";
 }
 
 bool node::is_hole() {
@@ -126,12 +142,13 @@ vector<node *> node::flatten(node *n) {
 	return v;
 }
 
-set<match *> node::find_matches(node *redex) {
+set<match *> node::find_matches(reactionrule *rule) {
 	// Construct the control map
 	map<control,vector<node *> > cmap;
 	vector<node *> tm = flatten(this);
 	cmap[ctrl] = vector<node *>();
 	cmap[ctrl].push_back(this);
+	node *redex = rule->redex;
 
 	for(unsigned int i = 0; i<tm.size(); i++) {
 		if(tm[i]->is_hole()) continue;
@@ -142,7 +159,7 @@ set<match *> node::find_matches(node *redex) {
 	// Define the candidate map
 	map<node *,match *> cand;
 	map<node *,match *> cand2;
-	cand2[this] = new match(this);
+	cand2[this] = new match(this,rule);
 	
 	// Redex work queue
 	vector<node *> work = flatten(redex);
@@ -203,7 +220,7 @@ set<match *> node::find_matches(node *redex) {
 
 			// At the root of the match, so we need to seed the candidate map
 			if(i == 0) {
-				cand2[cn[j]] = new match(cn[j]);
+				cand2[cn[j]] = new match(cn[j],rule);
 				cand2[cn[j]]->add_match(work[i],cn[j]);
 				cout << " ** Adding candidate to root work queue: " << cand2[cn[j]] << endl;
 			} else {
@@ -273,3 +290,74 @@ bool node::is_active_context() {
 
 	return active && pactive;
 }
+
+node *node::deep_copy() {
+	node *n = new node(ctrl);
+	
+	for(unsigned int i = 0; i<port.size(); i++) {
+		n->set_port(i,port[i]);
+	}
+
+	for(set<node*>::iterator i = children.begin(); i!=children.end(); i++) {
+		n->add((*i)->deep_copy());
+	}
+
+	return n;
+}
+
+node *node::instantiate(match *m) {
+	node *n = copy();
+	
+	for(set<node*>::iterator i = children.begin(); i!=children.end(); i++) {
+		if((*i)->is_hole()) {
+			hole *h = (hole *)*i;
+			node *p = m->get_param(h->index);
+			if(p == NULL) {
+				cerr << "Error: unknown hole $" << h->index << " in reactum" << endl;
+				exit(1);
+			} else {
+				set<node *> ch = p->children;
+				for(set<node *>::iterator j = ch.begin(); j != ch.end(); j++) {
+					n->add((*j)->deep_copy());
+				}
+			}
+		} else {
+			n->add((*i)->instantiate(m));
+		}
+	}
+
+	return n;
+}
+
+node *node::copy() {
+	node *n = new node(ctrl);
+	for(unsigned int i = 0; i<port.size(); i++) {
+		n->set_port(i,port[i]);
+	}
+
+	return n;
+}
+
+set<node *>node::apply_match(match *m) {
+	cout << "BUG: node::apply_match(): Mapping: " << m->get_mapping(this) << " id: " << id << endl;
+	if(m->root->id == id) {
+		cout << "BUG: node::apply_match(): Found match site" << endl;
+		// OK, we've reached the site of the match!  We need to start returning the reactum
+		// We have to strip the region off the reactum.
+
+		node *n = m->get_rule()->reactum->instantiate(m);
+		return n->get_children();
+	} else {
+		node *n = copy();
+		cout << "BUG: node::apply_match(): Didn't find match site: " << m->root->id << " != " << id << endl;
+		for(set<node *>::iterator ch = children.begin(); ch!=children.end(); ++ch) {
+			n->add((*ch)->apply_match(m));
+		}
+
+		set<node *> s;
+		s.insert(n);
+
+		return s;
+	}
+}
+

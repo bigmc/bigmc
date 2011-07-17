@@ -4,8 +4,9 @@ using namespace std;
 #include <iostream>
 #include <bigmc.h>
 
-match::match(node *r) {
+match::match(node *r, reactionrule *rl) {
 	root = r;
+	rule = rl;
 }
 
 match::~match() {
@@ -30,5 +31,13 @@ void match::add_match(node *src, node *target) {
 		exit(1);
 	}
 
-	mapping[src] = target;
+	mapping[target] = src;
+}
+
+reactionrule *match::get_rule() {
+	return rule;
+}
+
+node *match::get_mapping(node *targ) {
+	return mapping[targ];
 }

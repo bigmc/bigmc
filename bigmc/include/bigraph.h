@@ -33,6 +33,7 @@ public:
 	void add_inner_name(name n);
 	void set_root(node *n);
 	void add_rule(reactionrule *r);
+	bigraph *apply_match(match *m);
 };
 
 
