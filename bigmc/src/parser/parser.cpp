@@ -199,6 +199,42 @@ vector<node *> parser::bg_collapse(parsenode *p) {
 	return v;
 }
 
+vector<name> parser::bg_names(seqnode *p) {
+	namenode *l = (namenode *)p->lhs;
+	string n = l->to_string();
+	name nm = bigraph::name_from_string(n);
+	vector<name> v;
+	v.push_back(nm);
+
+	vector<name> w = bg_names(p->rhs);
+
+	for(unsigned int i = 0; i < w.size(); i++) {
+		v.push_back(w[i]);
+	}
+
+	return v;
+}
+
+vector<name> parser::bg_names(parsenode *p) {
+	switch(p->type) {
+		case NODE_NAME: {
+			vector<name> v;
+			name nm = bigraph::name_from_string(((namenode *)p)->to_string());
+			v.push_back(nm);
+			return v;
+		}
+		case NODE_SEQ: {
+			return bg_names((seqnode *) p);
+		}
+		default:
+			cerr << "BUG: Invalid name: " << p->to_string() << endl;
+			exit(1);
+			break;
+	}
+
+	return vector<name>();
+}
+
 node *parser::bg_mknode(controlnode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(controlnode): ");
 	cerr << p->to_string() << endl;
@@ -206,6 +242,16 @@ node *parser::bg_mknode(controlnode *p) {
 	string nm = ((namenode *)(p->name))->to_string();
 	control c = bigraph::control_from_string(nm);
 	node *n = new node(c);
+	
+	if(p->links == NULL) return n;
+
+
+	vector<name> l = bg_names(p->links);
+
+	for(unsigned int i = 0; i<l.size(); i++) {
+		n->set_port(i,l[i]);
+	}
+	
 
 	return n;
 }

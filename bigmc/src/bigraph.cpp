@@ -93,6 +93,19 @@ string bigraph::control_to_string(control c) {
 	return "<unknown control>";
 }
 
+string bigraph::name_to_string(name c) {
+	map<string,name>::iterator it = bigraph::name_map.begin();
+
+	while(it != name_map.end()) {
+		if(it->second == c)
+			return it->first;
+
+		++it;
+	}
+
+	return "<unknown control>";
+}
+
 node * bigraph::get_root(int i) {
 	return root;
 }

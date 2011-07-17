@@ -25,6 +25,7 @@ public:
 	static control control_from_string(string n);
 	static string control_to_string(control c);
 	static name name_from_string(string n);
+	static string name_to_string(name n);
 	static bool activity(control c);
 	static int arity(control c);
 	static control add_control(string n, bool act, int ar);

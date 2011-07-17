@@ -16,6 +16,9 @@ node::node(control c) {
 	ctrl = c;
 	arity = bigraph::arity(c);
 	active = bigraph::activity(c);
+
+	if(arity > 0)
+		port = vector<name>(arity,0);
 }
 
 node::~node() {
@@ -61,11 +64,24 @@ string node::to_string() {
 	}
 
 	string s = nm;
+
+	string prt = "";
+
+	if(port.size() > 0) {
+		for(unsigned int i = 0; i<port.size(); i++) {
+			if(port[i])
+				prt += "[" + bigraph::name_to_string(port[i]) + "]";
+			else
+				prt += "[.]";
+		}
+	}
+
 	set<node *> ch = get_children();
+	if(get_children().size() == 0) return s + prt;
 
-	if(get_children().size() == 0) return s;
 
-	s += " {\n";
+	
+	s += prt + " {\n";
 
 	set<node *>::iterator it = ch.begin();
 	while(it != ch.end()) {

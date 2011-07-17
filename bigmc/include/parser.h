@@ -12,6 +12,8 @@ class parser {
 	static string		bg_mkname(namenode *p);
 	static vector<node *>	bg_collapse(parallelnode *p);
 	static vector<node *>	bg_collapse(parsenode *p);
+	static vector<name>	bg_names(seqnode *p);
+	static vector<name>	bg_names(parsenode *p);
 
 public:
 	static void init(char *file);
