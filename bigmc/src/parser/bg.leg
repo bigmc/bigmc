@@ -9,8 +9,8 @@
 vector<parsenode *> g_declarations;
 %}
 
-model		= d:dec _ ';'				{ cout << "d1: " << d->to_string() << endl; $$ = d; }
-		| d:dec					{ cout << "d2: " << d->to_string() << endl; $$ = d; }
+model		= d:dec _ ';'				{ parser_add_result(d); $$ = d; }
+		| d:dec					{ parser_add_result(d); $$ = d; }
 		| _ 					
 
 
@@ -23,8 +23,8 @@ dec		= '%inner' nsp i:id			{ $$ = new interfacenode(i,false); }
 
 reaction	= e1:exp _ '->' _ e2: exp	{ $$ = new reactionnode(e1,e2); }
 
-exp		= e:expel _ '|' _ e2:exp	{ $$ = new parallelnode(e,e2); }
-		| e1:expel _ '.' _ e2:exp	{ $$ = new prefixnode(e1,e2); }
+exp		= e1:expel _ '.' _ e2:exp	{ $$ = new prefixnode(e1,e2); }
+		| e:expel _ '|' _ e2:exp	{ $$ = new parallelnode(e,e2); }
 		| e1:expel			{ $$ = e1; }
 
 expel		= _ i:id _'('_ n:names _')'	{ $$ = new controlnode(i,n); }

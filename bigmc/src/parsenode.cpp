@@ -7,6 +7,7 @@ using namespace std;
 
 parsenode::parsenode() {
 	filepos = 0;
+	type = NODE_PARSE;
 }
 
 parsenode::~parsenode() {
@@ -30,6 +31,7 @@ vector<parsenode *> parsenode::get_children() {
 prefixnode::prefixnode(parsenode *p, parsenode *q) {
 	prefix = p;
 	suffix = q;
+	type = NODE_PREFIX;
 }
 
 prefixnode::~prefixnode() {
@@ -55,6 +57,7 @@ vector<parsenode *> prefixnode::get_children() {
 parallelnode::parallelnode(parsenode *l, parsenode *r) {
 	lhs = l;
 	rhs = r;
+	type = NODE_PARALLEL;
 }
 
 parallelnode::~parallelnode() {
@@ -80,6 +83,7 @@ vector<parsenode *> parallelnode::get_children() {
 reactionnode::reactionnode(parsenode *red, parsenode *reac) {
 	redex = red;
 	reactum = reac;
+	type = NODE_REACTION;
 }
 
 reactionnode::~reactionnode() {
@@ -106,6 +110,7 @@ vector<parsenode *> reactionnode::get_children() {
 namenode::namenode(char *id) {
 	nme = strdup(id);
 	// TODO compute hash
+	type = NODE_NAME;
 }
 
 namenode::~namenode() {
@@ -128,6 +133,7 @@ vector<parsenode *> namenode::get_children() {
 
 holenode::holenode(int id) {
 	n = id;
+	type = NODE_HOLE;
 }
 
 holenode::~holenode() {
@@ -155,6 +161,7 @@ vector<parsenode *> holenode::get_children() {
 seqnode::seqnode(parsenode *l, parsenode *r) {
 	lhs = l;
 	rhs = r;
+	type = NODE_SEQ;
 }
 
 seqnode::~seqnode() {
@@ -180,6 +187,7 @@ vector<parsenode *> seqnode::get_children() {
 interfacenode::interfacenode(parsenode *n, bool is_outer) {
 	name = n;
 	outer = is_outer;
+	type = NODE_INTERFACE;
 }
 
 interfacenode::~interfacenode() {
@@ -208,6 +216,7 @@ signaturenode::signaturenode(parsenode *n, bool is_active, int ar) {
 	name = n;
 	active = is_active;
 	arity = ar;
+	type = NODE_SIGNATURE;
 }
 
 signaturenode::~signaturenode() {
@@ -241,6 +250,7 @@ vector<parsenode *> signaturenode::get_children() {
 controlnode::controlnode(parsenode *id, parsenode *linkseq) {
 	name = id;
 	links = linkseq;
+	type = NODE_CONTROL;
 }
 
 controlnode::~controlnode() {

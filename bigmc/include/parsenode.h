@@ -1,9 +1,21 @@
 #ifndef _PARSENODE_H
 #define _PARSENODE_H
 
+#define NODE_PARSE 0
+#define NODE_PREFIX 1
+#define NODE_PARALLEL 2
+#define NODE_REACTION 4
+#define NODE_NAME 8
+#define NODE_HOLE 16
+#define NODE_SEQ 32
+#define NODE_INTERFACE 64
+#define NODE_SIGNATURE 128
+#define NODE_CONTROL 256
+
 class parsenode {
 	int filepos;
 public:
+	int type;
 	parsenode();
 	~parsenode();
 	virtual string to_string();
@@ -12,9 +24,9 @@ public:
 };
 
 class prefixnode : public parsenode {
+public:
 	parsenode *prefix;
 	parsenode *suffix;
-public:
 	prefixnode(parsenode *p, parsenode *q);
 	~prefixnode();
 	string to_string();
@@ -23,9 +35,9 @@ public:
 };
 
 class parallelnode : public parsenode {
+public:
 	parsenode *lhs;
 	parsenode *rhs;
-public:
 	parallelnode(parsenode *l, parsenode *r);
 	~parallelnode();
 	string to_string();
@@ -34,9 +46,9 @@ public:
 };
 
 class reactionnode : public parsenode {
+public:
 	parsenode *redex;
 	parsenode *reactum;
-public:
 	reactionnode(parsenode *red, parsenode *reac);
 	~reactionnode();
 	string to_string();
@@ -45,9 +57,9 @@ public:
 };
 
 class namenode : public parsenode {
+public:
 	char *nme;
 	name hash;
-public:
 	namenode(char *id);
 	~namenode();
 	string to_string();
@@ -56,8 +68,8 @@ public:
 };
 
 class holenode : public parsenode {
-	int n;
 public:
+	int n;
 	holenode(int id);
 	~holenode();
 	string to_string();
@@ -66,9 +78,9 @@ public:
 };
 
 class seqnode : public parsenode {
+public:
 	parsenode *lhs;
 	parsenode *rhs;
-public:
 	seqnode(parsenode *l, parsenode *r);
 	~seqnode();
 	string to_string();
@@ -77,9 +89,9 @@ public:
 };
 
 class interfacenode : public parsenode {
+public:
 	parsenode *name;
 	bool outer;
-public:
 	interfacenode(parsenode *n, bool is_outer);
 	~interfacenode();
 	string to_string();
@@ -88,10 +100,10 @@ public:
 };
 
 class signaturenode : public parsenode {
+public:
 	parsenode *name;
 	bool active;
 	int arity;
-public:
 	signaturenode(parsenode *n, bool is_active, int ar);
 	~signaturenode();
 	string to_string();
@@ -100,9 +112,9 @@ public:
 };
 
 class controlnode : public parsenode {
+public:
 	parsenode *name;
 	parsenode *links;
-public:
 	controlnode(parsenode *id, parsenode *linkseq);
 	~controlnode();
 	string to_string();

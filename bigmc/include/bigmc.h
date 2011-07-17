@@ -15,8 +15,11 @@ using namespace std;
 #include "edge.h"
 #include "node.h"
 #include "match.h"
+#include "reactionrule.h"
 #include "bigraph.h"
 #include "parsenode.h"
+#include "mc.h"
+#include "driver.h"
 #include "parser.h"
 
 void print_version();

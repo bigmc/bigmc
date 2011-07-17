@@ -6,7 +6,8 @@ INCLUDE=-I../include/ -I/opt/local/include/
 BINARY=$(BIN)/bigmc
 DEPS=main.o bigraph.o \
 	match.o node.o edge.o \
-	parsenode.o 
+	parsenode.o driver.o mc.o \
+	reactionrule.o hole.o
 
 PARSERDEPS=parser/parser.o
 

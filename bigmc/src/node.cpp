@@ -14,7 +14,8 @@ node::node() {
 node::node(control c) {
 	parent = NULL;
 	ctrl = c;
-	// look up arity and activity in global control map
+	arity = bigraph::arity(c);
+	active = bigraph::activity(c);
 }
 
 node::~node() {
@@ -50,4 +51,27 @@ void node::set_parent(node *n) {
 	parent = n;
 }
 
+string node::to_string() {
+	string nm = "";
 
+	if(ctrl == 0) {
+		nm = "Region_0";
+	} else {
+		nm = bigraph::control_to_string(ctrl);
+	}
+
+	string s = nm;
+	set<node *> ch = get_children();
+
+	if(get_children().size() == 0) return s;
+
+	s += " {\n";
+
+	set<node *>::iterator it = ch.begin();
+	while(it != ch.end()) {
+		s += (*it)->to_string() + "\n";
+		++it;
+	}
+
+	return s + "}\n";
+}

@@ -53,14 +53,13 @@ int main(int argc, char**argv) {
 
 	int index;
 	char *modelfile = NULL;
-	parser *p = NULL;
 
 	for (index = optind; index < argc; index++) {
 		modelfile = argv[index];
 	}
 
 	if(!modelfile) {
-		p = new parser(NULL);
+		parser::init(NULL);
 	} else {
 		FILE *fp = fopen(modelfile, "r");
 		if(fp == NULL) {
@@ -69,12 +68,12 @@ int main(int argc, char**argv) {
 		} else
 			fclose(fp);
 
-		p = new parser(modelfile);
+		parser::init(modelfile);
 	}
 
-	p->parse();
+	parser::parse();
 
-	delete p;
+	parser::cleanup();
 
 	return 0;
 }
