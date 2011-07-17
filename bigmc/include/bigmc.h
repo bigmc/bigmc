@@ -13,8 +13,8 @@ using namespace std;
 #include <string>
 
 #include "edge.h"
-#include "node.h"
 #include "match.h"
+#include "node.h"
 #include "reactionrule.h"
 #include "bigraph.h"
 #include "parsenode.h"

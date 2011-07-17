@@ -20,7 +20,7 @@ public:
 	~bigraph();
 	node *get_root(int n);
 	bigraph operator + (bigraph b);
-	set<match> find_matches(bigraph redex);
+	set<match *> find_matches();
 	long hash();
 	static control control_from_string(string n);
 	static string control_to_string(control c);

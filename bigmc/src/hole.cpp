@@ -22,6 +22,13 @@ string hole::to_string() {
 	std::string s;
 	std::stringstream out;
 	out << index;
-	return "THIS IS A HOLE";
 	return "$" + out.str();
+}
+
+bool hole::is_hole() {
+	return true;
+}
+
+bool hole::matches(node *other) {
+	return true;
 }

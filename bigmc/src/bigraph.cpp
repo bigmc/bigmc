@@ -2,6 +2,7 @@ using namespace std;
 #include <string>
 #include <set>
 #include <map>
+#include <iostream>
 
 #include <bigmc.h>
 
@@ -108,5 +109,17 @@ string bigraph::name_to_string(name c) {
 
 node * bigraph::get_root(int i) {
 	return root;
+}
+
+set<match *> bigraph::find_matches() {
+	set<match *> res;
+
+	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
+		cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
+		set<match *> m = get_root(0)->find_matches((*i)->redex);
+		res.insert(m.begin(),m.end());
+	}
+
+	return res;
 }
 

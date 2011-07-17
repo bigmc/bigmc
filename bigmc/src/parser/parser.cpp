@@ -102,8 +102,6 @@ int parser_next_char() {
 		g_has_check = true;
 		driver::check(b);
 
-		cout << "Would start model checking here!" << endl;
-
 		for(vector<parsenode *>::iterator it=g_parsetree.begin();it!=g_parsetree.end();++it) {
 			cout << (*it)->to_string() << endl;
 		} 

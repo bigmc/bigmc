@@ -2,9 +2,9 @@
 #define _REACTIONRULE_H
 
 class reactionrule {
+public:
 	node *redex;
 	node *reactum;
-public:
 	reactionrule(node *red, node *reac);
 	~reactionrule();
 };

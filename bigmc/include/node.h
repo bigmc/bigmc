@@ -23,17 +23,23 @@ public:
 	void set_port(int i, name n);
 	void set_parent(node *n);
 	virtual string to_string();
-	
+	virtual bool is_hole();
+	set<match *> find_matches(node *redex);
+	virtual bool matches(node *other);
+	bool is_active_context();
+	static vector<node *> flatten(node *n);
 };
 
 
 class hole : public node {
-	int index;
 public:
+	int index;
 	hole(int id);
 	~hole();
 	void add(node *n);
 	string to_string(); 
+	bool is_hole();
+	bool matches(node *other);
 };
 
 #endif
