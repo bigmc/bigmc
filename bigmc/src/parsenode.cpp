@@ -1,8 +1,9 @@
 using namespace std;
-
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <stdio.h>
+#include <assert.h>
 #include <bigmc.h>
 
 parsenode::parsenode() {
@@ -28,8 +29,15 @@ vector<parsenode *> parsenode::get_children() {
 
 // PREFIX
 
-prefixnode::prefixnode(parsenode *p, parsenode *q) {
+prefixnode::prefixnode(controlnode *p, parsenode *q) {
 	prefix = p;
+	suffix = q;
+	type = NODE_PREFIX;
+}
+
+prefixnode::prefixnode(parsenode *p, parsenode *q) {
+	prefix = dynamic_cast<controlnode *>(p);
+	assert(prefix != NULL);
 	suffix = q;
 	type = NODE_PREFIX;
 }
@@ -38,7 +46,10 @@ prefixnode::~prefixnode() {
 }
 
 string prefixnode::to_string() {
-	return prefix->to_string() + "." + suffix->to_string();
+	if(suffix)
+		return prefix->to_string() + "." + suffix->to_string();
+	else 
+		return prefix->to_string() + ".nil";
 }
 
 bool prefixnode::is_valid() {
@@ -248,6 +259,12 @@ vector<parsenode *> signaturenode::get_children() {
 
 
 controlnode::controlnode(parsenode *id, parsenode *linkseq) {
+	name = id;
+	links = linkseq;
+	type = NODE_CONTROL;
+}
+
+controlnode::controlnode(namenode *id, parsenode *linkseq) {
 	name = id;
 	links = linkseq;
 	type = NODE_CONTROL;

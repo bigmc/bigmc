@@ -3,9 +3,9 @@
 
 class reactionrule {
 public:
-	node *redex;
-	node *reactum;
-	reactionrule(node *red, node *reac);
+	term *redex;
+	term *reactum;
+	reactionrule(term *red, term *reac);
 	~reactionrule();
 };
 

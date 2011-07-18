@@ -4,7 +4,9 @@ using namespace std;
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <assert.h>
 #include <bigmc.h>
+#include "bgparser.tab.hpp"
 
 static char *g_inputbuffer = (char *)NULL;
 int g_inputbuffer_len = 0;
@@ -14,14 +16,11 @@ bool g_userbreak = false;
 vector<parsenode *> g_parsetree;
 bool g_has_check = false;
 
-#define YY_INPUT(buf, result, max_size)        \
-{                                              \
-	int yyc = parser_next_char();                    \
-	result = (EOF == yyc) ? 0 : (*(buf)= yyc, 1); \
-}
+
 
 
 void parser_add_result(parsenode *p) {
+	cout << "BUG: parser_add_result: " << p->to_string() << endl;
 	g_parsetree.push_back(p);
 }
 
@@ -97,18 +96,11 @@ int parser_next_char() {
 		exit(0);
 	}
 
-	if(strncmp("%check",g_inputbuffer,6) == 0 || strncmp("%check;",g_inputbuffer,7) == 0) {
-		bigraph *b = parser::finish();
-		g_has_check = true;
-		driver::check(b);
-
-		for(vector<parsenode *>::iterator it=g_parsetree.begin();it!=g_parsetree.end();++it) {
-			cout << (*it)->to_string() << endl;
-		} 
-
-		g_parsetree.empty(); // TODO free memory here!
-
-		exit(0);
+	if(strncmp("check",g_inputbuffer,5) == 0 || strncmp("check;",g_inputbuffer,6) == 0 ||
+	   strncmp("%check",g_inputbuffer,6) == 0 || strncmp("%check;",g_inputbuffer,7) == 0) {
+		return EOF;
+		
+		//g_parsetree.clear(); // TODO free memory here!
 	}
 
 	return g_inputbuffer[g_inputbuffer_offset++];
@@ -117,6 +109,7 @@ int parser_next_char() {
 void parser::init(char *file) {
 	if(file == NULL) {
 		print_version();
+		cout << "Hint: remember to enter 'check' once you have finished entering your model!" << endl;
 		g_fp = NULL;
 		using_history();
 	} else {
@@ -134,7 +127,17 @@ void parser::cleanup() {
 }
 
 int parser::parse() {
-	while(!g_userbreak && yyparse()) {
+	yyparse();
+
+	cout << "Beginning check: " << g_parsetree.size() << endl;
+
+	bigraph *b = parser::finish();
+	g_has_check = true;
+	driver::check(b);
+
+	for(vector<parsenode *>::iterator it=g_parsetree.begin();it!=g_parsetree.end();++it) {
+		cout << typeid(*it).name() << endl;
+		//cout << (*it)->to_string() << endl;
 	}
 
 	return 0;
@@ -144,57 +147,46 @@ void add_result(parsenode *p) {
 	g_parsetree.push_back(p);
 } 
 
-node *parser::bg_mknode(prefixnode *p) {
+term *parser::bg_mknode(prefixnode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(prefixnode): ");
-	cerr << p->to_string() << endl;
-	node *n1 = bg_mknode(p->prefix);
-	// FIXME: This deals only with 1 child!
-	vector<node *> n2 = bg_collapse(p->suffix);
+	assert(p != NULL);
+
+	cout << "ptype is: " << typeid(p->prefix).name() << '\n';
+	controlnode *cn = dynamic_cast<controlnode *>(p->prefix);
+	assert(cn != NULL);
+
+	cerr << "Survived cast" << endl;
+	cerr << cn->to_string() << endl;
+	//cerr << "Links: " << cn->links->to_string() << endl;
 	
-	for(vector<node *>::iterator it = n2.begin(); it != n2.end(); ++it) {
-		n1->add(*it);
-	}
-	
-	return n1;
+	return new prefix(bigraph::control_from_string(cn->name->to_string()), 
+			vector<name>(), 
+			(p->suffix == NULL) ? new nil() : bg_mknode(p->suffix));
 }
 
-node *parser::bg_mknode(parallelnode *p) {
+set<term *> parser::bg_collapse(parallelnode *p) {
+
+}
+
+set<term *> parser::bg_collapse(parsenode *p) {
+
+}
+
+term *parser::bg_mknode(parallelnode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(parallelnode): ");
 	cerr << p->to_string() << endl;
 
-	exit(1);	
-	return NULL;
+	term *tl = bg_mknode(p->lhs);
+	term *tr = bg_mknode(p->rhs);
+	
+	return new parallel(bg_collapse(p));
 }
 
-node *parser::bg_mknode(holenode *p) {
+term *parser::bg_mknode(holenode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(holenode): ");
 	cerr << p->to_string() << endl;
-	hole *h = new hole(p->n);
 	
-	return h;
-}
-
-vector<node *> parser::bg_collapse(parallelnode *p) {
-	vector<node *> v = bg_collapse(p->lhs);
-	vector<node *> w = bg_collapse(p->rhs);
-	cout << "bg_collapse: set" << endl;
-
-	for(unsigned int i = 0; i < w.size(); i++) {
-		cout << "collapse merge: " << w[i]->to_string() << endl;
-		v.push_back(w[i]);
-	}
-
-	return v;
-}
-
-vector<node *> parser::bg_collapse(parsenode *p) {
-	if(p->type == NODE_PARALLEL)
-		return bg_collapse((parallelnode *)p);
-
-	vector<node *> v;
-	cout << "bg_collapse: singleton" << endl;
-	v.push_back(bg_mknode(p));
-	return v;
+	return new hole(p->n);
 }
 
 vector<name> parser::bg_names(seqnode *p) {
@@ -214,6 +206,9 @@ vector<name> parser::bg_names(seqnode *p) {
 }
 
 vector<name> parser::bg_names(parsenode *p) {
+	assert(0);
+	if(!p) return vector<name>();
+
 	switch(p->type) {
 		case NODE_NAME: {
 			vector<name> v;
@@ -233,48 +228,46 @@ vector<name> parser::bg_names(parsenode *p) {
 	return vector<name>();
 }
 
-node *parser::bg_mknode(controlnode *p) {
-	fprintf(stderr, "BUG: parser::bg_mknode(controlnode): ");
-	cerr << p->to_string() << endl;
+term *parser::bg_mknode(controlnode *p) {
+	prefixnode *n = new prefixnode(p,NULL);
 
-	string nm = ((namenode *)(p->name))->to_string();
-	control c = bigraph::control_from_string(nm);
-	node *n = new node(c);
-	
-	if(p->links == NULL) return n;
-
-
-	vector<name> l = bg_names(p->links);
-
-	for(unsigned int i = 0; i<l.size(); i++) {
-		n->set_port(i,l[i]);
-	}
-	
-
-	return n;
+	return bg_mknode(n);
 }
 
-node *parser::bg_mknode(parsenode *p) {
+term *parser::bg_mknode(parsenode *p) {
+	cout << "parser::bg_mknode(): " << p << endl;
+
 	if(p == NULL) {
 		fprintf(stderr, "BUG: parser::bg_mknode(parsenode): %s\n", "NULL");
 		exit(1);
 	}
+	cout << "parser::bg_mknode(): " << p << endl;
 
 	switch(p->type) {
-	case NODE_PREFIX:
-		return bg_mknode((prefixnode *) p);
+	case NODE_PREFIX: {
+		cout << "parser::bg_mknode(): NODE_PREFIX: " << p << endl;
+		cout << "ptype is: " << typeid(p).name() << '\n';
+		prefixnode *pp = static_cast<prefixnode *>(p);
+		cout << "pptype is: " << typeid(pp).name() << '\n';
+		assert(pp != NULL);
+		return bg_mknode(pp);
 		break;
+	}
 	case NODE_PARALLEL:
 		return bg_mknode((parallelnode *) p);
 		break;
 	case NODE_HOLE:
 		return bg_mknode((holenode *) p);
 		break;
-	case NODE_CONTROL:
-		return bg_mknode((controlnode *) p);
+	case NODE_CONTROL: {
+		cout << "parser::bg_mknode(): NODE_CONTROL: " << p << endl;
+		controlnode *pp = dynamic_cast<controlnode *>(p);
+		assert(pp != NULL);
+		return bg_mknode(pp);
 		break;
+	}
 	default:
-		fprintf(stderr, "Malformed node structure: ");
+		fprintf(stderr, "Malformed term structure: ");
 		cerr << p->to_string() << endl;
 		break;
 	}
@@ -309,35 +302,17 @@ bigraph *parser::finish() {
 				break;
 			}
 			case NODE_PREFIX: case NODE_PARALLEL: case NODE_HOLE: case NODE_CONTROL: {
-				printf("ROOT\n");
-				vector<node *> w = parser::bg_collapse(*it);
-				node *n = new node();
-
-				for(vector<node *>::iterator it2 = w.begin(); it2 != w.end(); ++it2) {
-					n->add(*it2);
-				}
-
-				b->set_root(n);
+				b->set_root(bg_mknode(*it));
 				break;
 			}
 			case NODE_REACTION: {
 				printf("NODE_REACTION\n");
 				reactionnode *t = (reactionnode *)(*it);
-				node *n1 = new node();
-				vector<node *> w = bg_collapse(t->redex);
 
-				for(vector<node *>::iterator it2 = w.begin(); it2 != w.end(); ++it2) {
-					n1->add(*it2);
-				}
+				b->add_rule(
+					new reactionrule(bg_mknode(t->redex),bg_mknode(t->reactum))
+				);
 
-				node *n2 = new node();
-				w = bg_collapse(t->reactum);
-
-				for(vector<node *>::iterator it2 = w.begin(); it2 != w.end(); ++it2) {
-					n2->add(*it2);
-				}
-
-				b->add_rule(new reactionrule(n1,n2));
 				break;
 			}
 			default:
@@ -349,4 +324,18 @@ bigraph *parser::finish() {
 	return b;
 }
 
-#include "bgparser.leg.cpp"
+// Some flex/bison specific functions
+
+//void yyerror (const char *error) {
+//	fprintf(stderr, "%d: %s at %s\n", yylineno, error, yytext);
+//}
+
+void yyerror(const char *s)
+{
+  if(yylloc.first_line)
+    fprintf(stderr, "%d.%d-%d.%d: error: %s\n", yylloc.first_line, yylloc.first_column,
+	    yylloc.last_line, yylloc.last_column, s);
+
+}
+
+

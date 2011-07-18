@@ -14,7 +14,7 @@ using namespace std;
 
 #include "edge.h"
 #include "match.h"
-#include "node.h"
+#include "term.h"
 #include "reactionrule.h"
 #include "bigraph.h"
 #include "parsenode.h"

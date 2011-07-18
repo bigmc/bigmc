@@ -23,11 +23,35 @@ public:
 	virtual vector<parsenode *> get_children();
 };
 
+class namenode : public parsenode {
+public:
+	char *nme;
+	name hash;
+	namenode(char *id);
+	~namenode();
+	string to_string();
+	bool is_valid();
+	vector<parsenode *> get_children();
+};
+
+class controlnode : public parsenode {
+public:
+	parsenode *name;
+	parsenode *links;
+	controlnode(parsenode *id, parsenode *linkseq);
+	controlnode(namenode *id, parsenode *linkseq);
+	~controlnode();
+	string to_string();
+	bool is_valid();
+	vector<parsenode *> get_children();
+};
+
 class prefixnode : public parsenode {
 public:
-	parsenode *prefix;
+	controlnode *prefix;
 	parsenode *suffix;
 	prefixnode(parsenode *p, parsenode *q);
+	prefixnode(controlnode *p, parsenode *q);
 	~prefixnode();
 	string to_string();
 	bool is_valid();
@@ -56,16 +80,7 @@ public:
 	vector<parsenode *> get_children();
 };
 
-class namenode : public parsenode {
-public:
-	char *nme;
-	name hash;
-	namenode(char *id);
-	~namenode();
-	string to_string();
-	bool is_valid();
-	vector<parsenode *> get_children();
-};
+
 
 class holenode : public parsenode {
 public:
@@ -111,15 +126,6 @@ public:
 	vector<parsenode *> get_children();
 };
 
-class controlnode : public parsenode {
-public:
-	parsenode *name;
-	parsenode *links;
-	controlnode(parsenode *id, parsenode *linkseq);
-	~controlnode();
-	string to_string();
-	bool is_valid();
-	vector<parsenode *> get_children();
-};
+
 
 #endif

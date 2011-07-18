@@ -5,11 +5,11 @@ LIBS=-L/opt/local/lib -lreadline
 INCLUDE=-I../include/ -I/opt/local/include/
 BINARY=$(BIN)/bigmc
 DEPS=main.o bigraph.o \
-	match.o node.o edge.o \
+	match.o edge.o \
 	parsenode.o driver.o mc.o \
-	reactionrule.o hole.o
+	reactionrule.o term.o
 
-PARSERDEPS=parser/parser.o
+PARSERDEPS=parser/parser.o parser/bgparser.tab.o parser/lex.yy.o
 
 .PHONY: parser clean
 

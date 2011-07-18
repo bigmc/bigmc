@@ -15,7 +15,7 @@ void driver::check(bigraph *b) {
 
 	cout << "driver::check(): " << b->get_root(0)->to_string() << endl;
 
-	set<match *> matches = b->find_matches();
+	/*set<match *> matches = b->find_matches();
 	cout << "driver::check(): found " << matches.size() << " matches" << endl;
 
 	cout << " * Original:" << endl;
@@ -25,6 +25,6 @@ void driver::check(bigraph *b) {
 		bigraph *b2 = b->apply_match(*it);
 		cout << " * Applied match:" << endl;
 		cout << b2->get_root(0)->to_string() << endl;
-	}
+	}*/
 
 }

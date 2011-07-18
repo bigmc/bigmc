@@ -3,7 +3,7 @@
 
 // Bigraph is (V,E,ctrl,prnt,link) : <n,K> -> <m,L>
 class bigraph {
-	node *root;
+	term *root;
 	int nholes;
 	int nregions;
 	set<name> inner;
@@ -18,7 +18,7 @@ public:
 	static name u_name;
 	bigraph(int roots);
 	~bigraph();
-	node *get_root(int n);
+	term *get_root(int n);
 	bigraph operator + (bigraph b);
 	set<match *> find_matches();
 	long hash();
@@ -31,7 +31,7 @@ public:
 	static control add_control(string n, bool act, int ar);
 	void add_outer_name(name n);
 	void add_inner_name(name n);
-	void set_root(node *n);
+	void set_root(term *n);
 	void add_rule(reactionrule *r);
 	bigraph *apply_match(match *m);
 };

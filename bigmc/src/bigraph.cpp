@@ -73,7 +73,7 @@ void bigraph::add_inner_name(name n) {
 	inner.insert(n);
 }
 
-void bigraph::set_root(node *n) {
+void bigraph::set_root(term *n) {
 	root = n;
 }
 
@@ -107,7 +107,7 @@ string bigraph::name_to_string(name c) {
 	return "<unknown control>";
 }
 
-node * bigraph::get_root(int i) {
+term* bigraph::get_root(int i) {
 	return root;
 }
 
@@ -116,26 +116,26 @@ set<match *> bigraph::find_matches() {
 
 	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
 		cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
-		set<match *> m = get_root(0)->find_matches(*i);
-		res.insert(m.begin(),m.end());
+		//set<match *> m = get_root(0)->find_matches(*i);
+		//res.insert(m.begin(),m.end());
 	}
 
-	return res;
+	return set<match *>();
 }
 
 bigraph *bigraph::apply_match(match *m) {
 	bigraph *b = new bigraph(1);
 
-	set<node *> matches = root->apply_match(m);
+	//set<term *> matches = root->apply_match(m);
 
-	if(matches.size() != 1) {
+	/*if(matches.size() != 1) {
 		cout << "Error: matching returned " << matches.size() << " nodes instead of 1!" << endl;
 		exit(1);
 	}
 
-	set<node *>::iterator i = matches.begin();
+	set<term *>::iterator i = matches.begin();
 
-	b->root = *i;
+	b->root = *i;*/
 
 	// destroy the match -- we're done with it
 	delete m;

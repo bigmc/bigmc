@@ -1,0 +1,76 @@
+%{
+#include <iostream>
+#include <fstream>
+#include <bigmc.h>
+
+void yyerror (const char *error);
+int  yylex ();
+
+%}
+
+%union {
+  parsenode *node;  /* For the expressions. Since it is a pointer, no problem. */
+  int       value;  /* For the lexical analyser. NUMBER tokens */
+  char      *ident;  /* For the lexical analyser. IDENT tokens */
+}
+
+%locations
+
+%token UNKNOWN
+%token SEMI ARROW PAR PREF COMMA LSQ RSQ LPAR RPAR
+%token INNER OUTER 
+%token ACTIVE PASSIVE COLON HOLE IDENT NUM
+
+%type <node> model dec reaction exp expel
+%type <node> prefix names
+%type <value> NUM
+%type <ident> HOLE IDENT
+
+%start model
+
+%%
+
+model
+: dec SEMI model		{ /* @1; */ parser_add_result($1); $$ = NULL; }
+| dec SEMI			{ parser_add_result($1), $$ = $1 ; }
+| error SEMI			{ $$ = NULL; }
+| dec				{ parser_add_result($1); $$ = $1; }
+;
+
+dec
+: INNER IDENT			{ $$ = new interfacenode(new namenode($2),false); }
+| OUTER IDENT			{ $$ = new interfacenode(new namenode($2),true); }
+| ACTIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),true,$4); }
+| PASSIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),false,$4); }
+| reaction			{ $$ = $1; }
+| exp				{ $$ = $1; }
+;
+
+reaction			
+: exp ARROW exp			{ $$ = new reactionnode($1,$3); }
+;
+
+exp
+: expel PAR exp			{ $$ = new parallelnode($1,$3); }
+| expel				{ $$ = $1; }
+;
+
+expel
+: prefix PREF expel		{ $$ = new prefixnode($1,$3); }
+| prefix			{ $$ = new prefixnode($1,NULL); }
+| HOLE				{ $$ = new holenode(atoi($1+1)); }
+| LPAR exp RPAR			{ $$ = $2; }
+;
+
+prefix
+: IDENT LSQ names RSQ		{ $$ = new controlnode(new namenode($1), $3); }
+| IDENT				{ $$ = new controlnode(new namenode($1), NULL); }
+;
+
+names
+: IDENT COMMA names		{ $$ = new seqnode(new namenode($1),$3); }
+| IDENT				{ $$ = new namenode($1); }
+;
+
+%%
+

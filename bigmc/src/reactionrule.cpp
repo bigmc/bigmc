@@ -5,7 +5,7 @@ using namespace std;
 
 #include <bigmc.h>
 
-reactionrule::reactionrule(node *red, node *reac) {
+reactionrule::reactionrule(term *red, term *reac) {
 	redex = red;
 	reactum = reac;
 }
