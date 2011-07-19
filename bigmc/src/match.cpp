@@ -7,6 +7,7 @@ using namespace std;
 match::match(term *r, reactionrule *rl) {
 	root = r;
 	rule = rl;
+	remaining.push_back(rule->redex);
 }
 
 match::~match() {
@@ -40,4 +41,36 @@ reactionrule *match::get_rule() {
 
 term *match::get_mapping(term *targ) {
 	return mapping[targ];
+}
+
+// Get the next thing to match.
+// Returns null when nothing is left to match.
+term *match::next() {
+	if(remaining.size() == 0) return NULL;
+
+	term *t = remaining.front();
+	remaining.pop_front();
+
+	switch(t->type) {
+		case TPREF:
+		remaining.push_back(((prefix *)t)->get_suffix());
+		break;
+		case TPAR: {
+			set<term*> ch = ((parallel *)t)->get_children();
+			set<term*>::iterator i = ch.begin();
+			while(i != ch.end())
+				remaining.push_back(*(i++));
+			break;
+		}
+		case THOLE:
+			break;
+		case TNIL:
+			break;
+		default:
+			cerr << "Matching encountered invalid term type " << t->type << endl;
+			exit(1);
+			break;
+	}
+
+	return t;
 }

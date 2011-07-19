@@ -135,11 +135,6 @@ int parser::parse() {
 	g_has_check = true;
 	driver::check(b);
 
-	for(vector<parsenode *>::iterator it=g_parsetree.begin();it!=g_parsetree.end();++it) {
-		cout << typeid(*it).name() << endl;
-		//cout << (*it)->to_string() << endl;
-	}
-
 	return 0;
 }
 
@@ -151,39 +146,42 @@ term *parser::bg_mknode(prefixnode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(prefixnode): ");
 	assert(p != NULL);
 
-	cout << "ptype is: " << typeid(p->prefix).name() << '\n';
 	controlnode *cn = dynamic_cast<controlnode *>(p->prefix);
 	assert(cn != NULL);
 
-	cerr << "Survived cast" << endl;
-	cerr << cn->to_string() << endl;
-	//cerr << "Links: " << cn->links->to_string() << endl;
-	
 	return new prefix(bigraph::control_from_string(cn->name->to_string()), 
-			vector<name>(), 
-			(p->suffix == NULL) ? new nil() : bg_mknode(p->suffix));
+			(cn->links == NULL) ? vector<name>() : bg_names(cn->links), 
+			bg_mknode(p->suffix));
 }
 
 set<term *> parser::bg_collapse(parallelnode *p) {
-
+	set<term *> l = bg_collapse(p->lhs);
+	set<term *> r = bg_collapse(p->rhs);
+	l.insert(r.begin(),r.end());
+	return l;
 }
 
 set<term *> parser::bg_collapse(parsenode *p) {
-
+	set<term *> s;
+	s.insert(bg_mknode(p));
+	return s; 
 }
 
 term *parser::bg_mknode(parallelnode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(parallelnode): ");
+
+	if(p == NULL) return new nil();
+
 	cerr << p->to_string() << endl;
 
-	term *tl = bg_mknode(p->lhs);
-	term *tr = bg_mknode(p->rhs);
-	
 	return new parallel(bg_collapse(p));
 }
 
 term *parser::bg_mknode(holenode *p) {
 	fprintf(stderr, "BUG: parser::bg_mknode(holenode): ");
+
+	if(p == NULL) return new nil();
+
 	cerr << p->to_string() << endl;
 	
 	return new hole(p->n);
@@ -206,7 +204,6 @@ vector<name> parser::bg_names(seqnode *p) {
 }
 
 vector<name> parser::bg_names(parsenode *p) {
-	assert(0);
 	if(!p) return vector<name>();
 
 	switch(p->type) {
@@ -229,26 +226,22 @@ vector<name> parser::bg_names(parsenode *p) {
 }
 
 term *parser::bg_mknode(controlnode *p) {
+	if(p == NULL) return new nil();
+	
 	prefixnode *n = new prefixnode(p,NULL);
 
 	return bg_mknode(n);
 }
 
 term *parser::bg_mknode(parsenode *p) {
-	cout << "parser::bg_mknode(): " << p << endl;
-
-	if(p == NULL) {
-		fprintf(stderr, "BUG: parser::bg_mknode(parsenode): %s\n", "NULL");
-		exit(1);
-	}
+	if(p == NULL) return new nil();
+	
 	cout << "parser::bg_mknode(): " << p << endl;
 
 	switch(p->type) {
 	case NODE_PREFIX: {
 		cout << "parser::bg_mknode(): NODE_PREFIX: " << p << endl;
-		cout << "ptype is: " << typeid(p).name() << '\n';
 		prefixnode *pp = static_cast<prefixnode *>(p);
-		cout << "pptype is: " << typeid(pp).name() << '\n';
 		assert(pp != NULL);
 		return bg_mknode(pp);
 		break;
@@ -280,8 +273,8 @@ bigraph *parser::finish() {
 	
 	bigraph *b = new bigraph(1);
 	
-	vector<parsenode *>::iterator it;
-	for(it=g_parsetree.begin(); it!=g_parsetree.end(); ++it) {
+	vector<parsenode *>::reverse_iterator it;
+	for(it=g_parsetree.rbegin(); it!=g_parsetree.rend(); ++it) {
 		switch((*it)->type) {
 			case NODE_INTERFACE: {
 				printf("NODE_INTERFACE\n");
@@ -298,7 +291,7 @@ bigraph *parser::finish() {
 				signaturenode *t = (signaturenode *)(*it);
 				string n = ((namenode *)t->name)->to_string();
 				control c = bigraph::add_control(n,t->active,t->arity);
-				printf("NODE_SIGNATURE: %d\n",c);
+				printf("NODE_SIGNATURE: %s (%d) : %d\n", n.c_str(), c, t->arity);
 				break;
 			}
 			case NODE_PREFIX: case NODE_PARALLEL: case NODE_HOLE: case NODE_CONTROL: {

@@ -13,11 +13,12 @@ void driver::check(bigraph *b) {
 		return;
 	}
 
-	cout << "driver::check(): " << b->get_root(0)->to_string() << endl;
+	cout << "driver::check():\n" << b->to_string() << endl;
 
-	/*set<match *> matches = b->find_matches();
+	set<match *> matches = b->find_matches();
 	cout << "driver::check(): found " << matches.size() << " matches" << endl;
 
+	/*
 	cout << " * Original:" << endl;
 	cout << b->get_root(0)->to_string() << endl;
 	

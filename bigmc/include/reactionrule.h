@@ -7,6 +7,7 @@ public:
 	term *reactum;
 	reactionrule(term *red, term *reac);
 	~reactionrule();
+	string to_string();
 };
 
 #endif

@@ -116,11 +116,20 @@ set<match *> bigraph::find_matches() {
 
 	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
 		cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
-		//set<match *> m = get_root(0)->find_matches(*i);
-		//res.insert(m.begin(),m.end());
+		set<match *> m = get_root(0)->find_matches(*i);
+		res.insert(m.begin(),m.end());
+
+		// just for fun
+		match *mf = new match(get_root(0),*i);
+		
+		term *t = NULL;
+
+		while((t = mf->next()) != NULL) {
+			cout << "match::next(): " << t->to_string() << endl;
+		}
 	}
 
-	return set<match *>();
+	return res;
 }
 
 bigraph *bigraph::apply_match(match *m) {
@@ -140,5 +149,17 @@ bigraph *bigraph::apply_match(match *m) {
 	// destroy the match -- we're done with it
 	delete m;
 	return b;
+}
+
+string bigraph::to_string() {
+	string s = "Bigraph:\n\tRules:\n";
+
+	for(set<reactionrule *>::iterator r = rules.begin(); r!=rules.end(); r++) {
+		s += "\t\t" + (*r)->to_string() + "\n";
+	}
+
+	s += "\tModel:\n\t\t" + root->to_string() + "\n";
+
+	return s;	
 }
 

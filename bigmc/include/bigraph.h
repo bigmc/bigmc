@@ -34,6 +34,7 @@ public:
 	void set_root(term *n);
 	void add_rule(reactionrule *r);
 	bigraph *apply_match(match *m);
+	string to_string();
 };
 
 

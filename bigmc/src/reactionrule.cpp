@@ -14,3 +14,7 @@ reactionrule::~reactionrule() {
 
 }
 
+string reactionrule::to_string() {
+	return redex->to_string() + " -> " + reactum->to_string();
+}
+
