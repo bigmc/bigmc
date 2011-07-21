@@ -9,13 +9,15 @@ using namespace std;
 
 // Globals
 bool g_debug = false;
+unsigned long g_maxsteps = 1000;
 
 void print_usage(char **argv) {
 	fprintf(stderr,
-	"Usage: %s [-hvV] [-m <max memory>] <modelfile>\n"
+	"Usage: %s [-hvV] [-m <max steps>] <modelfile>\n"
 	"\t-h\t\tDisplay this help and exit\n"
-	"\t-V\t\tPrint verbose debugging output\n"
-	"\t-m x\t\tSpecify x megabytes as the maximum usable memory\n"
+	"\t-V\t\tPrint verbose output\n"
+	"\t-V\t\tPrint verbose output\n"
+	"\t-m x\t\tSpecify x maximum steps of graph unfolding (default: 1000)\n"
 	"\t-v\t\tPrint version information and exit\n",
 	argv[0]);
 }
@@ -45,7 +47,7 @@ int main(int argc, char**argv) {
 			g_debug = true;
 			break;
 		case 'm':
-			maxmem = atoi(optarg);
+			g_maxsteps = (unsigned long)atol(optarg);
 			break;
 		case '?':
 			if (isprint (optopt))

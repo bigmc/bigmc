@@ -43,15 +43,27 @@ bool mc::step() {
 		return true;
 	}
 
+	unsigned long steps = 0;
+
 	for(set<match *>::iterator it = matches.begin(); it != matches.end(); ++it) {
+		if(steps > g_maxsteps) {
+			cout << "mc::step(): Interrupted!  Reached maximum steps: " << g_maxsteps << endl;
+			return false;
+		}
+
 		bigraph *b2 = b->apply_match(*it);
 		node *n2 = new node(b2,n);
 		g->add(n2);
 		n->add_target(n2,(*it)->get_rule());
 		workqueue.push_back(n2);
-		cout << "BUG: mc::step(): new node" << endl << b2->to_string() << endl;	
-		cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
-		g->report();
+		if(g_debug) cout << "BUG: mc::step(): new node" << endl << b2->to_string() << endl;	
+		if(g_debug) cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
+
+		steps++;
+
+		if(steps % 10 == 0) {
+			cout << "[q: " << workqueue.size() << " / g: " << g->size() << "]" << endl;
+		}
 	}
 
 	return true;

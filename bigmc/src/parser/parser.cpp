@@ -143,7 +143,7 @@ void add_result(parsenode *p) {
 } 
 
 term *parser::bg_mknode(prefixnode *p) {
-	fprintf(stderr, "BUG: parser::bg_mknode(prefixnode): ");
+	if(g_debug) fprintf(stderr, "BUG: parser::bg_mknode(prefixnode): ");
 	assert(p != NULL);
 
 	controlnode *cn = dynamic_cast<controlnode *>(p->prefix);

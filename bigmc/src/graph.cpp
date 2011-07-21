@@ -31,3 +31,7 @@ void graph::report() {
 	cout << "Graph Report:" << endl;
 	cout << "\tNumber of nodes: " << nodes.size() << endl;
 }
+
+unsigned long graph::size() {
+	return nodes.size();
+}

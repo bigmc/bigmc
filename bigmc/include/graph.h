@@ -15,6 +15,7 @@ public:
 	void add(node *n);
 	node *get(unsigned long id);
 	void report();
+	unsigned long size();
 };
 
 #endif
