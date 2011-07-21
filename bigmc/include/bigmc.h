@@ -17,6 +17,7 @@ using namespace std;
 #include "term.h"
 #include "reactionrule.h"
 #include "bigraph.h"
+#include "node.h"
 #include "graph.h"
 #include "parsenode.h"
 #include "mc.h"
@@ -24,5 +25,7 @@ using namespace std;
 #include "parser.h"
 
 void print_version();
+
+extern bool g_debug;
 
 #endif

@@ -2,12 +2,14 @@
 #define _MC_H
 
 class mc {
-	bigraph *bg;
+	graph *g;
+	deque<node *> workqueue;
 public:
 	mc(bigraph *b);
 	~mc();
 	bool check();
 	string report();
+	bool step();
 };
 
 #endif

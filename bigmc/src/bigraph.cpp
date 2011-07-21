@@ -25,7 +25,7 @@ bigraph::~bigraph() {
 }
 
 control bigraph::control_from_string(string n) {
-	cout << "BUG: bigraph::control_from_string(): " << n << endl;
+	if(g_debug) cout << "BUG: bigraph::control_from_string(): " << n << endl;
 	map<string,control>::iterator it;
 	it = bigraph::control_map.find(n);
 	if(it == bigraph::control_map.end()) {
@@ -116,24 +116,28 @@ set<match *> bigraph::find_matches() {
 	set<match *> res;
 
 	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
-		cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
+		if(g_debug) cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
 		set<match *> mp = term::find_all_matches(get_root(0), *i);
 		res.insert(mp.begin(),mp.end());
 	}
 
-	cout << "Matches:" << endl;
+	if(g_debug) { cout << "Matches:" << endl;
 	for(set<match *>::iterator i = res.begin(); i != res.end(); i++) {
 		cout << " * " << (*i) << ": " << (*i)->to_string() << endl;
+	}
 	}
 
 	return res;
 }
 
 bigraph *bigraph::apply_match(match *m) {
-	cout << "BUG: bigraph::apply_match():\n" << m->to_string() << "\nto:\n" << to_string() << endl;
+	if(g_debug) cout << "BUG: bigraph::apply_match():\n" << m->to_string() << "\nto:\n" << to_string() << endl;
 	bigraph *b = new bigraph(1);
 
 	b->root = root->apply_match(m);
+	b->inner = inner;
+	b->outer = outer;
+	b->rules = rules;
 
 	// destroy the match -- we're done with it
 	delete m;

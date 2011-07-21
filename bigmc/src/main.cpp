@@ -7,6 +7,9 @@ using namespace std;
 
 #include <bigmc.h>
 
+// Globals
+bool g_debug = false;
+
 void print_usage(char **argv) {
 	fprintf(stderr,
 	"Usage: %s [-hvV] [-m <max memory>] <modelfile>\n"
@@ -27,7 +30,7 @@ int main(int argc, char**argv) {
 	int verbose = 0;
 	int maxmem = 0;
 	
-	while ((c = getopt (argc, argv, "hvVm:")) != -1)
+	while ((c = getopt (argc, argv, "hvVdm:")) != -1)
 		switch (c) {
 		case 'h':
 			print_usage(argv);
@@ -38,6 +41,9 @@ int main(int argc, char**argv) {
 		case 'v':
 			print_version();
 			return 0;
+		case 'd':
+			g_debug = true;
+			break;
 		case 'm':
 			maxmem = atoi(optarg);
 			break;

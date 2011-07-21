@@ -20,7 +20,7 @@ bool g_has_check = false;
 
 
 void parser_add_result(parsenode *p) {
-	cout << "BUG: parser_add_result: " << p->to_string() << endl;
+	if(g_debug) cout << "BUG: parser_add_result: " << p->to_string() << endl;
 	g_parsetree.push_back(p);
 }
 
@@ -129,7 +129,7 @@ void parser::cleanup() {
 int parser::parse() {
 	yyparse();
 
-	cout << "Beginning check: " << g_parsetree.size() << endl;
+	if(g_debug) cout << "Beginning check: " << g_parsetree.size() << endl;
 
 	bigraph *b = parser::finish();
 	g_has_check = true;
@@ -171,21 +171,21 @@ set<term *> parser::bg_collapse(parsenode *p) {
 }
 
 term *parser::bg_mknode(parallelnode *p) {
-	fprintf(stderr, "BUG: parser::bg_mknode(parallelnode): ");
+	if(g_debug) fprintf(stderr, "BUG: parser::bg_mknode(parallelnode): ");
 
 	if(p == NULL) return new nil();
 
-	cerr << p->to_string() << endl;
+	if(g_debug) cerr << p->to_string() << endl;
 
 	return new parallel(bg_collapse(p));
 }
 
 term *parser::bg_mknode(holenode *p) {
-	fprintf(stderr, "BUG: parser::bg_mknode(holenode): ");
+	if(g_debug) fprintf(stderr, "BUG: parser::bg_mknode(holenode): ");
 
 	if(p == NULL) return new nil();
 
-	cerr << p->to_string() << endl;
+	if(g_debug) cerr << p->to_string() << endl;
 	
 	return new hole(p->n);
 }
@@ -239,11 +239,11 @@ term *parser::bg_mknode(controlnode *p) {
 term *parser::bg_mknode(parsenode *p) {
 	if(p == NULL) return new nil();
 	
-	cout << "parser::bg_mknode(): " << p << endl;
+	if(g_debug) cout << "parser::bg_mknode(): " << p << endl;
 
 	switch(p->type) {
 	case NODE_PREFIX: {
-		cout << "parser::bg_mknode(): NODE_PREFIX: " << p << endl;
+		if(g_debug) cout << "parser::bg_mknode(): NODE_PREFIX: " << p << endl;
 		prefixnode *pp = static_cast<prefixnode *>(p);
 		assert(pp != NULL);
 		return bg_mknode(pp);
@@ -256,7 +256,7 @@ term *parser::bg_mknode(parsenode *p) {
 		return bg_mknode((holenode *) p);
 		break;
 	case NODE_CONTROL: {
-		cout << "parser::bg_mknode(): NODE_CONTROL: " << p << endl;
+		if(g_debug) cout << "parser::bg_mknode(): NODE_CONTROL: " << p << endl;
 		controlnode *pp = dynamic_cast<controlnode *>(p);
 		assert(pp != NULL);
 		return bg_mknode(pp);
@@ -265,6 +265,7 @@ term *parser::bg_mknode(parsenode *p) {
 	default:
 		fprintf(stderr, "Malformed term structure: ");
 		cerr << p->to_string() << endl;
+		exit(1);
 		break;
 	}
 
@@ -272,7 +273,7 @@ term *parser::bg_mknode(parsenode *p) {
 }
 
 bigraph *parser::finish() {
-	fprintf(stderr, "BUG: parser::finish()\n");
+	if(g_debug) fprintf(stderr, "BUG: parser::finish()\n");
 	
 	bigraph *b = new bigraph(1);
 	
@@ -280,7 +281,7 @@ bigraph *parser::finish() {
 	for(it=g_parsetree.rbegin(); it!=g_parsetree.rend(); ++it) {
 		switch((*it)->type) {
 			case NODE_INTERFACE: {
-				printf("NODE_INTERFACE\n");
+				if(g_debug) printf("NODE_INTERFACE\n");
 				interfacenode *t = (interfacenode *)(*it);
 				string n = ((namenode *)t->name)->to_string();
 				name nm = b->name_from_string(n);
@@ -294,7 +295,7 @@ bigraph *parser::finish() {
 				signaturenode *t = (signaturenode *)(*it);
 				string n = ((namenode *)t->name)->to_string();
 				control c = bigraph::add_control(n,t->active,t->arity);
-				printf("NODE_SIGNATURE: %s (%d) : %d\n", n.c_str(), c, t->arity);
+				if(g_debug) printf("NODE_SIGNATURE: %s (%d) : %d\n", n.c_str(), c, t->arity);
 				break;
 			}
 			case NODE_PREFIX: case NODE_PARALLEL: case NODE_HOLE: case NODE_CONTROL: {
@@ -302,7 +303,7 @@ bigraph *parser::finish() {
 				break;
 			}
 			case NODE_REACTION: {
-				printf("NODE_REACTION\n");
+				if(g_debug) printf("NODE_REACTION\n");
 				reactionnode *t = (reactionnode *)(*it);
 
 				b->add_rule(

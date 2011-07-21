@@ -5,4 +5,16 @@
 #include <sstream>
 #include <deque>
 
+class graph {
+	set<node *> nodes;
+	node *root;
+	map<unsigned long,node *> lut;
+public:
+	graph(node *r);
+	~graph();
+	void add(node *n);
+	node *get(unsigned long id);
+	void report();
+};
+
 #endif
