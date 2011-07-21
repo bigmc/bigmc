@@ -4,10 +4,22 @@ using namespace std;
 #include <iostream>
 #include <bigmc.h>
 
-match::match(term *r, reactionrule *rl) {
-	root = r;
+long u_match = 1;
+
+match::match(term *head, list<term *>red, match *prnt, reactionrule *rl) {
+	root = NULL;
+
+	cout << "BUG: match::match(): new match created" << endl;
+
+	matchhead = head;
+	parent = prnt;
 	rule = rl;
-	remaining.push_back(rule->redex);
+	redex = red;
+	has_failed = false;
+	has_succeeded = false;
+	u_match++;
+	foobar = u_match;
+	//id = u_match++;
 }
 
 match::~match() {
@@ -43,34 +55,119 @@ term *match::get_mapping(term *targ) {
 	return mapping[targ];
 }
 
-// Get the next thing to match.
-// Returns null when nothing is left to match.
-term *match::next() {
-	if(remaining.size() == 0) return NULL;
 
-	term *t = remaining.front();
-	remaining.pop_front();
 
-	switch(t->type) {
-		case TPREF:
-		remaining.push_back(((prefix *)t)->get_suffix());
-		break;
-		case TPAR: {
-			set<term*> ch = ((parallel *)t)->get_children();
-			set<term*>::iterator i = ch.begin();
-			while(i != ch.end())
-				remaining.push_back(*(i++));
-			break;
-		}
-		case THOLE:
-			break;
-		case TNIL:
-			break;
-		default:
-			cerr << "Matching encountered invalid term type " << t->type << endl;
-			exit(1);
-			break;
+set<match *> match::failure() {
+	has_failed = true;
+	has_succeeded = false;
+	return set<match *>();
+}
+
+void match::success() {
+	if(has_failed) {
+		cerr << "BUG: match::success(): match has already failed!" << endl;
+		exit(1);
+	}
+	
+	has_succeeded = true;
+	has_failed = false;
+}
+
+set<match *> match::singleton(match *t) {
+	set<match *> l;
+	l.insert(t);
+	return l;
+}
+
+list<term *> match::remaining() {
+	return redex;
+}
+
+match *match::clone(term *head, list<term *> rem) {
+	cout << "BUG: match::clone(): new match created" << endl;
+	match *m = new match(head, rem, NULL, rule);
+	m->parameters = parameters;
+	m->mapping = mapping;
+	m->has_succeeded = has_succeeded;
+	m->has_failed = has_failed;
+	m->root = root;
+	if(m->root)
+		cout << "BUG: match::clone(): setting root: " << m->root->to_string() << endl;
+	return m;
+}
+
+match *match::fresh(term *head, list<term *> rem) {
+	cout << "BUG: match::fresh(): new match created" << endl;
+	return new match(head, rem, NULL, rule);
+}
+
+void match::advance(term *head, list<term *> rem) {
+	// Update the match in-place
+	matchhead = head;
+	redex = rem;
+}
+
+set<match *> match::merge(set<match *> a, set<match *> b) {
+	cout << "BUG: match::merge(): " << a.size() << " with " << b.size() << endl;
+	set<match *> n;
+	n.insert(a.begin(),a.end());
+	n.insert(b.begin(),b.end());
+	return n;
+}
+
+string match::to_string() {
+	string s = "";
+
+	std::stringstream out;
+	out << foobar;
+	s += "Match #" + out.str() + ": ";
+	
+	if(root == NULL) 
+		s += "Root: NULL";
+	else
+		s += "Root: " + root->to_string();
+
+	if(has_succeeded) {
+		s += " Succeeded";
 	}
 
-	return t;
+	if(has_failed) {
+		s += " Failed";
+	}
+
+	s += " Redex: [";
+
+	unsigned int j = 0;
+	for(list<term*>::iterator i = redex.begin(); i!=redex.end(); i++) {
+		s += (*i)->to_string();
+		if(j != redex.size()-1) s += ", ";
+		j++;
+	}
+
+	s += "]\n";
+
+	for(map<int,term*>::iterator i = parameters.begin(); i!=parameters.end(); i++) {
+		std::stringstream p;
+		p << i->first;
+		s += "\t" + p.str() + ": " + i->second->to_string() + "\n";
+	}
+
+	s += "Term Mapping:\n";
+
+	for(map<term*,term*>::iterator i = mapping.begin(); i!=mapping.end(); i++) {
+		s += "\t" + i->first->to_string() + " -> " + i->second->to_string() + "\n";
+
+	}
+
+	return s;
+}
+
+void match::incorporate(match *other) {
+	for(map<int,term*>::iterator i = other->parameters.begin(); i!=other->parameters.end(); i++) {
+		parameters[i->first] = i->second;
+	}
+
+	for(map<term*,term*>::iterator i = other->mapping.begin(); i!=other->mapping.end(); i++) {
+		mapping[i->first] = i->second;
+	}
 }

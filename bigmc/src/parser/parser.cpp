@@ -162,6 +162,9 @@ set<term *> parser::bg_collapse(parallelnode *p) {
 }
 
 set<term *> parser::bg_collapse(parsenode *p) {
+	if(p->type == TPAR)
+		return bg_collapse((parallelnode *)p);
+
 	set<term *> s;
 	s.insert(bg_mknode(p));
 	return s; 

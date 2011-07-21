@@ -3,11 +3,13 @@ using namespace std;
 #include <set>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include <assert.h>
 #include <bigmc.h>
 
 term::term() {
 	type = 0;
+	remaining.push_back(this);
 }
 
 term::~term() {
@@ -17,7 +19,7 @@ string term::to_string() {
 	return "<untyped term>";
 }
 
-set<match *> term::find_matches(reactionrule *r) {
+set<match *> term::find_matches(match *m) {
 	assert(0);
 	switch(type) {
 		case TPREF: {
@@ -43,6 +45,17 @@ set<match *> term::find_matches(reactionrule *r) {
 	return set<match*>();
 }
 
+term *term::apply_match(match *m) {
+	assert(0);
+	return this;
+}
+
+term *term::instantiate(match *m) {
+	assert(0);
+	return NULL;
+}
+
+
 parallel::parallel(set<term *>l) {
 	terms = l;
 	type = TPAR;
@@ -52,9 +65,9 @@ parallel::~parallel() {
 }
 
 string parallel::to_string() {
-	string s = "";
+	string s = "(";
 
-	int k = 0;
+	unsigned int k = 0;
 	for(set<term *>::iterator i = terms.begin(); i!=terms.end(); ++i) {
 		k++;
 
@@ -64,16 +77,203 @@ string parallel::to_string() {
 			s += " | ";
 	}
 
-	return s;
+	return s + ")";
 }
 
-set<match *> parallel::find_matches(reactionrule *r) {
-	cout << "parallel::find_matches()" << endl;
-	return set<match *>();
-}
+// FIXME: Should A | B match A | B | C?  Currently does.  Probably shouldn't.
+set<match *> parallel::find_matches(match *m) {
+	cout << "BUG: parallel::find_matches()" << endl;
+
+	if(m->has_succeeded || m->has_failed) return set<match *>();
+
+	list<term *> r = m->remaining();
+
+
+	if(r.size() == 0) {
+		cout << "BUG: parallel::find_matches(): SUCCESS (nothing to match)" << endl;
+		m->success();
+		return match::singleton(m);
+	}
+
+	if(r.size() == 1 && r.front()->type == TPAR) {
+		cout << "BUG: parallel::find_matches(): generating permutation" << endl;
+		set<term *> c = ((parallel *)r.front())->get_children();
+		list<term *> cl;
+		set<match *> matches;
+
+		if(m->root == NULL) {
+			cout << "BUG: Null root in match, setting to TPAR: " << to_string() << endl;
+			m->root = this;
+		}
+
+		for(set<term*>::iterator i = c.begin(); i!=c.end(); i++)
+			cl.push_back(*i);
+
+		do {
+			cout << "BUG: Permutation: result set: " << matches.size() << endl;
+			for(list<term *>::iterator i = cl.begin(); i!=cl.end(); i++) {
+				cout << " * " << (*i)->to_string() << endl;
+			}
+
+			match *mp = m->clone(NULL, cl);
+			set<match *> res = find_matches(mp);
+
+			matches = match::merge(matches,res);
+		} while(next_permutation(cl.begin(),cl.end()));
+
+		return matches;
+	}
+
+	if(r.size() > 1) {
+		/* So we have a situation like this:
+			The current node is a parallel term like this:
+			( A | B | C )
+			We have a permutation like this:
+			[ A, B, C ]
+			So we iterate over the current children (A | B | C) in-order
+			and try to find matches for A and then for C.
+			Once a match is "consumed", we remove it from the redex permutation
+			and proceed to the next next.  There is no back-tracking or anything
+			necessary.
+
+			We can't just match directly, to avoid spoiling the
+			match object.  Instead we clone it, and on a successful match,
+			we incorporate the match.
+		*/
+
+		cout << "BUG: Ready to match permutation against: " << to_string() << " Permutation: ";
+		for(list<term *>::iterator i = r.begin(); i!=r.end(); i++) {
+			cout << (*i)->to_string() << ", ";
+		}
+		cout << endl;
+
+		set<match *> results;
+
+		for(set<term *>::iterator i = terms.begin(); i!=terms.end(); i++) {
+			cout << "BUG: parallel::find_matches(): iterating child: " << (*i)->to_string() << endl;
+			
+			if(r.size() == 0) {
+				cout << "BUG: parallel::find_matches(): SUCCESS" << endl;
+				// We have succeeded!  We're done!
+				m->success();
+				results.insert(m);
+				return results;
+			}
+
+			if(r.size() == 1 && r.front()->type == THOLE) {
+				// This is success.  A hole as the last
+				// thing to match can match everything that is left.
+				m->success();
+				int idx = ((hole *)r.front())->index;
+				parallel *holecontents = new parallel(set<term *>());
+
+				while(i != terms.end()) {
+					holecontents->terms.insert(*i);
+					m->add_match(*i,r.front());
+					i++;
+				}
+
+				if(holecontents->terms.size() == 0) {
+					delete holecontents;
+					m->add_param(idx,new nil());
+				}
+
+				else if(holecontents->terms.size() == 1) {
+					m->add_param(idx,*(holecontents->terms.begin()));
+					delete holecontents;
+				}
+
+				else {
+					m->add_param(idx,holecontents);
+				}
+
+				results.insert(m);
+				r.pop_front();
+				return results;
+			}
+
+			term *nm = r.front();
+
+			cout << "BUG: parallel::find_matches(): matching " << (*i)->to_string() << " against " << nm->to_string() << endl;
+			// Clone the match and attempt to match
+			match *cl = m->clone(NULL, term::singleton(nm));
+
+			cout << "cl: " << cl->to_string() << endl;
+
+			set<match *> res = (*i)->find_matches(cl);
+
+			if(cl->has_failed || !cl->has_succeeded) {
+				cout << "BUG: parallel::find_matches(): match failed" << endl;
+				delete cl;
+				// Discard the matches we found
+				// FIXME leaking matches in the set res here.
+				return m->failure();
+				//continue;
+			} else if (cl->has_succeeded) { // Success!
+				cout << "BUG: parallel::find_matches(): match succeeded" << endl;
+				
+				// FIXME: leaking matches in the set res here.
+
+				m->advance(NULL, term::singleton(nm));
+				m->incorporate(cl);
+				match::merge(results,res);
+				r.pop_front();
+				delete cl;
+			} else {
+				cout << "BUG: parallel::find_matches(): match ... died?" << endl;
+				// FIXME: Um, what does this condition mean?
+				delete cl;
+				continue;
+			} 
+
+			cout << "BUG: parallel::find_matches(): match obj: " << m->to_string() << endl;
+		}
+
+		if(r.size() == 0) {
+			m->success();
+			results.insert(m);
+			cout << "BUG: parallel::find_matches(): match succeeded: " << m->to_string() << " Result Size: " << results.size() << endl;
+			return results;
+		} else {
+			cout << "BUG: parallel::find_matches(): match failed: " << m->to_string() << " r.size(): " << r.size() << endl;
+			cout << "BUG: r[0]: " << r.front()->to_string() << endl;
+			return m->failure();
+		}
+	}
+	
+
+	return m->failure();
+} 
 
 set<term *> parallel::get_children() {
 	return terms;
+}
+
+term *parallel::apply_match(match *m) {
+	// TODO: implement properly
+	
+	set<term *> n;
+
+	for(set<term*>::iterator i = terms.begin(); i!=terms.end(); i++) {
+		n.insert((*i)->apply_match(m));
+	}
+
+	return new parallel(n);
+}
+
+term *parallel::instantiate(match *m) {
+	set<term *> n;
+
+	for(set<term*>::iterator i = terms.begin(); i!=terms.end(); i++) {
+		if((*i)->type != TPAR)
+			n.insert((*i)->instantiate(m));
+		else {
+			parallel *p = (parallel *)(*i);
+			n.insert(p->terms.begin(), p->terms.end());
+		}
+	}
+
+	return new parallel(n);
 }
 
 
@@ -124,6 +324,90 @@ term *prefix::get_suffix() {
 	return suffix;
 }
 
+set<match *> prefix::find_matches(match *m) {
+	cout << "BUG: prefix::find_matches()" << endl;
+
+	if(m->has_succeeded || m->has_failed) return set<match *>();
+
+	list<term *> r = m->remaining();
+
+	if(r.size() == 0 || (r.size() == 1 && r.front()->type == TNIL)) {
+		return m->failure();
+	}
+
+	if(r.size() == 1) {
+		term *t = r.front();
+
+		if(t->type == TPREF) {
+			cout << "BUG: prefix::find_matches(): redex front: " << t->to_string() << endl;
+			prefix *tp = dynamic_cast<prefix *>(t);
+			assert(tp != NULL);
+
+			if(tp->ctrl == ctrl) {
+				cout << "BUG: prefix::find_matches(): match found" << endl;
+				// We have a match!
+
+				// If this is a new match, set the root to here.
+				if(m->root == NULL)
+					m->root = this;
+				
+				m->add_match(t,this);
+
+				// Now we send this match on its merry way into the suffix:
+				m->advance(suffix, term::singleton(tp->suffix));
+				
+				return suffix->find_matches(m);
+
+				// And we need to create a new match that could potentially start
+				// here! 
+
+				//match *newmatch = m->fresh(NULL, term::singleton(m->get_rule()->redex));
+				
+				//return match::merge(suffm,suffix->find_matches(newmatch));
+				//return suffm;
+			} else {
+				cout << "BUG: prefix::find_matches(): match not found" << endl;
+				//match *newmatch = m->fresh(NULL, term::singleton(m->get_rule()->redex));
+				//return suffix->find_matches(newmatch);
+				return m->failure();
+			}
+
+		} else if(t->type == THOLE) {
+			// A hole will always match a prefix.
+			if(m->root == NULL)
+				m->root = this;
+			m->success();
+			m->add_param(((hole *)t)->index, this);
+			m->add_match(t,this);
+			m->advance(NULL,list<term*>());
+			return match::singleton(m);
+		} else {
+			return m->failure();
+		}
+	}
+
+	return m->failure();
+} 
+
+term *prefix::apply_match(match *m) {
+	if(this == m->root) {
+		// This is the match site.  Return the reactum.
+		cout << "BUG: prefix::apply_match(): Found match site!" << endl;
+		term *r = m->get_rule()->reactum->instantiate(m);
+		cout << "Returning reactum: " << r->to_string() << endl;
+		return r;
+	} else {
+		cout << "BUG: prefix::apply_match(): not match site: " << this << " != " << m->root << endl;
+		return new prefix(ctrl,port,suffix->apply_match(m));
+	}
+}
+
+term *prefix::instantiate(match *m) {
+	set<term *> n;
+
+	return new prefix(ctrl,port,suffix->instantiate(m));
+}
+
 hole::hole(int idx) {
 	index = idx;
 	type = THOLE;
@@ -139,6 +423,35 @@ string hole::to_string() {
 	return "$" + out.str();
 }
 
+set<match *> hole::find_matches(match *m) {
+	cout << "BUG: hole::find_matches()" << endl;
+
+	m->advance(NULL,list<term*>());
+	return set<match *>();
+} 
+
+term *hole::apply_match(match *m) {
+	// Erm, no.  There shouldn't be any holes in the place graph.
+	cerr << "ERROR: hole::apply_match(): Invalid place graph contains a hole." << endl;
+	exit(1);
+	return NULL;
+}
+
+term *hole::instantiate(match *m) {
+	if(m == NULL) {
+		cerr << "ERROR: hole::apply_match(): Invalid place graph contains a hole." << endl;
+		exit(1);
+	}
+
+	term *t = m->get_param(index);
+
+	cout << "BUG: hole::instantiate(): " << t << endl;
+	cout << "BUG: hole::instantiate(): " << t->to_string() << endl;
+
+	// we can safely instantiate the parameter using instantiate(), because it should be ground.
+	return t->instantiate(NULL);
+}
+
 nil::nil() {
 	type = TNIL;
 }
@@ -150,4 +463,95 @@ string nil::to_string() {
 	return "nil";
 }
 
+set<match *> nil::find_matches(match *m) {
+	cout << "BUG: nil::find_matches()" << endl;
+
+	list<term *> r = m->remaining();
+
+	if(r.size() == 0 || (r.size() == 1 && r.front()->type == TNIL)) {
+		m->success();
+		m->advance(NULL,list<term*>());
+		return match::singleton(m);
+	}
+
+
+	if(r.size() == 1 && r.front()->type == THOLE) {
+		m->add_param(((hole *)r.front())->index, this);
+		m->success();
+		m->advance(NULL,list<term*>());
+		return match::singleton(m);
+	}
+
+	m->failure();
+
+	return set<match *>();
+} 
+
+term *nil::apply_match(match *m) {
+	return new nil();
+}
+
+term *nil::instantiate(match *m) {
+	return new nil();
+}
+
+
+
+list<term *> term::singleton(term *t) {
+	list<term *> l;
+	l.push_back(t);
+	return l;
+}
+
+term *term::next() {
+	if(remaining.size() == 0) return NULL;
+
+	term *t = remaining.front();
+	remaining.pop_front();
+
+	switch(t->type) {
+		case TPREF:
+		remaining.push_back(((prefix *)t)->get_suffix());
+		break;
+		case TPAR: {
+			set<term*> ch = ((parallel *)t)->get_children();
+			set<term*>::iterator i = ch.begin();
+			while(i != ch.end())
+				remaining.push_back(*(i++));
+			break;
+		}
+		case THOLE:
+			break;
+		case TNIL:
+			break;
+		default:
+			cerr << "Matching encountered invalid term type " << t->type << endl;
+			exit(1);
+			break;
+	}
+
+	return t;
+}
+
+void term::reset() {
+	remaining.clear();
+	remaining.push_back(this);
+}
+
+set<match *> term::find_all_matches(term *t, reactionrule *r) {
+	set<match *> matches;
+
+	term *p = t->next();
+	while(p != NULL) {
+		cout << "P: " << p->to_string() << endl;
+		match *newmatch = new match(NULL, term::singleton(r->redex), NULL, r);
+		matches = match::merge(matches, p->find_matches(newmatch));
+		cout << "BUG: term::find_all_matches(): " << newmatch->has_succeeded << "p: " << p->to_string() << endl;
+		p = t->next();
+	}
+
+	t->reset();
+
+	return matches;
+}
 

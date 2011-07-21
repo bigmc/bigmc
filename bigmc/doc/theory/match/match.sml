@@ -1,4 +1,3 @@
-
 datatype b = 
 	Pre of string * b
 |	Par of b * b

@@ -17,6 +17,7 @@ using namespace std;
 #include "term.h"
 #include "reactionrule.h"
 #include "bigraph.h"
+#include "graph.h"
 #include "parsenode.h"
 #include "mc.h"
 #include "driver.h"
