@@ -4,6 +4,7 @@
 class mc {
 	graph *g;
 	deque<node *> workqueue;
+	unsigned long steps;
 public:
 	mc(bigraph *b);
 	~mc();
