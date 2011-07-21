@@ -292,10 +292,102 @@ vector<parsenode *> controlnode::get_children() {
 	return v;
 }
 
+// PROPERTY
+
+propertynode::propertynode(char *nm, parsenode *p) {
+	name = string(nm);
+	prop = p;
+	type = NODE_PROPERTY;
+}
+
+propertynode::~propertynode() {
+	
+}
+
+string propertynode::to_string() {
+	return "%property " + name + " " + prop->to_string();
+}
+
+// AND
+
+andnode::andnode(parsenode *l, parsenode *r) {
+	lprop = l;
+	rprop = r;
+	type = NODE_AND;
+}
+
+andnode::~andnode() {
+	
+}
+
+string andnode::to_string() {
+	return lprop->to_string() + " && " + rprop->to_string();
+}
 
 
+// OR 
 
+ornode::ornode(parsenode *l, parsenode *r) {
+	lprop = l;
+	rprop = r;
+	type = NODE_OR;
+}
 
+ornode::~ornode() {
+	
+}
+
+string ornode::to_string() {
+	return lprop->to_string() + " || " + rprop->to_string();
+}
+
+// NOT 
+
+notnode::notnode(parsenode *l) {
+	prop = l;
+	type = NODE_NOT;
+}
+
+notnode::~notnode() {
+	
+}
+
+string notnode::to_string() {
+	return "!" + prop->to_string();
+}
+
+// PRED 
+
+prednode::prednode(char *n, parsenode *l) {
+	prop = l;
+	name = string(n);
+	type = NODE_PRED;
+}
+
+prednode::~prednode() {
+	
+}
+
+string prednode::to_string() {
+	return name + "(" + prop->to_string() + ")";
+}
+
+// NUM 
+
+numnode::numnode(int d) {
+	data = d;
+	type = NODE_NUM;
+}
+
+numnode::~numnode() {
+	
+}
+
+string numnode::to_string() {
+	stringstream out;
+	out << data;
+	return out.str();
+}
 
 
 

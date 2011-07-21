@@ -272,6 +272,39 @@ term *parser::bg_mknode(parsenode *p) {
 	return NULL;
 }
 
+query *parser::mk_query(parsenode *p) {
+	switch(p->type) {
+		case NODE_AND: {
+			andnode *pp = (andnode *)p;
+			query_and *a = new query_and(mk_query(pp->lprop),mk_query(pp->rprop));
+			return a;
+		}
+		case NODE_OR: {
+			ornode *pp = (ornode *)p;
+			query_or *a = new query_or(mk_query(pp->lprop),mk_query(pp->rprop));
+			return a;
+		}
+		case NODE_NOT: {
+			notnode *pp = (notnode *)p;
+			query_not *a = new query_not(mk_query(pp->prop));
+			return a;
+		}
+		case NODE_PRED: {
+			prednode *pp = (prednode *)p;
+			if(pp->prop != NULL)
+				return new query_predicate(pp->name, bg_mknode(pp->prop));
+			else
+				return new query_predicate(pp->name, NULL);
+		}
+		default:
+			cerr << "parser::mk_query(): Invalid syntax in query: " << p->to_string() << endl;
+			exit(1);
+			break;
+	}
+
+	return NULL;
+}
+
 bigraph *parser::finish() {
 	if(g_debug) fprintf(stderr, "BUG: parser::finish()\n");
 	
@@ -312,8 +345,16 @@ bigraph *parser::finish() {
 
 				break;
 			}
+			case NODE_PROPERTY: {
+				if(g_debug) printf("NODE_PROPERTY\n");
+				propertynode *p = (propertynode *)(*it);
+				query *q = mk_query(p->prop);
+				mc::add_property(p->name,q);
+				break;
+			}
 			default:
-				fprintf(stderr, "BUG: Fell through in parser::finish()\n");
+				fprintf(stderr, "BUG: Fell through in parser::finish():\n");
+				cerr << (*it)->to_string() << endl;
 				break;
 		}
 	}

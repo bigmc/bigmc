@@ -5,11 +5,12 @@ using namespace std;
 
 #include <bigmc.h>
 
-node::node(bigraph *b, node *psrc) {
+node::node(bigraph *b, node *psrc, reactionrule *r) {
 	parent = psrc;
 	bg = b;
 	visited = false;
 	terminal = false;
+	rule = r;
 
 	// FIXME: This is a kludge
         
@@ -38,3 +39,4 @@ void node::set_visited(bool v) {
 bool node::is_visited() {
 	return visited;
 }
+

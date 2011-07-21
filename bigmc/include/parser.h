@@ -13,7 +13,8 @@ class parser {
 	static vector<name>	bg_names(seqnode *p);
 	static vector<name>	bg_names(parsenode *p);
 	static set<term *> 	bg_collapse(parallelnode *p); 
-	static set<term *> 	bg_collapse(parsenode *p); 
+	static set<term *> 	bg_collapse(parsenode *p);
+	static query		*mk_query(parsenode *p);
 
 public:
 	static void init(char *file);

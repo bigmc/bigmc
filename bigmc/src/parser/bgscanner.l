@@ -42,6 +42,9 @@ IDENTR	[a-zA-Z0-9_]
 "->"               {
                     return ARROW;
                   }
+"||"       	  {
+                    return LOR;
+                  }
 "|"               {
                     return PAR;
                   }
@@ -75,12 +78,23 @@ IDENTR	[a-zA-Z0-9_]
 "%passive"        {
                     return PASSIVE;
                   }
+"%property"       {
+                    return PROPERTY;
+                  }
+"&&"       	  {
+                    return LAND;
+                  }
+"!"		  {
+                    return LNOT;
+		  }
 "%check"          {
                     yyterminate();
                   }
 ":"               {
                     return COLON;
                   }
+"forall"	  { return FORALL; }
+"exists"	  { return EXISTS; }
 "$"{DIGIT}+ 	  {
 		    yylval.ident = strdup(yytext);
                     return HOLE;

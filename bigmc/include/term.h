@@ -25,6 +25,7 @@ public:
 	term *next();
 	void reset();
 	static set<match *> find_all_matches(term *t, reactionrule *m);
+	virtual unsigned int size();
 };
 
 class parallel : public term {
@@ -37,6 +38,7 @@ public:
 	set<match *> find_matches(match *m);
 	term *apply_match(match *m);
 	term *instantiate(match *m);
+	unsigned int size();
 };
 
 class prefix : public term {
@@ -54,6 +56,7 @@ public:
 	set<match *> find_matches(match *m);
 	term *apply_match(match *m);
 	term *instantiate(match *m);
+	unsigned int size();
 
 };
 
@@ -66,6 +69,7 @@ public:
 	int index;
 	term *apply_match(match *m);
 	term *instantiate(match *m);
+	unsigned int size();
 
 };
 
@@ -77,6 +81,7 @@ public:
 	set<match *> find_matches(match *m);
 	term *apply_match(match *m);
 	term *instantiate(match *m);
+	unsigned int size();
 
 };
 

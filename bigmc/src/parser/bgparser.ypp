@@ -20,8 +20,9 @@ int  yylex ();
 %token SEMI ARROW PAR PREF COMMA LSQ RSQ LPAR RPAR
 %token INNER OUTER 
 %token ACTIVE PASSIVE COLON HOLE IDENT NUM
+%token PROPERTY LAND LOR LNOT FORALL EXISTS
 
-%type <node> model dec reaction exp expel
+%type <node> model dec reaction exp expel property
 %type <node> prefix names
 %type <value> NUM
 %type <ident> HOLE IDENT
@@ -42,6 +43,7 @@ dec
 | OUTER IDENT			{ $$ = new interfacenode(new namenode($2),true); }
 | ACTIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),true,$4); }
 | PASSIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),false,$4); }
+| PROPERTY IDENT property	{ $$ = new propertynode($2,$3); }
 | reaction			{ $$ = $1; }
 | exp				{ $$ = $1; }
 ;
@@ -70,6 +72,17 @@ prefix
 names
 : IDENT COMMA names		{ $$ = new seqnode(new namenode($1),$3); }
 | IDENT				{ $$ = new namenode($1); }
+;
+
+property
+: property LAND property	{ $$ = new andnode($1,$3); }
+| property LOR property		{ $$ = new ornode($1,$3); }
+| LNOT property			{ $$ = new notnode($2); }
+| LPAR property	RPAR		{ $$ = $2; }
+| IDENT LPAR RPAR		{ $$ = new prednode($1,NULL); }
+| IDENT LPAR exp RPAR		{ $$ = new prednode($1,$3); }
+| FORALL IDENT PREF property	{ $$ = NULL; }
+| EXISTS IDENT PREF property	{ $$ = NULL; }
 ;
 
 %%

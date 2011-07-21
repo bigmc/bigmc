@@ -14,9 +14,7 @@ void driver::check(bigraph *b) {
 
 	mc *m = new mc(b);
 
-	while(m->step()) {
-		;
-	}
+	m->check();
 	
 	delete m;
 

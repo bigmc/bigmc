@@ -11,7 +11,7 @@ all: $(DEPS)
 bgparser.tab.o: bgparser.tab.cpp
 
 bgparser.tab.cpp: bgparser.ypp
-	bison -d bgparser.ypp
+	bison -d -o bgparser.tab.cpp bgparser.ypp
 
 parser.o: parser.cpp
 	$(CPP) -c $(INCLUDE) -Wall -o parser.o parser.cpp

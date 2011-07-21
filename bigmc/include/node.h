@@ -8,9 +8,10 @@ class node {
 	bool visited;
 public:
 	node *parent;
+	reactionrule *rule;
 	bigraph *bg;
 	set<pair<node *,reactionrule *> > target;
-	node(bigraph *b, node *psrc);
+	node(bigraph *b, node *psrc, reactionrule *r);
 	~node();
 	void add_target(node *n, reactionrule *r);
 	unsigned long hash;

@@ -55,6 +55,9 @@ term *term::instantiate(match *m) {
 	return NULL;
 }
 
+unsigned int term::size() {
+	return 0;
+}
 
 parallel::parallel(set<term *>l) {
 	terms = l;
@@ -110,9 +113,11 @@ set<match *> parallel::find_matches(match *m) {
 			cl.push_back(*i);
 
 		do {
-			if(g_debug) cout << "BUG: Permutation: result set: " << matches.size() << endl;
-			for(list<term *>::iterator i = cl.begin(); i!=cl.end(); i++) {
-				cout << " * " << (*i)->to_string() << endl;
+			if(g_debug) {
+				cout << "BUG: Permutation: result set: " << matches.size() << endl;
+				for(list<term *>::iterator i = cl.begin(); i!=cl.end(); i++) {
+					cout << " * " << (*i)->to_string() << endl;
+				}
 			}
 
 			match *mp = m->clone(NULL, cl);
@@ -251,8 +256,14 @@ set<term *> parallel::get_children() {
 }
 
 term *parallel::apply_match(match *m) {
-	// TODO: implement properly
-	
+	if(this == m->root) {
+		// This is the match site.  Return the reactum.
+		if(g_debug) cout << "BUG: parallel::apply_match(): Found match site!" << endl;
+		term *r = m->get_rule()->reactum->instantiate(m);
+		if(g_debug) cout << "Returning reactum: " << r->to_string() << endl;
+		return r;
+	} 
+
 	set<term *> n;
 
 	for(set<term*>::iterator i = terms.begin(); i!=terms.end(); i++) {
@@ -277,6 +288,14 @@ term *parallel::instantiate(match *m) {
 	return new parallel(n);
 }
 
+unsigned int parallel::size() {
+	unsigned int sz = 0;
+	for(set<term *>::iterator i = terms.begin(); i!=terms.end(); i++) {
+		sz += (*i)->size();
+	}
+
+	return sz;
+}
 
 prefix::prefix(control c, vector<name> ports, term *suff) {
 	ctrl = c;
@@ -409,6 +428,10 @@ term *prefix::instantiate(match *m) {
 	return new prefix(ctrl,port,suffix->instantiate(m));
 }
 
+unsigned int prefix::size() {
+	return 1 + suffix->size();
+}
+
 hole::hole(int idx) {
 	index = idx;
 	type = THOLE;
@@ -451,6 +474,10 @@ term *hole::instantiate(match *m) {
 
 	// we can safely instantiate the parameter using instantiate(), because it should be ground.
 	return t->instantiate(NULL);
+}
+
+unsigned int hole::size() {
+	return 1;
 }
 
 nil::nil() {
@@ -496,7 +523,9 @@ term *nil::instantiate(match *m) {
 	return new nil();
 }
 
-
+unsigned int nil::size() {
+	return 0;
+}
 
 list<term *> term::singleton(term *t) {
 	list<term *> l;

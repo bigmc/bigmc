@@ -8,7 +8,7 @@ DEPS=main.o bigraph.o \
 	match.o edge.o \
 	parsenode.o driver.o mc.o \
 	reactionrule.o term.o graph.o \
-	node.o
+	node.o query.o
 
 PARSERDEPS=parser/parser.o parser/bgparser.tab.o parser/lex.yy.o
 

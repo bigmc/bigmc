@@ -16,6 +16,7 @@ public:
 	node *get(unsigned long id);
 	void report();
 	unsigned long size();
+	string backtrace(node *n);
 };
 
 #endif
