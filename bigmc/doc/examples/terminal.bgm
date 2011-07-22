@@ -1,0 +1,12 @@
+%passive a : 0;
+%passive b : 0;
+%passive c : 0;
+
+a.b.a.a.a.b;
+
+a.a.$0 -> a.b.$0;
+b.b.$0 -> a.b.$0;
+a.b.a.b.a.b -> c;
+
+%property term !terminal_contains(a.a) && !terminal_contains(b.b);
+%check

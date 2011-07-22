@@ -84,6 +84,8 @@ bool query_not::check(node *n) {
 
 // PREDICATE 
 
+map<string,predicate *> query_predicate::predicates;
+
 query_predicate::query_predicate(string nm, term *l) {
 	name = nm;
 	param = l;
@@ -102,12 +104,16 @@ string query_predicate::to_string() {
 }
 
 bool query_predicate::check(node *n) {
-	if(name == "empty") {
-		return (n->bg->get_root(0)->size() == 0);
+	predicate *p = predicates[name];
+
+	if(!p) {
+		cerr << "query_predicate()::check: unknown predicate '" << name << "'" << endl;
+		exit(1);
 	}
 
-	if(g_debug) cout << "query_predicate::check(): NOT IMPLEMENTED" << endl;
-	return false;
+	return p->invoke(n,param);
 }
 
-
+void query_predicate::register_predicate(string name, predicate *p) {
+	predicates[name] = p;
+}

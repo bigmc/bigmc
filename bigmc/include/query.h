@@ -40,6 +40,7 @@ public:
 
 
 class query_predicate : public query {
+	static map<string,predicate *> predicates;
 public:
 	term *param;
 	string name;
@@ -47,6 +48,7 @@ public:
 	~query_predicate();
 	string to_string();
 	bool check(node *n);
+	static void register_predicate(string name, predicate *p);
 };
 
 #endif

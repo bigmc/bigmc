@@ -19,6 +19,7 @@ using namespace std;
 #include "bigraph.h"
 #include "node.h"
 #include "graph.h"
+#include "predicate.h"
 #include "query.h"
 #include "parsenode.h"
 #include "mc.h"

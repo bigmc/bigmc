@@ -17,6 +17,7 @@ public:
 	void report();
 	unsigned long size();
 	string backtrace(node *n);
+	string dump_dot();
 };
 
 #endif

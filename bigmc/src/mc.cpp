@@ -40,7 +40,8 @@ bool mc::check_properties(node *n) {
 	for(map<string,query*>::iterator i = properties.begin(); i!=properties.end(); i++) {
 		if(!i->second->check(n)) {
 			// Failed
-			cout << "*** Check found violation of property: " << i->first << endl;
+			cout << "*** Found violation of property: " << i->first << endl;
+			cout << "*** " << i->first << ": " << i->second->to_string() << endl;
 			cout << g->backtrace(n);
 			return false;
 		}
@@ -53,6 +54,7 @@ bool mc::check_properties(node *n) {
 string mc::report() {
 	stringstream out;
 	out << "[q: " << workqueue.size() << " / g: " << g->size() << "] @ " << steps;
+	out << endl << g->dump_dot() << endl;
 	return out.str();
 }
 
@@ -95,9 +97,17 @@ bool mc::step() {
 		bigraph *b2 = b->apply_match(*it);
 		node *n2 = new node(b2,n,(*it)->get_rule());
 
-		g->add(n2);
+		node *n3 = g->get(n2->hash);
+		if(n3 != NULL) {
+			delete n2;
+			n2 = n3;
+		} else {
+			workqueue.push_back(n2);
+			g->add(n2);
+		}
+		
 		n->add_target(n2,(*it)->get_rule());
-		workqueue.push_back(n2);
+
 		if(g_debug) cout << "BUG: mc::step(): new node" << endl << b2->to_string() << endl;	
 		if(g_debug) cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
 	}

@@ -8,19 +8,22 @@ DEPS=main.o bigraph.o \
 	match.o edge.o \
 	parsenode.o driver.o mc.o \
 	reactionrule.o term.o graph.o \
-	node.o query.o
+	node.o query.o predicate.o
 
 PARSERDEPS=parser/parser.o parser/bgparser.tab.o parser/lex.yy.o
 
-.PHONY: parser clean
+.PHONY: parser clean predicates
 
 all: $(BINARY)
 
-$(BINARY): $(DEPS) parser
+$(BINARY): $(DEPS) parser predicates
 	$(CPP) -o $(BINARY) $(LIBS) $(INCLUDE) $(DEPS) $(PARSERDEPS)
 
 parser:
 	make -C parser
+
+predicates:
+	make -C predicates
 
 %.o: %.cpp
 	$(CPP) -c $(INCLUDE) -Wall -o $@ $<
@@ -28,3 +31,4 @@ parser:
 clean:
 	rm -f *.o $(BINARY)
 	make -C parser clean
+	make -C predicates clean

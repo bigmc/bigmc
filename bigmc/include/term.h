@@ -10,6 +10,8 @@
 #define THOLE	4
 #define TNIL	8
 
+class termvisitor;
+
 class term {
 protected:
 	deque<term *> remaining;
@@ -26,6 +28,7 @@ public:
 	void reset();
 	static set<match *> find_all_matches(term *t, reactionrule *m);
 	virtual unsigned int size();
+	virtual void accept(termvisitor *t);
 };
 
 class parallel : public term {
@@ -39,6 +42,7 @@ public:
 	term *apply_match(match *m);
 	term *instantiate(match *m);
 	unsigned int size();
+	void accept(termvisitor *t);
 };
 
 class prefix : public term {
@@ -57,6 +61,7 @@ public:
 	term *apply_match(match *m);
 	term *instantiate(match *m);
 	unsigned int size();
+	void accept(termvisitor *t);
 
 };
 
@@ -70,6 +75,7 @@ public:
 	term *apply_match(match *m);
 	term *instantiate(match *m);
 	unsigned int size();
+	void accept(termvisitor *t);
 
 };
 
@@ -82,7 +88,17 @@ public:
 	term *apply_match(match *m);
 	term *instantiate(match *m);
 	unsigned int size();
+	void accept(termvisitor *t);
 
+};
+
+class termvisitor {
+public:
+	virtual void visit(term *t);
+	virtual void visit(parallel *t);
+	virtual void visit(prefix *t);
+	virtual void visit(hole *t);
+	virtual void visit(nil *t);
 };
 
 #endif

@@ -59,6 +59,10 @@ unsigned int term::size() {
 	return 0;
 }
 
+void term::accept(termvisitor *t) {
+	t->visit(this);
+}
+
 parallel::parallel(set<term *>l) {
 	terms = l;
 	type = TPAR;
@@ -297,6 +301,14 @@ unsigned int parallel::size() {
 	return sz;
 }
 
+void parallel::accept(termvisitor *t) {
+	for(set<term*>::iterator i = terms.begin(); i != terms.end(); i++) {
+		(*i)->accept(t);
+	}
+
+	t->visit(this);
+}
+
 prefix::prefix(control c, vector<name> ports, term *suff) {
 	ctrl = c;
 	arity = bigraph::arity(c);
@@ -432,6 +444,11 @@ unsigned int prefix::size() {
 	return 1 + suffix->size();
 }
 
+void prefix::accept(termvisitor *t) {
+	suffix->accept(t);
+	t->visit(this);
+}
+
 hole::hole(int idx) {
 	index = idx;
 	type = THOLE;
@@ -480,6 +497,10 @@ unsigned int hole::size() {
 	return 1;
 }
 
+void hole::accept(termvisitor *t) {
+	t->visit(this);
+}
+
 nil::nil() {
 	type = TNIL;
 }
@@ -525,6 +546,10 @@ term *nil::instantiate(match *m) {
 
 unsigned int nil::size() {
 	return 0;
+}
+
+void nil::accept(termvisitor *t) {
+	t->visit(this);
 }
 
 list<term *> term::singleton(term *t) {
