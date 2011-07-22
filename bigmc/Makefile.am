@@ -1,5 +1,8 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
-SUBDIRS = src
-dist_doc_DATA = README
-EXTRA_DIST = conf/bigmc.conf doc/
+SUBDIRS = src doc
+
+confdir = @prefix@/conf
+
+conf_DATA = conf/bigmc.conf
+EXTRA_DIST = conf/bigmc.conf autogen.sh

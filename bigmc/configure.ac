@@ -14,6 +14,7 @@ AC_PREFIX_DEFAULT(/usr/local/bigmc)
 AC_CONFIG_FILES([Makefile
 src/Makefile
 src/predicates/Makefile
+doc/Makefile
 ])
 
 AC_PROG_LEX
