@@ -10,15 +10,17 @@ using namespace std;
 // Globals
 bool g_debug = false;
 unsigned long g_maxsteps = 1000;
+unsigned long g_report_interval = 500;
 char *g_graphout = NULL;
 
 void print_usage(char **argv) {
 	fprintf(stderr,
-	"Usage: %s [-hvV] [-G <file>] [-m <max steps>] <modelfile>\n"
+	"Usage: %s [-hvV] [-G <file>] [-m <max steps>] [-r <interval>] <modelfile>\n"
 	"\t-h\t\tDisplay this help and exit\n"
 	"\t-V\t\tPrint verbose output\n"
 	"\t-G x\t\tOutput graphviz dot file to x\n"
 	"\t-m x\t\tSpecify x maximum steps of graph unfolding (default: 1000)\n"
+	"\t-r x\t\tOutput statistics and graphs every x steps (default: 500)\n"
 	"\t-v\t\tPrint version information and exit\n",
 	argv[0]);
 }
@@ -121,7 +123,7 @@ int main(int argc, char**argv) {
 	int verbose = 0;
 	int maxmem = 0;
 	
-	while ((c = getopt (argc, argv, "hvVdm:G:")) != -1)
+	while ((c = getopt (argc, argv, "hvVdm:G:r:")) != -1)
 		switch (c) {
 		case 'h':
 			print_usage(argv);
@@ -140,6 +142,9 @@ int main(int argc, char**argv) {
 			break;
 		case 'm':
 			g_maxsteps = (unsigned long)atol(optarg);
+			break;
+		case 'r':
+			g_report_interval = (unsigned long)atol(optarg);
 			break;
 		case '?':
 			if (isprint (optopt))

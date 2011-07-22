@@ -80,6 +80,24 @@ void bigraph::set_root(term *n) {
 
 void bigraph::add_rule(reactionrule *r) {
 	rules.insert(r);
+
+	// Sanity check the rule
+	set<match *> f = r->reactum->find_all_matches(r->redex, r);
+	if(f.size() == 0)
+		return;
+
+	cout << "=================================================================================\n";
+	cout << "Warning: the redex of reaction rule:\n";
+	cout << r->to_string() << "\n";
+	cout << "matches the reactum reactum of the rule itself.\n";
+	cout << "This is very likely to result in an infinite state space to explore through\n";
+	cout << "repeated application of this rule. You'd be better off replacing this rule, or\n";
+	cout << "contributing better symbolic checking to BigMC right now.  You have been warned.\n";
+	cout << "=================================================================================\n";
+
+	// FIXME: leaking matches
+
+	return;
 }
 
 string bigraph::control_to_string(control c) {

@@ -1,0 +1,11 @@
+digraph reaction_graph {
+   rankdir=LR;
+   node [shape = circle];
+   N_15417219439267088493 [shape=doublecircle, color=lightblue2, style=filled, label="(send[a].recv[b].nil | recv[a].send[b].nil)"];
+N_15417219439267088493 [ label="(send[a].recv[b].nil | recv[a].send[b].nil)"];
+N_11408670437985433169 [ label="(recv[b].nil | send[b].nil)"];
+   N_15417219439267088493 -> N_11408670437985433169 [ label = "(send[x].$0 | recv[x].$1) -> ($0 | $1)" ];
+N_6733310148546425267 [ shape = doublecircle, label="(nil | nil)"];
+   N_11408670437985433169 -> N_6733310148546425267 [ label = "(send[x].$0 | recv[x].$1) -> ($0 | $1)" ];
+}
+

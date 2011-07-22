@@ -112,7 +112,7 @@ bool mc::step() {
 		if(g_debug) cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
 	}
 
-	if(steps % 100 == 0)
+	if(g_report_interval > 0 && steps % g_report_interval == 0)
 		cout << report() << endl;
 
 	return true;
