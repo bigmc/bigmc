@@ -29,6 +29,8 @@ public:
 	static set<match *> find_all_matches(term *t, reactionrule *m);
 	virtual unsigned int size();
 	virtual void accept(termvisitor *t);
+	term *parent;
+	virtual bool active_context();
 };
 
 class parallel : public term {
@@ -62,7 +64,7 @@ public:
 	term *instantiate(match *m);
 	unsigned int size();
 	void accept(termvisitor *t);
-
+	bool active_context();
 };
 
 class hole : public term {

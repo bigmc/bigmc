@@ -30,5 +30,6 @@ void print_version();
 
 extern bool g_debug;
 extern unsigned long g_maxsteps;
+extern char *g_graphout;
 
 #endif

@@ -65,6 +65,8 @@ string graph::backtrace(node *n) {
 }
 
 string graph::dump_dot() {
+	if(g_graphout == NULL) return "";
+
 	stringstream out;
 
 	out << "digraph reaction_graph {" << endl;
@@ -99,5 +101,19 @@ string graph::dump_dot() {
 	out << coda.str();
 	out << "}" << endl;
 
+	FILE *fp = fopen(g_graphout, "w");
+	if(!fp) {
+		cerr << "Error: could not open graph file " << g_graphout << " for writing\n";
+		return "";
+	}
+
+	fprintf(fp, "%s\n", out.str().c_str());
+
+	fclose(fp);
+
+	cout << "graph::dump_dot(): wrote dot file to " << g_graphout << endl;
+
 	return out.str();
+
+	
 }

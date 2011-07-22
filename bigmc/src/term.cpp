@@ -10,6 +10,7 @@ using namespace std;
 term::term() {
 	type = 0;
 	remaining.push_back(this);
+	parent = NULL;
 }
 
 term::~term() {
@@ -63,9 +64,19 @@ void term::accept(termvisitor *t) {
 	t->visit(this);
 }
 
+bool term::active_context() {
+	if(parent == NULL) return true;
+
+	return parent->active_context();
+}
+
 parallel::parallel(set<term *>l) {
 	terms = l;
 	type = TPAR;
+
+	for(set<term *>::iterator i = l.begin(); i!=l.end(); i++) {
+		(*i)->parent = this;
+	}
 }
 
 parallel::~parallel() {
@@ -107,6 +118,9 @@ set<match *> parallel::find_matches(match *m) {
 		set<term *> c = ((parallel *)r.front())->get_children();
 		list<term *> cl;
 		set<match *> matches;
+
+		if(m->root == NULL && !active_context())
+			return m->failure();
 
 		if(m->root == NULL) {
 			if(g_debug) cout << "BUG: Null root in match, setting to TPAR: " << to_string() << endl;
@@ -317,6 +331,9 @@ prefix::prefix(control c, vector<name> ports, term *suff) {
 	port = ports;
 	suffix = suff;
 
+	if(suffix)
+		suffix->parent = this;
+
 	type = TPREF;
 
 	if(port.size() > arity) {
@@ -379,6 +396,9 @@ set<match *> prefix::find_matches(match *m) {
 				if(g_debug) cout << "BUG: prefix::find_matches(): match found" << endl;
 				// We have a match!
 
+				if(m->root == NULL && !active_context())
+					return m->failure();
+
 				// If this is a new match, set the root to here.
 				if(m->root == NULL)
 					m->root = this;
@@ -405,6 +425,9 @@ set<match *> prefix::find_matches(match *m) {
 			}
 
 		} else if(t->type == THOLE) {
+			if(m->root == NULL && !active_context())
+				return m->failure();
+
 			// A hole will always match a prefix.
 			if(m->root == NULL)
 				m->root = this;
@@ -447,6 +470,12 @@ unsigned int prefix::size() {
 void prefix::accept(termvisitor *t) {
 	suffix->accept(t);
 	t->visit(this);
+}
+
+bool prefix::active_context() {
+	if(parent == NULL) return true;
+
+	return active && parent->active_context();
 }
 
 hole::hole(int idx) {

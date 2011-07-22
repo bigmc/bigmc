@@ -1,0 +1,17 @@
+digraph reaction_graph {
+   rankdir=LR;
+   node [shape = circle];
+   N_2755971660358179685 [shape=doublecircle, color=lightblue2, style=filled, label="a.b.a.a.a.b.nil"];
+N_2755971660358179685 [ label="a.b.a.a.a.b.nil"];
+N_2597189141033326950 [ label="a.b.a.b.a.b.nil"];
+   N_2755971660358179685 -> N_2597189141033326950 [ label = "a.a.$0 -> a.b.$0" ];
+N_9458159178923919846 [ label="a.b.a.a.b.b.nil"];
+   N_2755971660358179685 -> N_9458159178923919846 [ label = "a.a.$0 -> a.b.$0" ];
+N_7045355663231681382 [ shape = doublecircle, label="c.nil"];
+   N_2597189141033326950 -> N_7045355663231681382 [ label = "a.b.a.b.a.b.nil -> c.nil" ];
+N_9299376659599067111 [ label="a.b.a.b.b.b.nil"];
+   N_9458159178923919846 -> N_9299376659599067111 [ label = "a.a.$0 -> a.b.$0" ];
+N_2755971660358179685 [ label="a.b.a.a.a.b.nil"];
+   N_9458159178923919846 -> N_2755971660358179685 [ label = "b.b.$0 -> a.b.$0" ];
+}
+

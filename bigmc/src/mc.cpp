@@ -54,7 +54,7 @@ bool mc::check_properties(node *n) {
 string mc::report() {
 	stringstream out;
 	out << "[q: " << workqueue.size() << " / g: " << g->size() << "] @ " << steps;
-	out << endl << g->dump_dot() << endl;
+	g->dump_dot();
 	return out.str();
 }
 

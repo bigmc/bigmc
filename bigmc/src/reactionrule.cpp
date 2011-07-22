@@ -16,9 +16,6 @@ reactionrule::~reactionrule() {
 }
 
 string reactionrule::to_string() {
-	cout << "reactionrule::to_string(): " << endl;
-	cout << redex << endl;
-	cout << reactum << endl;
 	if(redex != NULL && reactum != NULL)
 		return redex->to_string() + " -> " + reactum->to_string();
 	if(redex != NULL)
