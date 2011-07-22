@@ -20,21 +20,36 @@ bigmc_SOURCES = bgparser.ypp \
 	query.cpp \
 	reactionrule.cpp \
 	term.cpp \
-	include/bigmc.h \
-	include/bigraph.h \
-	include/driver.h \
-	include/edge.h \
-	include/graph.h \
-	include/match.h \
-	include/mc.h \
-	include/node.h \
-	include/parsenode.h \
-	include/parser.h \
-	include/predicate.h \
-	include/query.h \
-	include/reactionrule.h \
-	include/term.h
- 
+	../include/bigmc.h \
+	../include/bigraph.h \
+	../include/driver.h \
+	../include/edge.h \
+	../include/graph.h \
+	../include/match.h \
+	../include/mc.h \
+	../include/node.h \
+	../include/parsenode.h \
+	../include/parser.h \
+	../include/predicate.h \
+	../include/query.h \
+	../include/reactionrule.h \
+	../include/term.h
+
+noinst_HEADERS = ../include/bigmc.h \
+	../include/bigraph.h \
+	../include/driver.h \
+	../include/edge.h \
+	../include/graph.h \
+	../include/match.h \
+	../include/mc.h \
+	../include/node.h \
+	../include/parsenode.h \
+	../include/parser.h \
+	../include/predicate.h \
+	../include/query.h \
+	../include/reactionrule.h \
+	../include/term.h
+
 bigmc_CPPFLAGS = -I../include
 includes = ../include
 SUBDIRS = predicates

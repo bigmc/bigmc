@@ -2,7 +2,7 @@ lib_LTLIBRARIES = pred_empty.la pred_equal.la pred_terminal_contains.la
 
 includes = ../../includes
 
-pred_empty_la_SOURCES = pred_empty.cpp $(includedir)/bigmc.h $(includedir)/bigraph.h $(includedir)/node.h
+pred_empty_la_SOURCES = pred_empty.cpp
 pred_empty_la_LDFLAGS = -module
 pred_empty_la_CPPFLAGS = -I../../include
 
