@@ -6,7 +6,7 @@ using namespace std;
 #include <readline/history.h>
 #include <assert.h>
 #include <bigmc.h>
-#include "bgparser.tab.hpp"
+#include "bgparser.h"
 
 static char *g_inputbuffer = (char *)NULL;
 int g_inputbuffer_len = 0;

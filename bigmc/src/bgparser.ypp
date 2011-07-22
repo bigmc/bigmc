@@ -8,6 +8,8 @@ int  yylex ();
 
 %}
 
+%expect 10
+
 %union {
   parsenode *node;  /* For the expressions. Since it is a pointer, no problem. */
   int       value;  /* For the lexical analyser. NUMBER tokens */

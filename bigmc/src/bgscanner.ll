@@ -1,7 +1,7 @@
 %{
 #include<sstream>
 #include "bigmc.h"
-#include "bgparser.tab.hpp"
+#include "bgparser.h"
 
 int line = 0;
 int column = 0;
