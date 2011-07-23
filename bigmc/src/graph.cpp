@@ -65,7 +65,7 @@ string graph::backtrace(node *n) {
 }
 
 string graph::dump_dot() {
-	if(g_graphout == NULL) return "";
+	if(global_cfg.graph_out == NULL) return "";
 
 	stringstream out;
 
@@ -101,9 +101,9 @@ string graph::dump_dot() {
 	out << coda.str();
 	out << "}" << endl;
 
-	FILE *fp = fopen(g_graphout, "w");
+	FILE *fp = fopen(global_cfg.graph_out, "w");
 	if(!fp) {
-		cerr << "Error: could not open graph file " << g_graphout << " for writing\n";
+		cerr << "Error: could not open graph file " << global_cfg.graph_out << " for writing\n";
 		return "";
 	}
 
@@ -111,7 +111,7 @@ string graph::dump_dot() {
 
 	fclose(fp);
 
-	cout << "graph::dump_dot(): wrote dot file to " << g_graphout << endl;
+	cout << "graph::dump_dot(): wrote dot file to " << global_cfg.graph_out << endl;
 
 	return out.str();
 

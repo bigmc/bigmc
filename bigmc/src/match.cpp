@@ -9,7 +9,7 @@ long u_match = 1;
 match::match(term *head, list<term *>red, match *prnt, reactionrule *rl) {
 	root = NULL;
 
-	if(g_debug) cout << "BUG: match::match(): new match created" << endl;
+	if(DEBUG) cout << "BUG: match::match(): new match created" << endl;
 
 	matchhead = head;
 	parent = prnt;
@@ -84,7 +84,7 @@ list<term *> match::remaining() {
 }
 
 match *match::clone(term *head, list<term *> rem) {
-	if(g_debug) cout << "BUG: match::clone(): new match created" << endl;
+	if(DEBUG) cout << "BUG: match::clone(): new match created" << endl;
 	match *m = new match(head, rem, NULL, rule);
 	m->parameters = parameters;
 	m->mapping = mapping;
@@ -92,12 +92,12 @@ match *match::clone(term *head, list<term *> rem) {
 	m->has_failed = has_failed;
 	m->root = root;
 	if(m->root)
-		if(g_debug) cout << "BUG: match::clone(): setting root: " << m->root->to_string() << endl;
+		if(DEBUG) cout << "BUG: match::clone(): setting root: " << m->root->to_string() << endl;
 	return m;
 }
 
 match *match::fresh(term *head, list<term *> rem) {
-	if(g_debug) cout << "BUG: match::fresh(): new match created" << endl;
+	if(DEBUG) cout << "BUG: match::fresh(): new match created" << endl;
 	return new match(head, rem, NULL, rule);
 }
 
@@ -108,7 +108,7 @@ void match::advance(term *head, list<term *> rem) {
 }
 
 set<match *> match::merge(set<match *> a, set<match *> b) {
-	if(g_debug) cout << "BUG: match::merge(): " << a.size() << " with " << b.size() << endl;
+	if(DEBUG) cout << "BUG: match::merge(): " << a.size() << " with " << b.size() << endl;
 	set<match *> n;
 	n.insert(a.begin(),a.end());
 	n.insert(b.begin(),b.end());

@@ -23,7 +23,6 @@ bigmc_SOURCES = bgparser.ypp \
 	../include/bigmc.h \
 	../include/bigraph.h \
 	../include/driver.h \
-	../include/edge.h \
 	../include/graph.h \
 	../include/match.h \
 	../include/mc.h \
@@ -40,7 +39,6 @@ bigmc_SOURCES = bgparser.ypp \
 noinst_HEADERS = ../include/bigmc.h \
 	../include/bigraph.h \
 	../include/driver.h \
-	../include/edge.h \
 	../include/graph.h \
 	../include/match.h \
 	../include/mc.h \

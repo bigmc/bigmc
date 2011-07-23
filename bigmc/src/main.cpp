@@ -62,6 +62,8 @@ void config_read() {
 			cerr << "Error: failed to locate bigmc.conf.  Try setting BIGMC_HOME\n";
 			exit(1);
 		}
+
+		global_cfg.bigmc_home = ".";
 	} else {
 		char buf[4096] = { 0 };
 		sprintf(buf,"%s/conf/bigmc.conf", bigmc_home);
@@ -72,6 +74,8 @@ void config_read() {
 			cerr << "Error: failed to locate " << buf << endl;
 			exit(1);
 		}
+
+		global_cfg.bigmc_home = bigmc_home;
 	}
 
 	int clineno = 0;

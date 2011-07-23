@@ -8,12 +8,20 @@ using namespace std;
 #include <dlfcn.h>
 
 predicate::predicate(string name, char *filename) {
-	cout << "predicate::predicate(): loading predicate module from " << filename << endl;
 	pred_impl = NULL;
 
-	handle = dlopen(filename, RTLD_LAZY);
+	if(filename[0] == '/') {
+		rinfo("predicate::predicate") << "loading predicate from " << filename << endl;
+		handle = dlopen(filename, RTLD_LAZY);
+	} else {
+		char buf[2048];
+		sprintf(buf,"%s/lib/%s", global_cfg.bigmc_home, filename);
+		rinfo("predicate::predicate") << "loading predicate from " << buf << endl;
+		handle = dlopen(buf, RTLD_LAZY);
+	}
+
 	if (!handle) {
-	        cerr << "predicate::predicate(): loading failed: " << dlerror() << '\n';
+	        rerror("predicate::predicate") << "loading failed: " << dlerror() << endl;
 		exit(1);
 	}
 

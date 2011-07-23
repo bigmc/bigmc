@@ -9,6 +9,7 @@ struct global_config {
 	char *graph_out;
 	bool check_local;
 	char *model_file;
+	char *bigmc_home;
 };
 
 extern global_config global_cfg; 

@@ -16,7 +16,7 @@ std::ostream &report(int level, char *file, char *lineno, string module) {
 	return cerr;
 }
 
-std::ostream &ferror(string module) {
+std::ostream &rerror(string module) {
 	return report(REPORT_FATAL, NULL, 0, module);
 }
 

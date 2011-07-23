@@ -60,8 +60,8 @@ string mc::report() {
 
 // returns true while there is work to do
 bool mc::step() {
-	if(steps >= g_maxsteps) {
-		cout << "mc::step(): Interrupted!  Reached maximum steps: " << g_maxsteps << endl;
+	if(steps >= global_cfg.max_steps) {
+		cout << "mc::step(): Interrupted!  Reached maximum steps: " << global_cfg.max_steps << endl;
 		cout << report() << endl;
 		return false;
 	}
@@ -108,11 +108,11 @@ bool mc::step() {
 		
 		n->add_target(n2,(*it)->get_rule());
 
-		if(g_debug) cout << "BUG: mc::step(): new node" << endl << b2->to_string() << endl;	
-		if(g_debug) cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
+		if(DEBUG) cout << "BUG: mc::step(): new node" << endl << b2->to_string() << endl;	
+		if(DEBUG) cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
 	}
 
-	if(g_report_interval > 0 && steps % g_report_interval == 0)
+	if(global_cfg.report_interval > 0 && steps % global_cfg.report_interval == 0)
 		cout << report() << endl;
 
 	return true;

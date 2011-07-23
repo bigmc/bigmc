@@ -9,7 +9,7 @@
 #define REPORT_INFO  3
 
 std::ostream &report(int level, char *file, char *lineno, string module);
-std::ostream &ferror(string module);
+std::ostream &rerror(string module);
 std::ostream &rwarning(string module);
 std::ostream &rinfo(string module);
 
