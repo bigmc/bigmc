@@ -11,15 +11,17 @@ global_config global_cfg;
 
 void print_usage(char **argv) {
 	fprintf(stderr,
-	"Usage: %s [-hvVl] [-G <file>] [-m <max steps>] [-r <interval>] <modelfile>\n"
-	"\t-h\t\tDisplay this help and exit\n"
-	"\t-V\t\tPrint verbose output\n"
-	"\t-VV\t\tPrint even more verbose output\n"
-	"\t-G x\t\tOutput graphviz dot file to x\n"
-	"\t-m x\t\tSpecify x maximum steps of graph unfolding (default: 1000)\n"
-	"\t-l\t\tLocal check mode - do not build the reaction graph.\n"
-	"\t-r x\t\tOutput statistics and graphs every x steps (default: 500)\n"
-	"\t-v\t\tPrint version information and exit\n",
+	"Usage: %s [options] <modelfile>\n"
+	"  Options:\n"
+	"\t-h\tDisplay this help and exit\n"
+	"\t-V\tPrint verbose output\n"
+	"\t-VV\tPrint even more verbose output\n"
+	"\t-t n\tStart n concurrent checker threads (default: 2)\n"
+	"\t-G x\tOutput graphviz dot file to x\n"
+	"\t-m x\tSpecify x maximum steps of graph unfolding (default: 1000)\n"
+	"\t-l\tLocal check mode - do not build the reaction graph.\n"
+	"\t-r x\tOutput statistics and graphs every x steps (default: 500)\n"
+	"\t-v\tPrint version information and exit\n",
 	argv[0]);
 }
 
@@ -137,8 +139,9 @@ int main(int argc, char**argv) {
 	global_cfg.report_interval = 500;
 	global_cfg.graph_out = NULL; 
 	global_cfg.check_local = false;
+	global_cfg.threads = 2;
 	
-	while ((c = getopt (argc, argv, "hvVdm:G:r:l")) != -1)
+	while ((c = getopt (argc, argv, "hvVldm:G:r:t:")) != -1)
 		switch (c) {
 		case 'h':
 			print_usage(argv);
@@ -158,11 +161,15 @@ int main(int argc, char**argv) {
 		case 'm':
 			global_cfg.max_steps = (unsigned long)atol(optarg);
 			break;
+		case 't':
+			global_cfg.threads = atoi(optarg);
+			break;
 		case 'r':
 			global_cfg.report_interval = (unsigned long)atol(optarg);
 			break;
 		case 'l':
 			global_cfg.check_local = true;
+			break;
 		case '?':
 			if (isprint (optopt))
 				fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -170,6 +177,7 @@ int main(int argc, char**argv) {
 				fprintf (stderr, "Unknown option character `\\x%x'.\n",
 				optopt);
 		default:
+			print_usage(argv);
 			abort ();
            	}
 

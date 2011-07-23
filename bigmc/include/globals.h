@@ -10,6 +10,7 @@ struct global_config {
 	bool check_local;
 	char *model_file;
 	char *bigmc_home;
+	int threads;
 };
 
 extern global_config global_cfg; 

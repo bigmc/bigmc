@@ -12,6 +12,8 @@ using namespace std;
 #include <map>
 #include <string>
 
+#include "config.h"
+
 #include "globals.h"
 #include "report.h"
 #include "match.h"

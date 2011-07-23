@@ -20,8 +20,13 @@ doc/Makefile
 AC_PROG_LEX
 AC_PROG_YACC
 AC_CHECK_LIB([readline], [readline])
+AC_CHECK_LIB([pthread], [pthread_create])
 AC_HEADER_ASSERT
+
 AC_CHECK_HEADER([readline/readline.h],[],AC_MSG_ERROR([Missing readline/readline.h... is GNU Readline installed correctly?]))
 AC_CHECK_HEADER([readline/history.h],[],AC_MSG_ERROR([Missing readline/history.h... is GNU Readline installed correctly?]))
+
+AX_PTHREAD
+
 AC_OUTPUT
 
