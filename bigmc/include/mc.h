@@ -6,6 +6,7 @@ class mc {
 	deque<node *> workqueue;
 	unsigned long steps;
 	static map<string,query *> properties;
+	static map<unsigned long,bool> terminals;
 public:
 	mc(bigraph *b);
 	~mc();

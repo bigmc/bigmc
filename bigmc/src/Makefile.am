@@ -6,9 +6,9 @@ bin_PROGRAMS = bigmc
 bigmc_SOURCES = bgparser.ypp \
 	bgscanner.ll \
 	parser.cpp \
+	report.cpp \
 	bigraph.cpp \
 	driver.cpp \
-	edge.cpp \
 	graph.cpp \
 	hole.cpp \
 	main.cpp \
@@ -33,6 +33,8 @@ bigmc_SOURCES = bgparser.ypp \
 	../include/predicate.h \
 	../include/query.h \
 	../include/reactionrule.h \
+	../include/report.h \
+	../include/globals.h \
 	../include/term.h
 
 noinst_HEADERS = ../include/bigmc.h \
@@ -48,6 +50,7 @@ noinst_HEADERS = ../include/bigmc.h \
 	../include/predicate.h \
 	../include/query.h \
 	../include/reactionrule.h \
+	../include/globals.h \
 	../include/term.h
 
 bigmc_CPPFLAGS = -I../include

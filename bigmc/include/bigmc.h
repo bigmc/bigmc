@@ -12,7 +12,8 @@ using namespace std;
 #include <map>
 #include <string>
 
-#include "edge.h"
+#include "globals.h"
+#include "report.h"
 #include "match.h"
 #include "term.h"
 #include "reactionrule.h"
@@ -27,10 +28,5 @@ using namespace std;
 #include "parser.h"
 
 void print_version();
-
-extern bool g_debug;
-extern unsigned long g_maxsteps;
-extern char *g_graphout;
-extern unsigned long g_report_interval;
 
 #endif

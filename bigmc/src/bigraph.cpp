@@ -25,7 +25,7 @@ bigraph::~bigraph() {
 }
 
 control bigraph::control_from_string(string n) {
-	if(g_debug) cout << "BUG: bigraph::control_from_string(): " << n << endl;
+	if(DEBUG) cout << "BUG: bigraph::control_from_string(): " << n << endl;
 	map<string,control>::iterator it;
 	it = bigraph::control_map.find(n);
 	if(it == bigraph::control_map.end()) {
@@ -86,14 +86,14 @@ void bigraph::add_rule(reactionrule *r) {
 	if(f.size() == 0)
 		return;
 
-	cout << "=================================================================================\n";
-	cout << "Warning: the redex of reaction rule:\n";
-	cout << r->to_string() << "\n";
-	cout << "matches the reactum reactum of the rule itself.\n";
-	cout << "This is very likely to result in an infinite state space to explore through\n";
-	cout << "repeated application of this rule. You'd be better off replacing this rule, or\n";
-	cout << "contributing better symbolic checking to BigMC right now.  You have been warned.\n";
-	cout << "=================================================================================\n";
+	rwarning("bigraph::add_rule") << "=================================================================================\n";
+	rwarning("bigraph::add_rule") << "Warning: the redex of reaction rule:\n";
+	rwarning("bigraph::add_rule") << r->to_string() << "\n";
+	rwarning("bigraph::add_rule") << "matches the reactum reactum of the rule itself.\n";
+	rwarning("bigraph::add_rule") << "This is very likely to result in an infinite state space to explore through\n";
+	rwarning("bigraph::add_rule") << "repeated application of this rule. You'd be better off replacing this rule, or\n";
+	rwarning("bigraph::add_rule") << "contributing better symbolic checking to BigMC right now.  You have been warned.\n";
+	rwarning("bigraph::add_rule") << "=================================================================================\n";
 
 	// FIXME: leaking matches
 
@@ -134,12 +134,12 @@ set<match *> bigraph::find_matches() {
 	set<match *> res;
 
 	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
-		if(g_debug) cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
+		if(DEBUG) cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
 		set<match *> mp = term::find_all_matches(get_root(0), *i);
 		res.insert(mp.begin(),mp.end());
 	}
 
-	if(g_debug) { cout << "Matches:" << endl;
+	if(DEBUG) { cout << "Matches:" << endl;
 	for(set<match *>::iterator i = res.begin(); i != res.end(); i++) {
 		cout << " * " << (*i) << ": " << (*i)->to_string() << endl;
 	}
@@ -149,7 +149,7 @@ set<match *> bigraph::find_matches() {
 }
 
 bigraph *bigraph::apply_match(match *m) {
-	if(g_debug) cout << "BUG: bigraph::apply_match():\n" << m->to_string() << "\nto:\n" << to_string() << endl;
+	if(DEBUG) cout << "BUG: bigraph::apply_match():\n" << m->to_string() << "\nto:\n" << to_string() << endl;
 	bigraph *b = new bigraph(1);
 
 	b->root = root->apply_match(m);

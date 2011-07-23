@@ -7,19 +7,17 @@ using namespace std;
 
 #include <bigmc.h>
 
-// Globals
-bool g_debug = false;
-unsigned long g_maxsteps = 1000;
-unsigned long g_report_interval = 500;
-char *g_graphout = NULL;
+global_config global_cfg;
 
 void print_usage(char **argv) {
 	fprintf(stderr,
-	"Usage: %s [-hvV] [-G <file>] [-m <max steps>] [-r <interval>] <modelfile>\n"
+	"Usage: %s [-hvVl] [-G <file>] [-m <max steps>] [-r <interval>] <modelfile>\n"
 	"\t-h\t\tDisplay this help and exit\n"
 	"\t-V\t\tPrint verbose output\n"
+	"\t-VV\t\tPrint even more verbose output\n"
 	"\t-G x\t\tOutput graphviz dot file to x\n"
 	"\t-m x\t\tSpecify x maximum steps of graph unfolding (default: 1000)\n"
+	"\t-l\t\tLocal check mode - do not build the reaction graph.\n"
 	"\t-r x\t\tOutput statistics and graphs every x steps (default: 500)\n"
 	"\t-v\t\tPrint version information and exit\n",
 	argv[0]);
@@ -35,6 +33,7 @@ void config_read() {
 	// If BIGMC_HOME is set:
 	// $BIGMC_HOME/conf/bigmc.conf
 	// otherwise:
+	// /usr/local/bigmc/conf/bigmc.conf
 	// ./bigmc.conf
 	// ./conf/bigmc.conf
 	// fail
@@ -46,8 +45,14 @@ void config_read() {
 	if(bigmc_home == NULL) {
 		cerr << "Warning: BIGMC_HOME environment variable is not set." << endl;
 
-		fp = fopen("./bigmc.conf", "r");
-		configfile = "./bigmc.conf";
+		fp = fopen("/usr/local/bigmc/conf/bigmc.conf", "r");
+		configfile = "/usr/local/bigmc/conf/bigmc.conf";
+
+		if(fp == NULL) {
+			fp = fopen("./bigmc.conf", "r");
+			configfile = "./bigmc.conf";
+		}
+
 		if(fp == NULL) {
 			fp = fopen("./conf/bigmc.conf","r");
 			configfile = "./conf/bigmc.conf";
@@ -120,32 +125,40 @@ void config_read() {
 
 int main(int argc, char**argv) {
 	int c;
-	int verbose = 0;
-	int maxmem = 0;
+
+	// Set config defaults
+	global_cfg.debug = false;
+	global_cfg.verbose_level = 0;
+	global_cfg.max_steps = 1000;
+	global_cfg.report_interval = 500;
+	global_cfg.graph_out = NULL; 
+	global_cfg.check_local = false;
 	
-	while ((c = getopt (argc, argv, "hvVdm:G:r:")) != -1)
+	while ((c = getopt (argc, argv, "hvVdm:G:r:l")) != -1)
 		switch (c) {
 		case 'h':
 			print_usage(argv);
 			return 0;
 		case 'V':
-			verbose = 1;
+			global_cfg.verbose_level++;
 			break;
 		case 'v':
 			print_version();
 			return 0;
 		case 'd':
-			g_debug = true;
+			global_cfg.debug = true;
 			break;
 		case 'G':
-			g_graphout = strdup(optarg);
+			global_cfg.graph_out = strdup(optarg);
 			break;
 		case 'm':
-			g_maxsteps = (unsigned long)atol(optarg);
+			global_cfg.max_steps = (unsigned long)atol(optarg);
 			break;
 		case 'r':
-			g_report_interval = (unsigned long)atol(optarg);
+			global_cfg.report_interval = (unsigned long)atol(optarg);
 			break;
+		case 'l':
+			global_cfg.check_local = true;
 		case '?':
 			if (isprint (optopt))
 				fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -175,9 +188,12 @@ int main(int argc, char**argv) {
 		} else
 			fclose(fp);
 
+		global_cfg.model_file = modelfile;
 		parser::init(modelfile);
 	}
 
+	global_cfg.model_file = modelfile;
+	
 	parser::parse();
 
 	parser::cleanup();
