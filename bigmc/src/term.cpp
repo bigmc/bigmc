@@ -80,6 +80,7 @@ parallel::parallel(set<term *>l) {
 }
 
 parallel::~parallel() {
+	terms.clear();
 }
 
 string parallel::to_string() {
@@ -98,7 +99,6 @@ string parallel::to_string() {
 	return s + ")";
 }
 
-// FIXME: Should A | B match A | B | C?  Currently does.  Probably shouldn't.
 set<match *> parallel::find_matches(match *m) {
 	if(DEBUG) cout << "BUG: parallel::find_matches()" << endl;
 
@@ -343,6 +343,7 @@ prefix::prefix(control c, vector<name> ports, term *suff) {
 }
 
 prefix::~prefix() {
+	delete suffix;
 }
 
 string prefix::to_string() {

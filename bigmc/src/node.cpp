@@ -25,7 +25,7 @@ node::node(bigraph *b, node *psrc, reactionrule *r) {
 }
 
 node::~node() {
-
+	delete bg;
 }
 
 void node::add_target(node *n, reactionrule *r) {

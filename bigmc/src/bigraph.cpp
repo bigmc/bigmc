@@ -21,7 +21,7 @@ bigraph::bigraph(int roots = 1) {
 }
 
 bigraph::~bigraph() {
-	// should maybe recursively delete nodes
+	delete root;
 }
 
 control bigraph::control_from_string(string n) {
