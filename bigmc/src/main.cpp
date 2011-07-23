@@ -205,8 +205,12 @@ int main(int argc, char**argv) {
 	}
 
 	global_cfg.model_file = modelfile;
-	
-	parser::parse();
+
+	try {
+		parser::parse();
+	} catch (const std::bad_alloc& ) {
+		rerror("top-level") << "Oh dear.  We hit a bad_alloc exception.  This usually means you ran out of memory." << endl;
+	}
 
 	parser::cleanup();
 
