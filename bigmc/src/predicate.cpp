@@ -42,7 +42,7 @@ predicate::~predicate() {
 		dlclose(handle);
 }
 
-bool predicate::invoke(node *n,term *param) {
+bool predicate::invoke(node *n,list<query_val *> param) {
 	if(!pred_impl) {
 		cout << "predicate::invoke(): Implementation is NULL!" << endl;
 		exit(1);

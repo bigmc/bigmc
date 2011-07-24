@@ -389,7 +389,7 @@ set<match *> prefix::find_matches(match *m) {
 		term *t = r.front();
 
 		if(t->type == TPREF) {
-			if(DEBUG) cout << "BUG: prefix::find_matches(): redex front: " << t->to_string() << endl;
+			if(DEBUG) cout << "BUG: prefix::find_matches(): redex front: " << t->to_string() << " matching against: " << to_string() << endl;
 			prefix *tp = dynamic_cast<prefix *>(t);
 			assert(tp != NULL);
 
@@ -632,11 +632,37 @@ set<match *> term::find_all_matches(term *t, reactionrule *r) {
 		match *newmatch = new match(NULL, term::singleton(r->redex), NULL, r);
 		matches = match::merge(matches, p->find_matches(newmatch));
 		if(DEBUG) cout << "BUG: term::find_all_matches(): " << newmatch->has_succeeded << "p: " << p->to_string() << endl;
+		// FIXME: leaking newmatch here?
 		p = t->next();
 	}
 
 	t->reset();
 
 	return matches;
+}
+
+bool term::matches(term *subj, term *redex) {
+	term *p = subj->next();
+
+	while(p != NULL) {
+		match *newmatch = new match(NULL, term::singleton(redex), NULL, NULL);
+
+		set<match *> m = p->find_matches(newmatch);
+
+		if(m.size() > 0) {
+			subj->reset();
+			delete newmatch;
+			m.clear();
+			return true;
+		}
+	
+		m.clear();
+		delete newmatch;
+		p = subj->next();
+	}
+
+	subj->reset();
+
+	return false;
 }
 

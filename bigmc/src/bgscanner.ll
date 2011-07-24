@@ -93,12 +93,20 @@ IDENTR	[a-zA-Z0-9_]
 ":"               {
                     return COLON;
                   }
+"<="		  { return LEQ; }
+">="		  { return GEQ; }
+"<"		  { return LT; }
+">"		  { return GT; }
+"=="		  { return EQ; }
+"!="		  { return NEQ; }
 "forall"	  { return FORALL; }
 "exists"	  { return EXISTS; }
-"$"{DIGIT}+ 	  {
-		    yylval.ident = strdup(yytext);
-                    return HOLE;
-                  }
+"$"		  { return DOLLAR; }
+"true"		  { return BTRUE; }
+"if"		  { return IF; }
+"then"		  { return THEN; }
+"else"		  { return ELSE; }
+
 {DIGIT}+	 {
 		    std::istringstream(yytext) >> yylval.value;
                     return NUM;

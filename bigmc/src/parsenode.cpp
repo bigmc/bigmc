@@ -308,38 +308,55 @@ string propertynode::to_string() {
 	return "%property " + name + " " + prop->to_string();
 }
 
-// AND
+// BINARY OP 
 
-andnode::andnode(parsenode *l, parsenode *r) {
+binnode::binnode(parsenode *l, int opr, parsenode *r) {
 	lprop = l;
 	rprop = r;
-	type = NODE_AND;
+	oper = opr;
+	type = NODE_BIN;
 }
 
-andnode::~andnode() {
+binnode::~binnode() {
 	
 }
 
-string andnode::to_string() {
-	return lprop->to_string() + " && " + rprop->to_string();
+string binnode::to_string() {
+	string op = "";
+
+	switch(oper) {
+		case OPR_NEQ:
+			op = "!=";
+			break;
+		case OPR_EQ:
+			op = "==";
+			break;
+		case OPR_LEQ:
+			op = "<=";
+			break;
+		case OPR_GEQ:
+			op = ">=";
+			break;
+		case OPR_GT:
+			op = ">";
+			break;
+		case OPR_LT:
+			op = "<";
+			break;
+		case OPR_AND:
+			op = "&&";
+			break;
+		case OPR_OR:
+			op = "||";
+			break;
+		default:
+			op = "??";
+			break;
+	}
+
+	return lprop->to_string() + " " + op + " " + rprop->to_string();
 }
 
-
-// OR 
-
-ornode::ornode(parsenode *l, parsenode *r) {
-	lprop = l;
-	rprop = r;
-	type = NODE_OR;
-}
-
-ornode::~ornode() {
-	
-}
-
-string ornode::to_string() {
-	return lprop->to_string() + " || " + rprop->to_string();
-}
 
 // NOT 
 
@@ -389,6 +406,39 @@ string numnode::to_string() {
 	return out.str();
 }
 
+// QUERY
+
+querynode::querynode(char *n, parsenode *l) {
+	prop = l;
+	name = string(n);
+	type = NODE_QUERY;
+}
+
+querynode::~querynode() {
+	
+}
+
+string querynode::to_string() {
+	return "$" + name + "->" + prop->to_string();
+}
+
+// IF
+
+ifnode::ifnode(parsenode *c, parsenode *t, parsenode *f) {
+	cond = c;
+	tbranch = t;
+	fbranch = f;
+	type = NODE_IF;
+}
+
+ifnode::~ifnode() {
+	
+}
+
+string ifnode::to_string() {
+	return "(if " + cond->to_string() + " then " + tbranch->to_string() +
+		" else " + fbranch->to_string() + ")";
+}
 
 
 

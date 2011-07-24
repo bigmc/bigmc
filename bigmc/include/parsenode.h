@@ -12,11 +12,21 @@
 #define NODE_SIGNATURE 128
 #define NODE_CONTROL 256
 #define NODE_PROPERTY 512
-#define NODE_AND	1024
-#define NODE_OR		2048
+#define NODE_BIN	1024
+#define NODE_QUERY	2048
 #define NODE_NOT	4096
 #define NODE_PRED	8192
 #define NODE_NUM	16384
+#define NODE_IF		32768
+
+#define OPR_NEQ	1
+#define OPR_EQ	2
+#define OPR_LEQ	3
+#define OPR_GEQ	4
+#define OPR_GT	5
+#define OPR_LT	6
+#define OPR_AND	7
+#define OPR_OR	8
 
 class parsenode {
 	int filepos;
@@ -142,21 +152,13 @@ public:
 };
 
 
-class andnode : public parsenode {
+class binnode : public parsenode {
 public:
 	parsenode *lprop;
 	parsenode *rprop;
-	andnode(parsenode *l, parsenode *r);
-	~andnode();
-	string to_string();
-};
-
-class ornode : public parsenode {
-public:
-	parsenode *lprop;
-	parsenode *rprop;
-	ornode(parsenode *l, parsenode *r);
-	~ornode();
+	int oper;
+	binnode(parsenode *l, int opr, parsenode *r);
+	~binnode();
 	string to_string();
 };
 
@@ -185,7 +187,24 @@ public:
 	string to_string();
 };
 
+class querynode : public parsenode {
+public:
+	parsenode *prop;
+	string name;
+	querynode(char *name, parsenode *n);
+	~querynode();
+	string to_string();
+};
 
+class ifnode : public parsenode {
+public:
+	parsenode *cond;
+	parsenode *tbranch;
+	parsenode *fbranch;
+	ifnode(parsenode *c, parsenode *t, parsenode *f);
+	~ifnode();
+	string to_string();
+};
 
 
 #endif

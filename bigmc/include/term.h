@@ -27,6 +27,7 @@ public:
 	term *next();
 	void reset();
 	static set<match *> find_all_matches(term *t, reactionrule *m);
+	static bool matches(term *subj, term *redex);
 	virtual unsigned int size();
 	virtual void accept(termvisitor *t);
 	term *parent;

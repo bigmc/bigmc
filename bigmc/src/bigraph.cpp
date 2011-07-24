@@ -81,10 +81,7 @@ void bigraph::set_root(term *n) {
 void bigraph::add_rule(reactionrule *r) {
 	rules.insert(r);
 
-	// Sanity check the rule
-	set<match *> f = r->reactum->find_all_matches(r->redex, r);
-	if(f.size() == 0)
-		return;
+	if(!term::matches(r->reactum, r->redex)) return;
 
 	rwarning("bigraph::add_rule") << "=================================================================================\n";
 	rwarning("bigraph::add_rule") << "Warning: the redex of reaction rule:\n";
@@ -94,8 +91,6 @@ void bigraph::add_rule(reactionrule *r) {
 	rwarning("bigraph::add_rule") << "repeated application of this rule. You'd be better off replacing this rule, or\n";
 	rwarning("bigraph::add_rule") << "contributing better symbolic checking to BigMC right now.  You have been warned.\n";
 	rwarning("bigraph::add_rule") << "=================================================================================\n";
-
-	// FIXME: leaking matches
 
 	return;
 }

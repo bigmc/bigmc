@@ -8,8 +8,6 @@ int  yylex ();
 
 %}
 
-%expect 10
-
 %union {
   parsenode *node;  /* For the expressions. Since it is a pointer, no problem. */
   int       value;  /* For the lexical analyser. NUMBER tokens */
@@ -23,9 +21,10 @@ int  yylex ();
 %token INNER OUTER 
 %token ACTIVE PASSIVE COLON HOLE IDENT NUM
 %token PROPERTY LAND LOR LNOT FORALL EXISTS
+%token LEQ GEQ LT GT EQ NEQ DOLLAR BTRUE BFALSE IF THEN ELSE
 
 %type <node> model dec reaction exp expel property
-%type <node> prefix names
+%type <node> prefix names propexp propatom proplist proplistel
 %type <value> NUM
 %type <ident> HOLE IDENT
 
@@ -62,7 +61,7 @@ exp
 expel
 : prefix PREF expel		{ $$ = new prefixnode($1,$3); }
 | prefix			{ $$ = new prefixnode($1,NULL); }
-| HOLE				{ $$ = new holenode(atoi($1+1)); }
+| DOLLAR NUM			{ $$ = new holenode($2); }
 | LPAR exp RPAR			{ $$ = $2; }
 ;
 
@@ -77,14 +76,42 @@ names
 ;
 
 property
-: property LAND property	{ $$ = new andnode($1,$3); }
-| property LOR property		{ $$ = new ornode($1,$3); }
-| LNOT property			{ $$ = new notnode($2); }
-| LPAR property	RPAR		{ $$ = $2; }
+: propexp LAND propexp		{ $$ = new binnode($1,OPR_AND,$3); }
+| propexp LOR propexp		{ $$ = new binnode($1,OPR_OR, $3); }
+| LNOT propexp			{ $$ = new notnode($2); }
+| IF property THEN property ELSE property
+				{ $$ = new ifnode($2,$4,$6); }
+| propexp			{ $$ = $1; }
+;
+
+propexp
+: propatom NEQ propatom		{ $$ = new binnode($1,OPR_NEQ,$3); } 
+| propatom EQ propatom		{ $$ = new binnode($1,OPR_EQ,$3); }
+| propatom LEQ propatom		{ $$ = new binnode($1,OPR_LEQ,$3); }
+| propatom GEQ propatom		{ $$ = new binnode($1,OPR_GEQ,$3); }
+| propatom LT propatom		{ $$ = new binnode($1,OPR_LT,$3); }
+| propatom GT propatom		{ $$ = new binnode($1,OPR_GT,$3); }
+| propatom			{ $$ = $1; }
+;
+
+propatom
+: LPAR property RPAR		{ $$ = $2; }
 | IDENT LPAR RPAR		{ $$ = new prednode($1,NULL); }
-| IDENT LPAR exp RPAR		{ $$ = new prednode($1,$3); }
-| FORALL IDENT PREF property	{ $$ = NULL; }
-| EXISTS IDENT PREF property	{ $$ = NULL; }
+| IDENT LPAR proplist RPAR	{ $$ = new prednode($1,$3); }
+| NUM				{ $$ = new numnode($1); }
+| DOLLAR IDENT			{ $$ = new namenode($2); }
+| DOLLAR IDENT ARROW propatom	{ $$ = new querynode($2,$4); }
+;
+
+proplist
+: proplistel COMMA proplist	{ $$ = new seqnode($1,$3); }
+| proplistel			{ $$ = $1; }
+;
+
+proplistel
+: NUM				{ $$ = new numnode($1); }
+| DOLLAR IDENT			{ $$ = new namenode($2); }
+| exp				{ $$ = $1; }
 ;
 
 %%

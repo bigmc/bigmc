@@ -272,19 +272,43 @@ term *parser::bg_mknode(parsenode *p) {
 	return NULL;
 }
 
+query_val *parser::mk_queryval(parsenode *p) {
+	if(p == NULL) {
+		rerror("parser::mk_queryval") << "Invalid value in property term" << endl;
+		exit(1);
+	}
+
+	switch(p->type) {
+	case NODE_NUM:
+		return new query_num(((numnode *)p)->data);
+	case NODE_CONTROL: case NODE_PREFIX: case NODE_PARALLEL: case NODE_HOLE:
+		return new query_term(bg_mknode(p));
+	case NODE_NAME:
+		return new query_id(((namenode *)p)->nme);
+	}
+}
+
+list<query_val *> parser::mk_queryargs(parsenode *p) {
+	list<query_val *> vals;
+
+	if(p == NULL) return vals;
+
+	while(p->type == NODE_SEQ) {
+		vals.push_back(mk_queryval(((seqnode *)p)->lhs));
+		p = ((seqnode *)p)->rhs;
+	}
+
+	vals.push_back(mk_queryval(p));
+
+	return vals;
+}
+
 query *parser::mk_query(parsenode *p) {
 	switch(p->type) {
-		case NODE_AND: {
-			andnode *pp = (andnode *)p;
-			query_and *a = new query_and(mk_query(pp->lprop),mk_query(pp->rprop));
-			return a;
-		}
-		case NODE_OR: {
-			ornode *pp = (ornode *)p;
-			query_or *a = new query_or(mk_query(pp->lprop),mk_query(pp->rprop));
-			return a;
-		}
-		case NODE_NOT: {
+		case NODE_BIN: {
+			binnode *pp = (binnode *)p;
+			return new query_bin(mk_query(pp->lprop),pp->oper,mk_query(pp->rprop));
+		} case NODE_NOT: {
 			notnode *pp = (notnode *)p;
 			query_not *a = new query_not(mk_query(pp->prop));
 			return a;
@@ -292,9 +316,16 @@ query *parser::mk_query(parsenode *p) {
 		case NODE_PRED: {
 			prednode *pp = (prednode *)p;
 			if(pp->prop != NULL)
-				return new query_predicate(pp->name, bg_mknode(pp->prop));
+				return new query_predicate(pp->name, mk_queryargs(pp->prop));
 			else
-				return new query_predicate(pp->name, NULL);
+				return new query_predicate(pp->name, list<query_val*>());
+		}
+		case NODE_NUM: {
+			return mk_queryval(p);
+		}
+		case NODE_QUERY: {
+			querynode *pp = (querynode *)p;
+			return new query_scope(pp->name, mk_query(pp->prop));
 		}
 		default:
 			cerr << "parser::mk_query(): Invalid syntax in query: " << p->to_string() << endl;

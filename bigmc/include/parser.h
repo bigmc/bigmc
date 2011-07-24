@@ -15,6 +15,8 @@ class parser {
 	static set<term *> 	bg_collapse(parallelnode *p); 
 	static set<term *> 	bg_collapse(parsenode *p);
 	static query		*mk_query(parsenode *p);
+	static list<query_val *> mk_queryargs(parsenode *p);
+	static query_val 	*mk_queryval(parsenode *p);
 
 public:
 	static void init(char *file);
