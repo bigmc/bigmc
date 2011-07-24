@@ -7,6 +7,7 @@ public:
 	~query();
 	virtual string to_string();
 	virtual bool check(node *n);
+	virtual int eval(node *n);
 };
 
 class query_val : public query {
@@ -15,6 +16,7 @@ public:
 	~query_val();
 	virtual string to_string();
 	virtual bool check(node *n);
+	virtual int eval(node *n);
 };
 
 class query_num : public query_val {
@@ -24,6 +26,7 @@ public:
 	int value;
 	string to_string();
 	bool check(node *n);
+	int eval(node *n);
 };
 
 class query_term : public query_val {
@@ -33,6 +36,7 @@ public:
 	term *data;
 	string to_string();
 	bool check(node *n);
+	int eval(node *n);
 };
 
 class query_id : public query_val {
@@ -42,6 +46,7 @@ public:
 	string name;
 	string to_string();
 	bool check(node *n);
+	int eval(node *n);
 };
 
 class query_bin : public query {
@@ -74,6 +79,7 @@ public:
 	~query_predicate();
 	string to_string();
 	bool check(node *n);
+	int eval(node *n);
 	static void register_predicate(string name, predicate *p);
 };
 
@@ -85,6 +91,7 @@ public:
 	query *qry;
 	string to_string();
 	bool check(node *n);
+	int eval(node *n);
 };
 
 

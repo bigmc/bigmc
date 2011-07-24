@@ -1,6 +1,8 @@
 bgdocdir = @prefix@/doc
+exampledir = @prefix@/doc/example
+theorydir = @prefix@/doc/theory
 
-bgdoc_DATA = \
+example_DATA = \
 	examples/ccs.bgm \
 	examples/diverge.bgm \
 	examples/hole.bgm \
@@ -10,9 +12,11 @@ bgdoc_DATA = \
 	examples/par2.bgm \
 	examples/prop.bgm \
 	examples/terminal.bgm \
-	theory/match/match.sml 
+	examples/diverge_prop.bgm
 
-bgdoc_DIST = \
+theory_DATA = theory/match/match.sml 
+
+example_DIST = \
 	examples/ccs.bgm \
 	examples/diverge.bgm \
 	examples/hole.bgm \
@@ -21,5 +25,7 @@ bgdoc_DIST = \
 	examples/par.bgm \
 	examples/par2.bgm \
 	examples/prop.bgm \
-	examples/terminal.bgm \
+	examples/terminal.bgm
+
+theory_DIST =
 	theory/match/match.sml 
