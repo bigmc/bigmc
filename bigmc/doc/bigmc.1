@@ -1,0 +1,64 @@
+.TH bigmc 1  "July 24, 2011" "version 0.1" "USER COMMANDS"
+.SH NAME
+bigmc \- bigraphical model checker
+.SH SYNOPSIS
+.B bigmc
+[\-hlvV] [\-G file] [\-m steps] [\-r steps] [\-t threads] [file.bgm]
+.SH DESCRIPTION
+BigMC provides a means of constructing specifications of properties
+of Bigraphical Reactive Systems (BRS), and checking these properties
+through an exhaustive search of some state space.
+.PP
+BigMC performs only explicit-state checking, and presently has
+no support for symbolic model-checking.
+.SH OPTIONS
+.TP
+\-h
+display usage information and exit.
+.TP
+\-l
+employ only local checking. This avoids building the transition system
+and saves memory when checking large models, but limits the properties
+that you can check to those relating only to a single agent.
+.TP
+\-v
+print version information and exit.
+.TP
+\-V \-VV
+increase the verbosity of the information that is output during execution.
+.TP
+\-G file
+if set, output a graphviz file suitable for rendering with dot to file.
+.TP
+\-m steps
+set the maximum number of steps of reaction that may be performed.
+.TP
+\-r steps
+set the frequency with which statistics about the graph and
+work queue are output while running.
+.TP
+\-t threads
+instruct the checker to run t parallel threads. Defaults to 2.
+.SH EXAMPLES
+.TP
+Run a large model in local checking mode with three parallel threads:
+.B bigmc
+\-l \-t 3 example.bgm
+.PP
+.TP
+Set a maximum number of steps while outputting a dot graph:
+.B bigmc
+\-m 10000 \-G graph.dot example.bgm
+.PP
+.SH EXIT STATUS
+bigmc returns a non-zero status in the event of an error, or zero
+if the model checking process terminates by finding a property
+violation, exhausting all possible states, or is interrupted by
+reaching the maximum number of steps.
+.SH AUTHOR
+Gian Perrone (gdpe (at) itu.dk)
+.SH ACKNOWLEDGEMENT
+This work funded in part by the Danish Research Agency 
+(grant no.: 2106-080046) and the IT University of Copenhagen
+(the Jingling Genies project)
+

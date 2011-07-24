@@ -28,4 +28,9 @@ example_DIST = \
 	examples/terminal.bgm
 
 theory_DIST =
-	theory/match/match.sml 
+	theory/match/match.sml
+
+dist_man_MANS = bigmc.1 
+
+info_TEXINFOS = manual/bigmc.texi
+

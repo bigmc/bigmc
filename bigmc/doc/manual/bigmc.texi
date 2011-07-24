@@ -1,0 +1,72 @@
+\input texinfo   @c -*-texinfo-*-
+@comment %**start of header
+@setfilename bigmc.info
+@include version.texi
+@settitle BigMC @value{VERSION}
+@syncodeindex pg cp
+@comment %**end of header
+
+@copying
+This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
+
+Copyright @copyright{} 2011 Gian Perrone
+
+@quotation
+Permission is granted to make and distribute verbatim copies
+of this entire document without royalty provided the
+copyright notice and this permission notice are preserved.
+@end quotation
+
+
+@quotation
+This work funded in part by the Danish Research Agency (grant no.: 2106-080046)
+and the IT University of Copenhagen (the Jingling Genies project)
+@end quotation
+@end copying
+
+@dircategory BigMC Bigraphical Model Checker
+@direntry
+* bigmc: (bigmc)Invoking bigmc.
+@end direntry
+
+@titlepage
+@title BigMC
+@subtitle for version @value{VERSION}
+@author Gian Perrone (@email{gdpe at itu.dk})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@ifnottex
+@node Top
+@top BigMC
+
+This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
+@end ifnottex
+
+@menu
+* Invoking bigmc::
+* Index::
+@end menu
+
+@node Invoking bigmc
+@chapter Invoking bigmc
+
+@pindex bigmc
+@cindex invoking @command{bigmc}
+
+This is a sample manual.  There is no sample program to
+invoke, but if there was, you could see its basic usage
+and command line options here.
+
+@node Index
+@unnumbered Index
+
+@printindex cp
+
+@bye
+
+
