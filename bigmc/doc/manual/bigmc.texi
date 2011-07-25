@@ -107,8 +107,8 @@ The latest version of BigMC will always be available from the
 @section Installation
 
 @acronym{BigMC} uses a standard GNU Autoconf/Automake setup.  You will need a 
-Unix-like environment --- the current release is known to work on Mac OS X 10.6 and 
-recent version of Debian and Ubuntu.
+Unix-like environment --- the current release is known to work on MacOS X 10.6, MacOS X 10.7
+ and recent version of Debian and Ubuntu.
 
 If you're lucky, the following procedure will install everything to
 @code{/usr/local/bigmc/}:
@@ -124,7 +124,7 @@ sudo make install
 The build process relies on the presence of the following:
 
 @itemize
-@item The GNU C++ compiler @code{g++}, version 4.0 or greater.
+@item A C++ compiler (tested with The GNU C++ compiler @code{g++}, version 4.0 or greater)
 @item GNU Make
 @item GNU Readline
 @end itemize
