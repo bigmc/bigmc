@@ -3,7 +3,7 @@
 bigmc \- bigraphical model checker
 .SH SYNOPSIS
 .B bigmc
-[\-hlvV] [\-G file] [\-m steps] [\-r steps] [\-t threads] [file.bgm]
+[\-hlpvV] [\-G file] [\-m steps] [\-r steps] [\-t threads] [file.bgm]
 .SH DESCRIPTION
 BigMC provides a means of constructing specifications of properties
 of Bigraphical Reactive Systems (BRS), and checking these properties
@@ -32,6 +32,9 @@ if set, output a graphviz file suitable for rendering with dot to file.
 .TP
 \-m steps
 set the maximum number of steps of reaction that may be performed.
+.TP
+\-p
+print new states as they are discovered.
 .TP
 \-r steps
 set the frequency with which statistics about the graph and

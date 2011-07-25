@@ -11,6 +11,7 @@ struct global_config {
 	char *model_file;
 	char *bigmc_home;
 	int threads;
+	bool print_mode;
 };
 
 extern global_config global_cfg; 

@@ -8,6 +8,6 @@ b -> a.b;
 a.a.b -> a;
 a.$0 -> c.$0;
 
-%property growth $pred->size() <= $this->size();
+%property growth size() != $pred->size();
 
 %check

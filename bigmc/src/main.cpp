@@ -19,6 +19,7 @@ void print_usage(char **argv) {
 	"\t-t n\tStart n concurrent checker threads (default: 2)\n"
 	"\t-G x\tOutput graphviz dot file to x\n"
 	"\t-m x\tSpecify x maximum steps of graph unfolding (default: 1000)\n"
+	"\t-p\tPrint new states as they are discovered.\n"
 	"\t-l\tLocal check mode - do not build the reaction graph.\n"
 	"\t-r x\tOutput statistics and graphs every x steps (default: 500)\n"
 	"\t-v\tPrint version information and exit\n",
@@ -140,8 +141,9 @@ int main(int argc, char**argv) {
 	global_cfg.graph_out = NULL; 
 	global_cfg.check_local = false;
 	global_cfg.threads = 2;
-	
-	while ((c = getopt (argc, argv, "hvVldm:G:r:t:")) != -1)
+	global_cfg.print_mode = false;
+
+	while ((c = getopt (argc, argv, "hvVlpdm:G:r:t:")) != -1)
 		switch (c) {
 		case 'h':
 			print_usage(argv);
@@ -160,6 +162,9 @@ int main(int argc, char**argv) {
 			break;
 		case 'm':
 			global_cfg.max_steps = (unsigned long)atol(optarg);
+			break;
+		case 'p':
+			global_cfg.print_mode = true;
 			break;
 		case 't':
 			global_cfg.threads = atoi(optarg);

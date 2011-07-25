@@ -2,7 +2,9 @@
 %passive recv : 1;
 %outer a;
 %outer b;
-send[a].recv[b] | recv[a].send[b];
+send[a].recv[b].recv[a] | recv[a].send[b].send[a];
 send[x].$0 | recv[x].$1 -> $0 | $1;
+
+%property shrink $pred->empty() || size() < $pred->size();
 
 %check

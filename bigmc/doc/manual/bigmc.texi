@@ -17,21 +17,21 @@ of this entire document without royalty provided the
 copyright notice and this permission notice are preserved.
 @end quotation
 
-
-@quotation
 This work funded in part by the Danish Research Agency (grant no.: 2106-080046)
 and the IT University of Copenhagen (the Jingling Genies project)
-@end quotation
 @end copying
 
 @dircategory BigMC Bigraphical Model Checker
 @direntry
-* bigmc: (bigmc)Invoking bigmc.
+* bigmc: (bigmc)  Invoking bigmc.
 @end direntry
 
 @titlepage
 @title BigMC
 @subtitle for version @value{VERSION}
+@vskip 0pt plus 1filll
+@center @image{ccslts,8cm}
+@vskip 0pt plus 1filll
 @author Gian Perrone (@email{gdpe at itu.dk})
 @page
 @vskip 0pt plus 1filll
@@ -41,31 +41,483 @@ and the IT University of Copenhagen (the Jingling Genies project)
 @contents
 
 @ifnottex
-@node Top
+@node Top, Introduction, (dir), (dir)
 @top BigMC
 
 This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
+
 @end ifnottex
 
 @menu
-* Invoking bigmc::
-* Index::
+* Introduction::       What is BigMC and why do you need it?
+* Obtaining BigMC::    How do you obtain and install BigMC?
+* Invoking bigmc::     Quick-start guide to using the tool
+* BGM file structure:: How to construct model files
+* Term language::      How to describe bigraphical reactive systems
+* Property language::  How to describe specifications
+* Checking::           How to check properties
+* Interactive mode::   How to use BigMC interactively
 @end menu
 
-@node Invoking bigmc
-@chapter Invoking bigmc
+@node Introduction
+@chapter Introduction 
 
 @pindex bigmc
 @cindex invoking @command{bigmc}
 
-This is a sample manual.  There is no sample program to
-invoke, but if there was, you could see its basic usage
-and command line options here.
+@acronym{BigMC} (@strong{Big}raphical @strong{M}odel @strong{C}hecker) is a model-checker 
+designed to
+operate on @emph{Bigraphical Reactive Systems} --- @acronym{BRS}.  BRS is a formalism developed
+by Robin Milner and colleagues that emphasises the orthogonal notions of @emph{locality} and
+@emph{connectivity}.  Bigraphs have found applications in ubiquitous computing, computational
+biology, business workflow modelling, and context-aware systems.
 
-@node Index
-@unnumbered Index
+By @emph{model checking}, we mean precisely the act of checking whether some specification is
+true of a particular bigraphical model.  This is achieved through a kind of exhaustive search
+of all the possible states of the system.  For arbitrary models, this kind of checking is
+computationally intractible --- the state space is simply too huge (and indeed infinite in
+many cases).  The challenge of this kind of task is to limit the kinds of models we check
+to some tractible subset, and to reduce the number of actual states that we need to check 
+directly in order to provide concrete correctness guarantees.
 
-@printindex cp
+@section A cautionary note
+
+@acronym{BigMC} is experimental software, still under active development.  It might never be
+finished.  It would be foolish to depend upon the kinds of guarantees that it can provide
+without considering exactly @strong{why} these might be true.
+
+@section About BigMC
+
+@acronym{BigMC} is being developed at the @uref{http://itu.dk, IT University of Copenhagen}
+by @uref{http://itu.dk/~gdpe/, Gian Perrone} in collaboration with
+@uref{http://itu.dk/~hilde, Thomas Hildebrandt} and @uref{http://itu.dk/~debois, S@o{}ren Debois}.
+
+@node Obtaining BigMC
+@chapter Obtaining BigMC
+
+The latest version of BigMC will always be available from the 
+@uref{http://bigraph.org/bigmc/, primary project website}:
+
+@itemize
+@item Download BigMC-@value{VERSION} (tar.gz, latest as of @value{UPDATED}):
+
+@url{http://bigraph.org/bigmc/release/bigmc-@value{VERSION}.tar.gz}
+@end itemize
+
+@section Installation
+
+@acronym{BigMC} uses a standard GNU Autoconf/Automake setup.  You will need a 
+Unix-like environment --- the current release is known to work on Mac OS X 10.6 and 
+recent version of Debian and Ubuntu.
+
+If you're lucky, the following procedure will install everything to
+@code{/usr/local/bigmc/}:
+
+@example
+tar -xzf bigmc-@value{VERSION}.tar.gz
+cd bigmc/
+./configure
+make
+sudo make install
+@end example
+
+The build process relies on the presence of the following:
+
+@itemize
+@item The GNU C++ compiler @code{g++}, version 4.0 or greater.
+@item GNU Make
+@item GNU Readline
+@end itemize
+
+Highly recommended:
+
+@itemize
+@item @uref{http://code.google.com/p/google-perftools/, Google-Perftools}
+@end itemize
+
+Finally, it is recommended that you add something like the following to your @file{.profile}:
+
+@example
+export PATH=/usr/local/bigmc/bin:$PATH
+export BIGMC_HOME=/usr/local/bigmc
+@end example
+
+All going well, you should be able to just invoke @acronym{BigMC} using the command:
+
+@example
+$ bigmc
+@end example
+
+@section Configuration
+
+The configuration file @file{/usr/local/bigmc/conf/bigmc.conf} contains predicate definitions
+that point to the dynamically loadable modules that implement them.  If you wish to
+add new predicates, you will need to add them to this configuration file.
+
+@node Invoking bigmc
+@chapter Invoking bigmc
+
+Running @code{bigmc} alone will enter the interactive environment:
+
+
+@example
+$ bigmc
+BigMC version 0.1-dev (http://www.itu.dk/~gdpe/bigmc)
+Copyright (c) 2011 Gian Perrone <gdpe at itu.dk>
+Hint: remember to enter 'check' once you have finished entering your model!
+bigmc> 
+@end example
+
+The @code{bigmc>} prompt indicates that the interactive environment is ready to accept
+model definitions, properties and finally the @code{check} command.
+
+To exit the interactive environment, enter @code{quit} or @kbd{C-d}. It is often more useful to invoke @code{bigmc} with a model file.  The full command line options are:
+
+@example
+bigmc [-hlpvV] [-G @var{file}] [-m @var{steps}] [-r @var{steps}] [-t @var{threads}] [@var{file}]
+@end example
+
+@section Command Line Options
+
+Several options are available to control the runtime behaviour of the checking process:
+
+@table @code
+@item @code{-h}     
+display usage information and exit.
+
+@item @code{-l}
+employ only local checking. This avoids building  the  transition  system
+and  saves  memory  when checking large models, but limits the properties
+that you can check to those relating only to a single agent.
+
+@item @code{-v}     
+print version information and exit.
+
+@item @code{-V -VV} 
+increase the verbosity of the information that is  output  during  execution.
+
+@item @code{-G} @var{file}
+if set, output a graphviz file suitable for rendering with dot to @var{file}.
+
+@item @code{-m} @var{steps}
+set the maximum number of steps of reaction that may be performed.
+
+@item @code{-p}
+print new states as they are discovered.
+
+@item @code{-r} @var{steps}
+set  the  frequency  with which statistics about the graph and work queue
+              are output while running.
+
+@item @code{-t} @var{threads}
+instruct the checker to run @var{threads} parallel threads. Defaults to 2.
+
+@end table
+
+
+
+@node BGM file structure
+@chapter BGM file structure
+
+The basic structure for a bigraph model file is as follows:
+
+@example
+# Comments
+<control definitions>
+
+<inner and outer names>
+
+<reaction rules>
+
+<model definition>
+
+<properties>
+
+%check;
+@end example
+
+@section Comments
+
+Comments are lines starting with '#', and continue to the end of the line.
+
+@example
+# This is a comment
+@end example
+
+@section Control Definitions
+
+Control definitions take one of two forms:
+
+@example
+%active @var{control-name} : @var{arity};
+%passive @var{control-name} : @var{arity};
+@end example
+
+All of the information must be present.  For example:
+
+@example
+%passive send : 1;
+%active foo : 3;
+@end example
+
+@section Inner and outer names
+
+The top-level inner and outer names are defined as follows:
+
+@example
+%outer @var{name};
+%inner @var{name};
+@end example
+
+For example:
+
+@example
+%outer a;
+%outer b;
+@end example
+
+Names need not be unique with respect to control names; however, it might be best to keep them
+that way to avoid confusion.
+
+@node Term language
+@chapter Term language
+
+The term language is relatively simple. It uses the control names and inner and outer names
+as defined in the preamble.  The full grammar is given by:
+
+@example
+@var{T} ::= @var{K}.@var{T}
+@var{T} ::= @var{T} | @var{T}
+@var{T} ::= $@var{n}
+@var{T} ::= @var{K}
+
+@var{K} ::= @var{k}[@var{names}]
+@var{K} ::= @var{k}
+
+@var{names} ::= @var{n} , @var{names}
+@var{names} ::= @var{n}
+@end example
+
+Where @var{n} is drawn from the set of names, and @var{k} is drawn from the set of controls.
+
+@section Reaction Rules
+
+All terms of the form @code{@var{T} -> @var{T};} are considered to be reaction rules for the
+model under construction.  Order is not significant.  For example:
+
+@example
+send[x].$0 | recv[x].$1 -> $0 | $1;
+@end example
+
+Names that do not appear in @code{%inner} or @code{%outer} definitions are considered free names
+and will be bound during matching.  Names that are defined in the name set will be matched
+literally, and will not be re-bound.
+
+@section Model Definition
+
+There can be at most one model definition per model file --- this will always be the last line
+in the file of the form @code{@var{T};}.  It may appear anywhere in the file before the @code{%check} line, and after any definitions upon which it depends.  Order with respect to reaction
+rules is not significant.  Continuing from the previous sections, we could define a complete
+model:
+
+@example
+%passive send : 1;
+%passive recv : 1;
+%outer a;
+%outer b;
+
+send[x].$0 | recv[x].$1 -> $0 | $1;
+
+# The model definition
+send[a].recv[b].send[a] | recv[a].send[b].recv[b];
+@end example
+
+We now have a complete model file suitable to use for checking.
+
+@node Property language
+@chapter Property language
+
+Having defined a model in the previous section, we want to start to be able to make some
+kind of specification of properties which we would like to ensure hold.  We do this using the
+@code{%property} specifier, which is of the form:
+
+@example
+%property @var{property-name} @var{property-expression};
+@end example
+
+The @var{property-name} is a non-semantically-significant name which will be reported if the
+checker encounters a violation of a property during checking.
+
+A single @file{.bgm} file can have arbitrarily many @code{%property} declarations.  The order
+in which they appear in the file will be the order in which they are considered at each new
+state; it may be a sensible strategy to place matches more likely to fail earlier in the
+file.
+
+@section Property Expressions
+
+The basic unit of most property expressions is the @dfn{predicate}.  An exhaustive list of
+available predicates will be provided in a subsequent section of this manual.  Aside from
+predicates, various familiar programming language logical connectives are provided:
+
+@example
+@var{P} ::= @var{B} && @var{B}
+@var{P} ::= @var{B} || @var{B}
+@var{P} ::= !@var{B}
+
+@var{B} ::= @var{E} == @var{E}
+@var{B} ::= @var{E} != @var{E}
+@var{B} ::= @var{E} <= @var{E}
+@var{B} ::= @var{E} >= @var{E}
+@var{B} ::= @var{E} < @var{E} 
+@var{B} ::= @var{E} > @var{E}
+
+@var{E} ::= @var{predicate}(@var{parameters})
+@var{E} ::= @var{integer literal}
+@end example
+
+The essential execution model associated with these properties is that each time a new state is
+discovered and considered, the predicates are applied to @emph{that state}.  The simplest
+property we could define might be:
+
+@example
+%property not_empty !empty();
+@end example
+
+Assuming we have some (pre-defined) predicate called @code{empty} that takes no arguments, then
+this property will be satisfied iff every state in the model is not empty.
+
+It turns out that this is sufficient to write specifications that inspect the properties of
+individual states, but what if we want to write a specification that defines properties
+over states as they evolve?  We have another mechanism for that:
+
+@example
+%property growth size() >= $pred->size();
+@end example 
+
+This property assumes that we have a pre-existing predicate called @code{size} that returns the
+``size'' of a given term (spoiler alert: we do).  The first application of the predicate 
+@code{size} will evaluate to the size of the current state under consideration.  The second
+instance of the predicate is prefixed with @code{$pred} (short for @emph{predecessor}), which
+is a placeholder for ``the state from which the current state was created by a step of
+reaction'', so in this instance @code{size} is being applied to the predecessor state, not
+the current state.  Finally, taking the greater-than-or-equal-to connective @code{>=}, this is a
+property stating that this model must never shrink through a step of reaction.  If the checker
+can find any two consecutive states in the transition system where a state is smaller than
+the one from which it is derived, this will constitute a violation of the @file{growth}
+property.
+
+@section Pre-defined Scopes
+
+The full list of scopes:
+
+@itemize
+@item @code{$pred}
+The predecessor to the current state, such that there exists some step of reaction from
+ @code{$pred} to the current state.
+@item @code{$this}
+The current state.
+@item @code{$succ}
+The set of successor states, i.e., those reachable by a step of reaction from the current state.
+@item @code{$terminal}
+The predicate in question is only applied to states marked @code{terminal}, that is, they
+do not lead to any further states and there are no reactions that can be applied to them.
+@code{$terminal->p()} will return @code{true} when applied to non-terminal states, or
+@code{p()} if applied to a terminal state.
+@item ... More to come?  Suggest more useful scopes!
+@end itemize
+
+It's important to note that scopes like @code{$succ} and @code{pred} will not work when in
+local checking mode!
+
+@section Pre-defined Predicates
+
+@itemize
+@item @code{size()}
+@item @code{matches(@var{t})}
+@item @code{empty()}
+@end itemize
+
+@section Defining your own predicates
+
+Predicates are loadable modules that live in @file{$BIGMC_HOME/lib/}.  The predicates to load
+are defined in @file{bigmc.conf}.
+
+
+@node Checking
+@chapter Checking
+
+Having defined your reaction rules, model and properties, the final
+line in your file should be @code{%check}.  This signals to @code{bigmc} that checking should
+actually begin.  
+
+For example, we could check some @file{diverge_prop.bgm} (which is in the @file{doc/example}
+directory of your @acronym{BigMC} distribution):
+
+@example
+%active a : 0;
+%active b : 0;
+%active c : 0;
+
+a.b;
+
+b -> a.b;
+a.a.b -> a;
+a.$0 -> c.$0;
+
+%property growth size() >= $pred->size();
+
+%check;
+@end example
+
+We invoke @code{bigmc} using a command such as:
+
+@example
+$ bigmc diverge_prop.bgm
+@end example
+
+This will result in the following backtrace:
+
+@example
+*** Found violation of property: growth
+*** growth: size >= $pred->size()
+#0  a.nil   <- *** VIOLATION ***
+ >> a.a.b.nil -> a.nil
+
+#1  a.a.b.nil
+ >> b.nil -> a.b.nil
+
+#2  a.b.nil
+ >> (root)
+mc::step(): Counter-example found.
+@end example
+
+We interpret the backtrace as showing us a state that violated the property @code{growth}.
+States are displayed from ``newest'' to ``oldest'', interleaved with the reaction rule
+that was applied to reach that state from the previous one.
+
+@section A successful example
+
+This example is included as @file{ccs.bgm} in the @file{examples} directory:
+
+@example
+%passive send : 1;
+%passive recv : 1;
+%outer a;
+%outer b;
+
+send[a].recv[b].recv[a] | recv[a].send[b].send[a];
+
+send[x].$0 | recv[x].$1 -> $0 | $1;
+
+%property shrink $pred->empty() || size() < $pred->size();
+
+%check;
+@end example
+
+
+
+@node Interactive mode
+@chapter Interactive mode
 
 @bye
 

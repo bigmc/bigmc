@@ -109,9 +109,19 @@ bool mc::step() {
 
 	if(workqueue.size() == 0) {
 		// We're done!
+		#ifdef HAVE_PTHREAD
+		pthread_mutex_lock( &mcmutex );
+		#endif
+
 		cout << "mc::step(): Complete!" << endl;
 		cout << report(step) << endl;
 		// TODO: sound the alarms and release the balloons at this point.
+
+		#ifdef HAVE_PTHREAD
+		pthread_mutex_unlock( &mcmutex );
+		#endif
+
+		exit(0);
 		return false; 
 	}
 
@@ -122,6 +132,10 @@ bool mc::step() {
 
 	node *n = workqueue.front();
 	workqueue.pop_front();
+
+	if(global_cfg.print_mode) {
+		cout << step << ": " << n->bg->get_root(0)->to_string() << endl;
+	}
 
 	#ifdef HAVE_PTHREAD
 	pthread_mutex_unlock( &wqmutex );

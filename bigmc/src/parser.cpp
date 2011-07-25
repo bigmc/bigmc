@@ -157,8 +157,8 @@ term *parser::bg_mknode(prefixnode *p) {
 set<term *> parser::bg_collapse(parallelnode *p) {
 	set<term *> l = bg_collapse(p->lhs);
 	set<term *> r = bg_collapse(p->rhs);
-	l.insert(r.begin(),r.end());
-	return l;
+	r.insert(l.begin(),l.end());
+	return r;
 }
 
 set<term *> parser::bg_collapse(parsenode *p) {
