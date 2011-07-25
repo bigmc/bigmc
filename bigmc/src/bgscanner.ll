@@ -23,6 +23,8 @@ int yycolumn = 1;
 %option noyywrap
 %option yylineno
 
+%x COMMENT
+
 DIGIT	[0-9]
 IDENT1	[a-zA-Z]
 IDENTR	[a-zA-Z0-9_]
@@ -106,6 +108,7 @@ IDENTR	[a-zA-Z0-9_]
 "if"		  { return IF; }
 "then"		  { return THEN; }
 "else"		  { return ELSE; }
+"#"		  { BEGIN COMMENT; }
 
 {DIGIT}+	 {
 		    std::istringstream(yytext) >> yylval.value;
@@ -121,5 +124,7 @@ IDENTR	[a-zA-Z0-9_]
 <<EOF>>           {
                     yyterminate();
                   }
+<COMMENT>"\n"	  { yycolumn = 1; BEGIN 0; }
+<COMMENT>.	  { ; }
 
 %%

@@ -18,6 +18,7 @@ public:
 	unsigned long size();
 	string backtrace(node *n);
 	string dump_dot();
+	string dump_dot_forward();
 };
 
 #endif

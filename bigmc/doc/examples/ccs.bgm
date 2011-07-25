@@ -1,10 +1,14 @@
-%passive send : 1;
-%passive recv : 1;
+# This is an example approximating CCS
+
+%passive send : 1; # CCS ! action
+%passive recv : 1; # CCS ? action
 %outer a;
 %outer b;
+
 send[a].recv[b].recv[a] | recv[a].send[b].send[a];
+
 send[x].$0 | recv[x].$1 -> $0 | $1;
 
-%property shrink $pred->empty() || size() < $pred->size();
+%property shrink $pred->empty() || size() > $pred->size();
 
 %check

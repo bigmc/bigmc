@@ -41,6 +41,9 @@ bool mc::check() {
 
 	if(global_cfg.threads <= 1) {
 		thread_wrapper(this);
+		cout << "mc::check(): Complete!" << endl;
+		cout << report(steps) << endl;
+
 		return false;
 	}
 
@@ -54,6 +57,9 @@ bool mc::check() {
 		pthread_join(threads[i], NULL);
 		rinfo("mc::check") << "Worker thread #" << i << " finished" << endl;
 	}
+
+	cout << "mc::check(): Complete!" << endl;
+	cout << report(steps) << endl;
 
 	#else
 	thread_wrapper(this);
@@ -83,7 +89,7 @@ bool mc::check_properties(node *n) {
 string mc::report(int step) {
 	stringstream out;
 	rinfo("mc::report") << "[q: " << workqueue.size() << " / g: " << g->size() << "] @ " << step;
-	g->dump_dot();
+	g->dump_dot_forward();
 	return out.str();
 }
 
@@ -102,33 +108,24 @@ bool mc::step() {
 	steps++;
 	int step = steps;
 
-	#ifdef HAVE_PTHREAD
-	pthread_mutex_unlock( &mcmutex );
-	#endif
-
-
 	if(workqueue.size() == 0) {
 		// We're done!
-		#ifdef HAVE_PTHREAD
-		pthread_mutex_lock( &mcmutex );
-		#endif
 
+		#ifdef HAVE_PTHREAD
+
+		cout << "workqueue.size() == 0, exiting thread..." << endl;
+		pthread_mutex_unlock( &mcmutex );
+		return false;
+
+		#else
 		cout << "mc::step(): Complete!" << endl;
 		cout << report(step) << endl;
 		// TODO: sound the alarms and release the balloons at this point.
 
-		#ifdef HAVE_PTHREAD
-		pthread_mutex_unlock( &mcmutex );
-		#endif
-
 		exit(0);
 		return false; 
+		#endif
 	}
-
-	
-	#ifdef HAVE_PTHREAD
-	pthread_mutex_lock( &wqmutex );
-	#endif
 
 	node *n = workqueue.front();
 	workqueue.pop_front();
@@ -138,17 +135,10 @@ bool mc::step() {
 	}
 
 	#ifdef HAVE_PTHREAD
-	pthread_mutex_unlock( &wqmutex );
+	pthread_mutex_unlock( &mcmutex );
 	#endif
 
 	bigraph *b = n->bg;
-
-
-	if(!check_properties(n)) {
-		cout << "mc::step(): Counter-example found." << endl;
-		return false;
-	}
-
 
 	set<match *> matches = b->find_matches();
 	if(matches.size() == 0) {
@@ -159,13 +149,13 @@ bool mc::step() {
 
 	if(global_cfg.check_local) {
 		#ifdef HAVE_PTHREAD
-		pthread_mutex_lock( &gmutex );
+		pthread_mutex_lock( &mcmutex );
 		#endif
 
 		checked[n->hash] = true;
 		
 		#ifdef HAVE_PTHREAD
-		pthread_mutex_unlock( &gmutex );
+		pthread_mutex_unlock( &mcmutex );
 		#endif
 	}
 
@@ -178,44 +168,45 @@ bool mc::step() {
 			if(n3 != NULL) {
 				delete n2;
 				n2 = n3;
+
+				#ifdef HAVE_PTHREAD
+				pthread_mutex_lock( &mcmutex );
+				#endif
+
+				n->add_target(n2,(*it)->get_rule());
+	
+				#ifdef HAVE_PTHREAD
+				pthread_mutex_unlock( &mcmutex );
+				#endif
 			} else {
 				
 				#ifdef HAVE_PTHREAD
-				pthread_mutex_lock( &wqmutex );
+				pthread_mutex_lock( &mcmutex );
 				#endif
 			
 				workqueue.push_back(n2);
 
-				#ifdef HAVE_PTHREAD
-				pthread_mutex_unlock( &wqmutex );
-				#endif
-	
-
-				#ifdef HAVE_PTHREAD
-				pthread_mutex_lock( &gmutex );
-				#endif
-
 				g->add(n2);
+				n->add_target(n2,(*it)->get_rule());
 	
 				#ifdef HAVE_PTHREAD
-				pthread_mutex_unlock( &gmutex );
+				pthread_mutex_unlock( &mcmutex );
 				#endif
 			}
 			
-			n->add_target(n2,(*it)->get_rule());
 		} else {
 			if(checked[n2->hash]) {
 				// We've already checked this one!
 				delete n2;
 			} else {
 				#ifdef HAVE_PTHREAD
-				pthread_mutex_lock( &wqmutex );
+				pthread_mutex_lock( &mcmutex );
 				#endif
 
 				workqueue.push_back(n2);
 
 				#ifdef HAVE_PTHREAD
-				pthread_mutex_unlock( &wqmutex );
+				pthread_mutex_unlock( &mcmutex );
 				#endif
 			}
 		}
@@ -226,6 +217,12 @@ bool mc::step() {
 
 	if(global_cfg.report_interval > 0 && step % global_cfg.report_interval == 0) {
 		cout << report(step) << endl;
+	}
+
+	
+	if(!check_properties(n)) {
+		cout << "mc::step(): Counter-example found." << endl;
+		return false;
 	}
 
 	if(global_cfg.check_local)
