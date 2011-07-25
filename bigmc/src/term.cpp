@@ -70,6 +70,15 @@ bool term::active_context() {
 	return parent->active_context();
 }
 
+set<term *> term::flatten() {
+	if(type == TPAR)
+		return ((parallel *)this)->flatten();
+
+	set<term *> s;
+	s.insert(this);
+	return s; 
+}
+
 parallel::parallel(set<term *>l) {
 	terms = l;
 	type = TPAR;
@@ -231,8 +240,8 @@ set<match *> parallel::find_matches(match *m) {
 				delete cl;
 				// Discard the matches we found
 				// FIXME leaking matches in the set res here.
-				return m->failure();
-				//continue;
+				//return m->failure();
+				continue;
 			} else if (cl->has_succeeded) { // Success!
 				if(DEBUG) cout << "BUG: parallel::find_matches(): match succeeded" << endl;
 				
@@ -243,11 +252,6 @@ set<match *> parallel::find_matches(match *m) {
 				match::merge(results,res);
 				r.pop_front();
 				delete cl;
-			} else {
-				if(DEBUG) cout << "BUG: parallel::find_matches(): match ... died?" << endl;
-				// FIXME: Um, what does this condition mean?
-				delete cl;
-				continue;
 			} 
 
 			if(DEBUG) cout << "BUG: parallel::find_matches(): match obj: " << m->to_string() << endl;
@@ -288,7 +292,10 @@ term *parallel::apply_match(match *m) {
 		n.insert((*i)->apply_match(m));
 	}
 
-	return new parallel(n);
+	parallel *pp = new parallel(n);
+	pp->flatten();
+
+	return pp;
 }
 
 term *parallel::instantiate(match *m) {
@@ -303,8 +310,24 @@ term *parallel::instantiate(match *m) {
 		}
 	}
 
-	return new parallel(n);
+	parallel *pp = new parallel(n);
+	pp->flatten();
+	return pp;
 }
+
+set<term*> parallel::flatten() {
+	set<term *> t;
+
+	for(set<term *>::iterator i = terms.begin(); i != terms.end(); i++) {
+		set<term *> l = (*i)->flatten();
+		t.insert(l.begin(), l.end());
+	}
+	
+	terms = t;
+	return t;
+}
+
+
 
 unsigned int parallel::size() {
 	unsigned int sz = 0;

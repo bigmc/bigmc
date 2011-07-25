@@ -161,6 +161,11 @@ string bigraph::to_string() {
 	string s = "Bigraph:\n\tRules:\n";
 
 	for(set<reactionrule *>::iterator r = rules.begin(); r!=rules.end(); r++) {
+		if(*r == NULL) {
+			rerror("bigraph::to_string") << "invalid NULL rule" << endl;
+			exit(1);
+		}
+
 		s += "\t\t" + (*r)->to_string() + "\n";
 	}
 

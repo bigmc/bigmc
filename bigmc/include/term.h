@@ -32,6 +32,7 @@ public:
 	virtual void accept(termvisitor *t);
 	term *parent;
 	virtual bool active_context();
+	virtual set<term*> flatten();
 };
 
 class parallel : public term {
@@ -46,6 +47,7 @@ public:
 	term *instantiate(match *m);
 	unsigned int size();
 	void accept(termvisitor *t);
+	set<term*> flatten();
 };
 
 class prefix : public term {
