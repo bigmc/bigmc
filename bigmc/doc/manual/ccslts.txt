@@ -1,0 +1,26 @@
+digraph reaction_graph {
+   node [shape = circle];
+   N_4593147777180348051 [shape=doublecircle, color=lightblue2, style=filled, label="(send[a].recv[a].recv[a].nil | recv[a].send[a].send[a].nil | send[a].recv[a].recv[a].nil)"];
+N_4593147777180348051 [ label="(send[a].recv[a].recv[a].nil | recv[a].send[a].send[a].nil | send[a].recv[a].recv[a].nil)"];
+N_17999559006850817143 [ label="(recv[a].recv[a].nil | send[a].send[a].nil | send[a].recv[a].recv[a].nil)"];
+   N_4593147777180348051 -> N_17999559006850817143 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_5107116720747329911 [ label="(send[a].recv[a].recv[a].nil | recv[a].recv[a].nil | send[a].send[a].nil)"];
+   N_4593147777180348051 -> N_5107116720747329911 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_8214833984966088411 [ label="(recv[a].nil | send[a].send[a].nil | recv[a].recv[a].nil)"];
+   N_17999559006850817143 -> N_8214833984966088411 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_14059371618174167131 [ label="(send[a].nil | recv[a].nil | send[a].recv[a].recv[a].nil)"];
+   N_5107116720747329911 -> N_14059371618174167131 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_16245608878023933403 [ label="(send[a].send[a].nil | recv[a].recv[a].nil | recv[a].nil)"];
+   N_5107116720747329911 -> N_16245608878023933403 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_16581416510299633215 [ shape = doublecircle, label="(nil | nil | send[a].recv[a].recv[a].nil)"];
+   N_14059371618174167131 -> N_16581416510299633215 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_11809144210498835263 [ label="(nil | recv[a].recv[a].nil | send[a].nil)"];
+   N_14059371618174167131 -> N_11809144210498835263 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_13381159432254647743 [ label="(nil | send[a].nil | recv[a].recv[a].nil)"];
+   N_16245608878023933403 -> N_13381159432254647743 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_13017104320144003007 [ label="(send[a].nil | recv[a].nil | recv[a].nil)"];
+   N_16245608878023933403 -> N_13017104320144003007 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+N_6480033968965447075 [ shape = doublecircle, label="(nil | nil | recv[a].nil)"];
+   N_13017104320144003007 -> N_6480033968965447075 [ label = "($2 | send[x].$0 | recv[x].$1) -> ($2 | $1 | $0)" ];
+}
+

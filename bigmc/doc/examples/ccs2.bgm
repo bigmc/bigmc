@@ -1,0 +1,9 @@
+%passive send : 1;
+%passive recv : 1;
+%outer a;
+send[a].recv[a].recv[a] | recv[a].send[a].send[a] | send[a].recv[a].recv[a];
+send[x].$0 | recv[x].$1 | $2 -> $0 | $1 | $2;
+
+%property shrink $pred->empty() || size() < $pred->size();
+
+%check
