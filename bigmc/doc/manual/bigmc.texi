@@ -104,6 +104,10 @@ The latest version of BigMC will always be available from the
 @url{http://bigraph.org/bigmc/release/bigmc-@value{VERSION}.tar.gz}
 @end itemize
 
+The latest version of this manual is available in PDF format from 
+@url{http://bigraph.org/bigmc/bigmc.pdf} or
+in HTML format from @url{http://bigraph.org/bigmc/manual}.
+
 @section Installation
 
 @acronym{BigMC} uses a standard GNU Autoconf/Automake setup.  You will need a 
