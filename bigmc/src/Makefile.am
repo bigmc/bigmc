@@ -10,7 +10,6 @@ bigmc_SOURCES = bgparser.ypp \
 	bigraph.cpp \
 	driver.cpp \
 	graph.cpp \
-	hole.cpp \
 	main.cpp \
 	match.cpp \
 	mc.cpp \
@@ -20,6 +19,11 @@ bigmc_SOURCES = bgparser.ypp \
 	query.cpp \
 	reactionrule.cpp \
 	term.cpp \
+	terms/regions.cpp \
+	terms/parallel.cpp \
+	terms/prefix.cpp \
+	terms/hole.cpp \
+	terms/nil.cpp \
 	../include/bigmc.h \
 	../include/bigraph.h \
 	../include/driver.h \

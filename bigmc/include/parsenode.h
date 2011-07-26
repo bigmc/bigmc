@@ -1,3 +1,24 @@
+/*******************************************************************************
+*
+* Copyright (C) 2011 Gian Perrone (http://itu.dk/~gdpe)
+* 
+* BigMC - A bigraphical model checker (http://bigraph.org/bigmc).
+* 
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+* USA.
+*********************************************************************************/
 #ifndef _PARSENODE_H
 #define _PARSENODE_H
 
@@ -18,6 +39,7 @@
 #define NODE_PRED	8192
 #define NODE_NUM	16384
 #define NODE_IF		32768
+#define NODE_REGION	65536
 
 #define OPR_NEQ	1
 #define OPR_EQ	2
@@ -80,6 +102,17 @@ public:
 	parsenode *rhs;
 	parallelnode(parsenode *l, parsenode *r);
 	~parallelnode();
+	string to_string();
+	bool is_valid();
+	vector<parsenode *> get_children();
+};
+
+class regionnode : public parsenode {
+public:
+	parsenode *lhs;
+	parsenode *rhs;
+	regionnode(parsenode *l, parsenode *r);
+	~regionnode();
 	string to_string();
 	bool is_valid();
 	vector<parsenode *> get_children();

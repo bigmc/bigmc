@@ -1,3 +1,24 @@
+/*******************************************************************************
+*
+* Copyright (C) 2011 Gian Perrone (http://itu.dk/~gdpe)
+* 
+* BigMC - A bigraphical model checker (http://bigraph.org/bigmc).
+* 
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+* USA.
+*********************************************************************************/
 using namespace std;
 #include <iostream>
 #include <string>
@@ -162,11 +183,27 @@ set<term *> parser::bg_collapse(parallelnode *p) {
 }
 
 set<term *> parser::bg_collapse(parsenode *p) {
-	if(p->type == TPAR)
+	if(p->type == NODE_PARALLEL)
 		return bg_collapse((parallelnode *)p);
 
 	set<term *> s;
 	s.insert(bg_mknode(p));
+	return s; 
+}
+
+list<term *> parser::bg_rcollapse(regionnode *p) {
+	list<term *> l = bg_rcollapse(p->lhs);
+	list<term *> r = bg_rcollapse(p->rhs);
+	l.insert(l.end(), r.begin(),r.end());
+	return l;
+}
+
+list<term *> parser::bg_rcollapse(parsenode *p) {
+	if(p->type == NODE_REGION)
+		return bg_rcollapse((regionnode *)p);
+
+	list<term *> s;
+	s.push_back(bg_mknode(p));
 	return s; 
 }
 
@@ -178,6 +215,16 @@ term *parser::bg_mknode(parallelnode *p) {
 	if(DEBUG) cerr << p->to_string() << endl;
 
 	return new parallel(bg_collapse(p));
+}
+
+term *parser::bg_mknode(regionnode *p) {
+	if(DEBUG) fprintf(stderr, "BUG: parser::bg_mknode(regionnode): ");
+
+	if(p == NULL) return new nil();
+
+	if(DEBUG) cerr << p->to_string() << endl;
+
+	return new regions(bg_rcollapse(p));
 }
 
 term *parser::bg_mknode(holenode *p) {
@@ -362,7 +409,8 @@ bigraph *parser::finish() {
 				if(DEBUG) printf("NODE_SIGNATURE: %s (%d) : %d\n", n.c_str(), c, t->arity);
 				break;
 			}
-			case NODE_PREFIX: case NODE_PARALLEL: case NODE_HOLE: case NODE_CONTROL: {
+			case NODE_REGION: case NODE_PREFIX: case NODE_PARALLEL: 
+			case NODE_HOLE: case NODE_CONTROL: {
 				b->set_root(bg_mknode(*it));
 				break;
 			}

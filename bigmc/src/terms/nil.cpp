@@ -22,30 +22,67 @@
 using namespace std;
 #include <string>
 #include <set>
-#include <map>
 #include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <map>
 #include <assert.h>
 
-#include <bigmc.h>
+#include <config.h>
+#include <globals.h>
+#include <report.h>
+#include <match.h>
+#include <term.h>
+#include <reactionrule.h>
 
-reactionrule::reactionrule(term *red, term *reac) {
-	redex = red;
-	reactum = reac;
+nil::nil() {
+	type = TNIL;
 }
 
-reactionrule::~reactionrule() {
-
+nil::~nil() {
 }
 
-string reactionrule::to_string() {
-	assert(this != NULL);
+string nil::to_string() {
+	return "nil";
+}
 
-	if(redex != NULL && reactum != NULL)
-		return redex->to_string() + " -> " + reactum->to_string();
-	if(redex != NULL)
-		return redex->to_string() + " -> NULL";
-	if(reactum != NULL)
-		return "NULL -> " + reactum->to_string();
-	return "<error printing rule>";
+set<match *> nil::find_matches(match *m) {
+	if(DEBUG) cout << "BUG: nil::find_matches()" << endl;
+
+	list<term *> r = m->remaining();
+
+	if(r.size() == 0 || (r.size() == 1 && r.front()->type == TNIL)) {
+		m->success();
+		m->advance(NULL,list<term*>());
+		return match::singleton(m);
+	}
+
+
+	if(r.size() == 1 && r.front()->type == THOLE) {
+		m->add_param(((hole *)r.front())->index, this);
+		m->success();
+		m->advance(NULL,list<term*>());
+		return match::singleton(m);
+	}
+
+	m->failure();
+
+	return set<match *>();
+} 
+
+term *nil::apply_match(match *m) {
+	return new nil();
+}
+
+term *nil::instantiate(match *m) {
+	return new nil();
+}
+
+unsigned int nil::size() {
+	return 0;
+}
+
+void nil::accept(termvisitor *t) {
+	t->visit(this);
 }
 
