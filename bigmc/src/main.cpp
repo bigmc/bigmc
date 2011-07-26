@@ -27,7 +27,7 @@ void print_usage(char **argv) {
 }
 
 void print_version() {
-	cout << "BigMC version " << VERSION << " (http://www.itu.dk/~gdpe/bigmc)\n";
+	cout << "BigMC version " << PACKAGE_VERSION << " (http://bigraph.org/bigmc)\n";
 	cout << "Copyright (c) 2011 Gian Perrone <gdpe at itu.dk>\n";
 }
 
