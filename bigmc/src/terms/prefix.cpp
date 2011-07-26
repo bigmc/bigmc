@@ -83,6 +83,10 @@ string prefix::to_string() {
 		return bigraph::control_to_string(ctrl) + nm + ".NULL";
 }
 
+control prefix::get_control() {
+	return ctrl;
+}
+
 term *prefix::get_suffix() {
 	return suffix;
 }

@@ -19,6 +19,7 @@ bigmc_SOURCES = bgparser.ypp \
 	query.cpp \
 	reactionrule.cpp \
 	term.cpp \
+	subtree.cpp \
 	terms/regions.cpp \
 	terms/parallel.cpp \
 	terms/prefix.cpp \
@@ -38,7 +39,8 @@ bigmc_SOURCES = bgparser.ypp \
 	../include/reactionrule.h \
 	../include/report.h \
 	../include/globals.h \
-	../include/term.h
+	../include/term.h \
+	../include/subtree.h
 
 noinst_HEADERS = ../include/bigmc.h \
 	../include/bigraph.h \
@@ -53,7 +55,8 @@ noinst_HEADERS = ../include/bigmc.h \
 	../include/query.h \
 	../include/reactionrule.h \
 	../include/globals.h \
-	../include/term.h
+	../include/term.h \
+	../include/subtree.h
 
 bigmc_CPPFLAGS = -I../include
 includes = ../include

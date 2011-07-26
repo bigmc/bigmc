@@ -6,6 +6,6 @@ a || b | c || c | a;
 
 a -> b;
 
-%property nil true;
+%property nil size() > 0;
 
 %check

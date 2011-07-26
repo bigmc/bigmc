@@ -19,33 +19,21 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 * USA.
 *********************************************************************************/
-#ifndef _BIGMC_H
-#define _BIGMC_H
+#ifndef _SUBTREE_H
+#define _SUBTREE_H
 
-using namespace std;
-#include <set>
-#include <vector>
-#include <map>
 #include <string>
+#include <sstream>
+#include <deque>
+#include <vector>
 
-#include "config.h"
-
-#include "globals.h"
-#include "report.h"
-#include "match.h"
-#include "term.h"
-#include "reactionrule.h"
-#include "bigraph.h"
-#include "node.h"
-#include "graph.h"
-#include "predicate.h"
-#include "query.h"
-#include "parsenode.h"
-#include "subtree.h"
-#include "mc.h"
-#include "driver.h"
-#include "parser.h"
-
-void print_version();
+class subtree {
+public:
+	static string preorder_string(term *t);
+	static string preorder_string(prefix *t);
+	static string preorder_string(parallel *t);
+	static string preorder_string(nil *t);
+	static string preorder_string(hole *t);
+};
 
 #endif

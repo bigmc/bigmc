@@ -302,6 +302,9 @@ term *parser::bg_mknode(parsenode *p) {
 	case NODE_HOLE:
 		return bg_mknode((holenode *) p);
 		break;
+	case NODE_REGION:
+		return bg_mknode((regionnode *) p);
+		break;
 	case NODE_CONTROL: {
 		if(DEBUG) cout << "parser::bg_mknode(): NODE_CONTROL: " << p << endl;
 		controlnode *pp = dynamic_cast<controlnode *>(p);

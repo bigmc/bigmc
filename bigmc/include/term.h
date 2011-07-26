@@ -98,6 +98,7 @@ class prefix : public term {
 public:
 	prefix(control ctrl, vector<name> ports, term *suff);
 	~prefix();
+	control get_control();
 	string to_string();
 	term *get_suffix();
 	set<match *> find_matches(match *m);
