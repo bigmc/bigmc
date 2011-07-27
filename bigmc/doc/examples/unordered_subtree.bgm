@@ -1,0 +1,11 @@
+%active a : 0;
+%active b : 0;
+%active c : 0;
+%active d : 0;
+%active e : 0;
+
+e.(d | a | b.(c | b));
+
+a -> b;
+
+%check

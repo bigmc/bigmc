@@ -149,8 +149,31 @@ term* bigraph::get_root(int i) {
 set<match *> bigraph::find_matches() {
 	set<match *> res;
 
+	list<st_el*> l = subtree::preorder_string(root);
+
+	cout << "bigraph::find_matches: preorder: ";
+
+	for(list<st_el*>::iterator i = l.begin(); i!=l.end(); i++) {
+		cout << (*i)->name << " ";
+	}
+
+	cout << endl;
+
 	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
 		if(DEBUG) cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
+
+		list<st_el*> lr = subtree::preorder_string((*i)->redex);
+
+		cout << "bigraph::find_matches: preorder redex: ";
+
+		for(list<st_el*>::iterator j = lr.begin(); j!=lr.end(); j++) {
+			cout << (*j)->name << " ";
+		}
+
+		cout << endl;
+
+
+
 		set<match *> mp = term::find_all_matches(get_root(0), *i);
 		res.insert(mp.begin(),mp.end());
 	}

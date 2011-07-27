@@ -40,37 +40,91 @@ using namespace std;
 /* An implementation of Luccio et al.'s sublinear exact tree matching, as described in
  "Exact rooted subtree matching in sublinear time". */
 
-string subtree::preorder_string(term *t) {
+
+bool cmp_st_elp (st_el *a, st_el *b) {
+	if(a->name == "[-]") return false;
+	if(b->name == "[-]") return true;
+
+	return a->name < b->name;
+}
+
+list<st_el*> subtree::preorder_string(term *t) {
 	switch(t->type) {
 		case TPREF: return preorder_string((prefix *)t);
 		case TPAR:  return preorder_string((parallel *)t);
 		case THOLE: return preorder_string((hole *)t);
 		case TNIL:  return preorder_string((nil *)t);
-		default: return "<unhandled>";
+		default: return list<st_el*>();
 	}
 }
 
-string subtree::preorder_string(prefix *t) {
-	return " " + bigraph::control_to_string(t->get_control()) +
-		 preorder_string(t->get_suffix());
+list<st_el*> subtree::preorder_string(prefix *t) {
+	st_el* e = new st_el(t, bigraph::control_to_string(t->get_control()));
+
+	list<st_el*> tl = preorder_string(t->get_suffix());
+
+	tl.push_front(e);
+	tl.push_back(new st_el(NULL, "0"));
+
+	return tl;
 }
 
-string subtree::preorder_string(nil *t) {
-	return " 0";
+list<st_el*> subtree::preorder_string(nil *t) {
+	list<st_el*> l;
+
+	//l.push_back(new st_el(NULL, "0"));
+
+	return l;
 }
 
-string subtree::preorder_string(parallel *t) {
-	string s = " ";
-
+list<st_el*> subtree::preorder_string(parallel *t) {
+	cout << "subtree::preorder_string: parallel: " << t->to_string() << endl;
 	set<term *> ch = t->get_children();
-	
+	list<st_el*> sorted_ch;
+	list<st_el*> res;
+
 	for(set<term *>::iterator i = ch.begin(); i!=ch.end(); i++) {
-		s += preorder_string(*i);
+		switch((*i)->type) {
+		case TPREF:
+			sorted_ch.push_back(
+				new st_el(*i,bigraph::control_to_string(
+					((prefix *)(*i))->get_control())));
+			break;
+		case THOLE:
+			sorted_ch.push_back(new st_el(*i, "[-]"));
+			break;
+		case TNIL:
+			break;
+		}
 	}
 
-	return s + " 0";
+	sorted_ch.sort(cmp_st_elp);
+
+	for(list<st_el*>::iterator i = sorted_ch.begin(); i!=sorted_ch.end(); i++) {
+		list<st_el*> j = preorder_string((*i)->data);
+		res.insert(res.end(), j.begin(), j.end());
+	}
+
+
+	return res;
 }
 
-string subtree::preorder_string(hole *t) {
-	return " [-]";
+list<st_el*> subtree::preorder_string(hole *t) {
+	list<st_el*> l;
+	l.push_back(new st_el(t, "[-]"));
+	return l;
 }
+
+st_el::st_el(term *t, string n) {
+	data = t;
+	name = n;
+}
+
+st_el::~st_el() {
+
+}
+
+bool st_el::operator< (st_el &other) {
+	return name < other.name;
+}
+

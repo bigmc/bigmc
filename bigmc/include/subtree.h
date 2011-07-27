@@ -27,13 +27,22 @@
 #include <deque>
 #include <vector>
 
+class st_el {
+public:
+	st_el(term *t, string n);
+	~st_el();
+	term *data;
+	string name;
+	bool operator <(st_el &l);
+};
+
 class subtree {
 public:
-	static string preorder_string(term *t);
-	static string preorder_string(prefix *t);
-	static string preorder_string(parallel *t);
-	static string preorder_string(nil *t);
-	static string preorder_string(hole *t);
+	static list<st_el*> preorder_string(term *t);
+	static list<st_el*> preorder_string(prefix *t);
+	static list<st_el*> preorder_string(parallel *t);
+	static list<st_el*> preorder_string(nil *t);
+	static list<st_el*> preorder_string(hole *t);
 };
 
 #endif

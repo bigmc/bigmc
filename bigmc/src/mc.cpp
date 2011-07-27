@@ -42,7 +42,17 @@ mc::mc(bigraph *b) {
 	g = new graph(n);
 	workqueue.push_back(n);
 	steps = 0;
-	cout << "mc::mc: preorder: " << subtree::preorder_string(b->get_root(0)) << endl;
+
+	list<st_el*> l = subtree::preorder_string(b->get_root(0));
+
+	cout << "mc::mc: preorder: ";
+
+	for(list<st_el*>::iterator i = l.begin(); i!=l.end(); i++) {
+		cout << (*i)->name << " ";
+	}
+
+	cout << endl;
+
 }
 
 mc::~mc() {

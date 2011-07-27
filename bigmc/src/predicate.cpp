@@ -33,11 +33,14 @@ predicate::predicate(string name, char *filename) {
 	pred_eval = NULL;
 
 	if(filename[0] == '/') {
-		rinfo("predicate::predicate") << "loading predicate from " << filename << endl;
+		if(global_cfg.verbose_level) 
+			rinfo("predicate::predicate") << "loading predicate from " <<
+				filename << endl;
 		handle = dlopen(filename, RTLD_LAZY);
 	} else {
 		char buf[2048];
 		sprintf(buf,"%s/lib/%s", global_cfg.bigmc_home, filename);
+		if(global_cfg.verbose_level) 
 		rinfo("predicate::predicate") << "loading predicate from " << buf << endl;
 		handle = dlopen(buf, RTLD_LAZY);
 	}
