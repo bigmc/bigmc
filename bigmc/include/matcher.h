@@ -19,34 +19,20 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 * USA.
 *********************************************************************************/
-#ifndef _BIGMC_H
-#define _BIGMC_H
+#ifndef _MATCHER_H
+#define _MATCHER_H
 
-using namespace std;
-#include <set>
-#include <vector>
-#include <map>
-#include <string>
+class matcher {
+public:
+	static set<match *> try_match(prefix *t, prefix *r, match *m);
+	static set<match *> try_match(parallel *t, prefix *r, match *m);
+	static set<match *> try_match(parallel *t, parallel *r, match *m);
+	static set<match *> try_match(term *t, regions *r, match *m);
+	static set<match *> try_match(term *t, hole *r, match *m);
+	static set<match *> try_match(nil *t, nil *r, match *m);
+	static set<match *> try_match(term *t, term *r, match *m);
 
-#include "config.h"
-
-#include "globals.h"
-#include "report.h"
-#include "match.h"
-#include "term.h"
-#include "reactionrule.h"
-#include "bigraph.h"
-#include "node.h"
-#include "graph.h"
-#include "predicate.h"
-#include "query.h"
-#include "parsenode.h"
-#include "subtree.h"
-#include "matcher.h"
-#include "mc.h"
-#include "driver.h"
-#include "parser.h"
-
-void print_version();
+	static set<match *> try_match(term *t, reactionrule *r);
+};
 
 #endif
