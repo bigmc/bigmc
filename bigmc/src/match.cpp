@@ -198,3 +198,28 @@ void match::incorporate(match *other) {
 		mapping[i->first] = i->second;
 	}
 }
+
+wide_match::wide_match(reactionrule *r)
+: match(NULL,list<term*>(),NULL,r)
+{
+	;
+}
+
+wide_match::~wide_match() {
+
+}
+
+void wide_match::add_submatch(match *m) {
+	submatches.push_back(m);
+}
+
+list<match *> wide_match::get_submatches() {
+	return submatches;
+}
+
+match *wide_match::clone(term *head, list<term *> rem) {
+	wide_match *m = new wide_match(get_rule());
+	m->submatches = submatches;
+	return m;
+}
+

@@ -33,6 +33,7 @@ public:
 	static set<match *> try_match(term *t, term *r, match *m);
 
 	static set<match *> try_match(term *t, reactionrule *r);
+	static set<match *> try_match_anywhere(term *t, term *r, reactionrule *rl);
 };
 
 #endif

@@ -39,6 +39,11 @@ using namespace std;
 #include <matcher.h>
 
 set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
+	if(DEBUG) {
+		rinfo("matcher::try_match") << "matching prefix: " << t->to_string() <<
+			" against redex: " << r->to_string() << endl;
+	}
+
 	if(t->get_control() == r->get_control()) {
 
 		if(m->root == NULL && t->active_context()) {
@@ -58,9 +63,12 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 }
 
 set<match *> matcher::try_match(parallel *t, prefix *r, match *m) {
-	set<term *> tch = t->get_children();
+	if(DEBUG) {
+		rinfo("matcher::try_match") << "matching par: " << t->to_string() <<
+			" against pref redex: " << r->to_string() << endl;
+	}
 	
-	return set<match*>();
+	return m->failure();
 }
 
 set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
@@ -163,8 +171,62 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	return res;
 }
 
+set<match *> crossprod(set<match *>  m1, set<match *> m2) {
+	// We have two sets {a,b,c} and {d,e,f}:
+	// We want to construct:
+	// {a.incorporate(d), a.incorporate(e), a.incorporate(f), b.inc...}
+
+	if(DEBUG) cout << "crossprod(): " << m1.size() << " with " << m2.size() << endl;
+
+	set<match *> res;
+
+	for(set<match*>::iterator i = m1.begin(); i!=m1.end(); i++) {
+		for(set<match*>::iterator j = m2.begin(); j!=m2.end(); j++) {
+			match *nm = (*i)->clone(NULL, list<term*>());
+			nm->incorporate(*j);
+			res.insert(nm);
+		}
+	}
+
+	m1.clear();
+	m2.clear();
+	
+	if(DEBUG) cout << "crossprod(): res: " << res.size() << endl;
+
+	return res;
+}
+
 set<match *> matcher::try_match(term *t, regions *r, match *m) {
-	return set<match*>();
+	if(DEBUG) {
+		rinfo("matcher::try_match") << "matching region: " << t->to_string() <<
+			" against redex: " << r->to_string() << endl;
+	}
+
+	set<match *> matches;
+	list<term *> ch = r->get_children();
+
+	if(m->root != NULL || t->parent != NULL) 
+		return m->failure();
+
+	m->root = t;
+	m->add_match(r,t);
+	
+
+	for(list<term *>::iterator i = ch.begin(); i != ch.end(); i++) {
+		set<match*> ms = try_match_anywhere(t, *i, m->get_rule());
+
+		if(ms.size() == 0)
+			return m->failure();
+
+		if(matches.size() == 0)
+			matches = ms;
+		else
+			matches = crossprod(matches, ms);
+	}
+
+	m->success();
+
+	return matches;
 }
 
 set<match *> matcher::try_match(term *t, hole *r, match *m) {
@@ -199,6 +261,10 @@ set<match *> matcher::try_match(term *t, term *r, match *m) {
 set <match *> matcher::try_match(term *t, reactionrule *r) {
 	set<match *> matches;
 
+	if(r->redex->type == TREGION)
+		return try_match(t, r->redex, 
+			new match(NULL, term::singleton(r->redex), NULL, r));
+
 	term *p = t->next();
 	while(p != NULL) {
 		match *nm = new match(NULL, term::singleton(r->redex), NULL, r);
@@ -210,5 +276,21 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 
 	return matches;
 }
+
+set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl) {
+	set<match *> matches;
+
+	term *p = t->next();
+	while(p != NULL) {
+		match *nm = new match(NULL, term::singleton(r), NULL, rl);
+		matches = match::merge(matches, try_match(p, r, nm));
+		p = t->next();
+	}
+
+	t->reset();
+
+	return matches;
+}
+
 
 

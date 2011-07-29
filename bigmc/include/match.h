@@ -51,7 +51,7 @@ public:
 	void success();
 	static set<match *> singleton(match *t);	
 	list<term *> remaining();
-	match *clone(term *head, list<term *> rem);
+	virtual match *clone(term *head, list<term *> rem);
 	match *fresh(term *head, list<term *> rem);
 	void advance(term *head, list<term *> rem);
 	static set<match *> merge(set<match *> a, set<match *> b);
@@ -60,6 +60,16 @@ public:
 	bool has_failed;
 	void incorporate(match *other);
 
+};
+
+class wide_match : public match {
+	list<match *> submatches;
+public:
+	wide_match(reactionrule *r);
+	~wide_match();
+	void add_submatch(match *m);
+	list<match *> get_submatches();
+	match *clone(term *head, list<term *> rem);
 };
 
 #endif
