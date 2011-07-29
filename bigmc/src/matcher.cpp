@@ -107,11 +107,13 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 		for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
 			if((*i)->type == THOLE) {
 				if(xdim > ydim) {
+					// There are "extra" things lying around, 
+					// push these all into the hole.
 					set<term*> nch;
 				
 					nch.insert(cand[xdim-1-k++]);
 
-					for(int l = 0; l<ydim-xdim; l++) {
+					for(int l = 0; l<xdim-ydim; l++) {
 						nch.insert(cand[l]);
 					}
 
