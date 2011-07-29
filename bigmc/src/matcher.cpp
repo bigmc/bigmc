@@ -131,6 +131,8 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 				}
 			}
 
+			// FIXME: We should store matches as they are tried,
+			// and then not repeat them.
 			set<match*> mm = try_match(cand[xdim-1-k++],*i,nn);
 
 			if(nn->has_failed) {
