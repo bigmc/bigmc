@@ -23,6 +23,7 @@ using namespace std;
 #include <string>
 #include <set>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <algorithm>
 #include <map>
@@ -39,14 +40,12 @@ using namespace std;
 
 set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 	if(t->get_control() == r->get_control()) {
-		cout << "prefix: successful match" << endl;
 
 		if(m->root == NULL && t->active_context()) {
 			m->root = t;
 		} 
 
 		if(m->root == NULL && !t->active_context()) {
-			cout << "prefix: match failed: passive ctx" << endl;
 			return m->failure();
 		}
 
@@ -54,13 +53,11 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 
 		return try_match(t->get_suffix(), r->get_suffix(), m);
 	} else {
-		cout << "prefix: match failed" << endl;
 		return m->failure();
 	}
 }
 
 set<match *> matcher::try_match(parallel *t, prefix *r, match *m) {
-	cout << "matcher::try_match: parallel, prefix" << endl;
 	set<term *> tch = t->get_children();
 	
 	return set<match*>();
@@ -69,23 +66,31 @@ set<match *> matcher::try_match(parallel *t, prefix *r, match *m) {
 set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	set<term *> tch = t->get_children();
 	set<term *> rch = r->get_children();
-	map<term *, list<set<match *> > > matches;
+	map<term *, vector<set<match *> > > matches;
 
 	if(rch.size() > tch.size())
 		return m->failure();
 
+	// FIXME: We need to distinguish matching behaviour for:
+	// a.(a | b) vs. a | b -- the former will not match a.(a | b | c), latter will.
+
+	if(m->root == NULL) {
+		if(!t->active_context()) return m->failure();
+	
+		m->root = t;
+	}
+	
 	m->add_match(r,t);
 
 	for(set<term *>::iterator i = rch.begin(); i != rch.end();  i++) {
 		for(set<term *>::iterator j = tch.begin(); j != tch.end(); j++) {
-			cout << "matcher: " << (*i)->to_string() << " against " << (*j)->to_string() << endl;
 			match *nm = m->clone(m->root, term::singleton(*i));
 			set<match*> mt = try_match(*j,*i,nm);
 
 			if(nm->has_succeeded || mt.size() > 0) {
 				matches[*i].push_back(mt);
-				cout << "nm succeeded: " << mt.size() << " m: " << nm->to_string() << endl;
 			} else {
+				matches[*i].push_back(set<match*>());
 				//cout << "nm: failed: " << nm->to_string() << endl;
 			}
 
@@ -95,7 +100,6 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 
 	if(matches.size() < rch.size()) {
 		// We didn't obtain enough matches for all the parts of the redex
-		cout << "matches sz: " << matches.size() << " rch sz: " << rch.size() << endl;
 		return m->failure();
 	}
 
@@ -108,30 +112,84 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	// match1 = m1 + m5, match2 = m2 + m5
 	
 
-	unsigned int sum = 1;
-	for(set<term *>::iterator i = rch.begin(); i != rch.end();  i++) {
-		sum = sum * matches[*i].size();
+	cout << setw(20) << " ";
+
+	for(set<term *>::iterator j = tch.begin(); j != tch.end();  j++) {
+		cout << "\t" << setw(20) << (*j)->to_string();
 	}
 
-	cout << "sum: " << sum << endl;
+	cout << endl;
 
-	return set<match*>();
+	for(set<term *>::iterator i = rch.begin(); i != rch.end();  i++) {
+		cout << setw(20) << (*i)->to_string();
+		int k = 0;
+		for(set<term *>::iterator j = tch.begin(); j != tch.end();  j++) {
+			cout << "\t" << setw(20) << matches[*i][k++].size();
+		}
+
+		cout << endl;
+	}
+
+	
+	int sum = rch.size() * tch.size();
+
+
+	unsigned int xdim = tch.size();
+	unsigned int ydim = rch.size();
+	term *cand[xdim];
+
+	int p = 0;
+	for(set<term*>::iterator i = tch.begin(); i != tch.end(); i++) {
+		cand[p++] = *i;
+	}
+
+	sort(cand,cand+xdim);
+
+	set<match *> res;
+
+	do {
+		int k = 0;
+		int succ = 0;
+		
+		match *nn = m->clone(m->root, list<term*>());
+
+		for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
+			set<match*> mm = try_match(cand[xdim-1-k++],*i,nn);
+
+			if(nn->has_failed) {
+				delete nn;
+				mm.clear();
+				break;
+			}
+
+			nn->has_succeeded = false;
+
+			res = match::merge(res,mm);		
+
+			succ++;
+		}
+
+		if(succ >= ydim) {
+			res.insert(nn);
+		}
+	} while(next_permutation(cand, cand+xdim));
+
+	if(res.size() == 0) return m->failure();
+
+	return res;
 }
 
 set<match *> matcher::try_match(term *t, regions *r, match *m) {
-	cout << "matcher::try_match: term, regions" << endl;
 	return set<match*>();
 }
 
 set<match *> matcher::try_match(term *t, hole *r, match *m) {
-	cout << "matcher::try_match: term, hole" << endl;
 	m->success();
 	m->add_param(r->index, t);
 	return match::singleton(m);
 }
 
 set<match *> matcher::try_match(nil *t, nil *r, match *m) {
-	cout << "matcher::try_match: nil, nil" << endl;
 	m->add_match(r,t);
 	m->success();
 	return match::singleton(m);
@@ -159,7 +217,7 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 
 	term *p = t->next();
 	while(p != NULL) {
-		match *nm = new match(NULL, term::singleton(r->redex), NULL, NULL);
+		match *nm = new match(NULL, term::singleton(r->redex), NULL, r);
 		matches = match::merge(matches, try_match(p, r->redex, nm));
 		p = t->next();
 	}

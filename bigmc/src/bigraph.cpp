@@ -153,9 +153,9 @@ set<match *> bigraph::find_matches() {
 	for(set<reactionrule *>::iterator i = rules.begin(); i!= rules.end(); ++i) {
 		if(DEBUG) cout << "bigraph::find_matches(): redex: " << (*i)->redex->to_string() << endl;
 		
-		matcher::try_match(get_root(0), *i);
+		set<match *> mp = matcher::try_match(get_root(0), *i);
 
-		set<match *> mp = term::find_all_matches(get_root(0), *i);
+		//set<match *> mp = term::find_all_matches(get_root(0), *i);
 		res.insert(mp.begin(),mp.end());
 	}
 
