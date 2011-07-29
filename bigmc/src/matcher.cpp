@@ -82,55 +82,6 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	
 	m->add_match(r,t);
 
-	for(set<term *>::iterator i = rch.begin(); i != rch.end();  i++) {
-		for(set<term *>::iterator j = tch.begin(); j != tch.end(); j++) {
-			match *nm = m->clone(m->root, term::singleton(*i));
-			set<match*> mt = try_match(*j,*i,nm);
-
-			if(nm->has_succeeded || mt.size() > 0) {
-				matches[*i].push_back(mt);
-			} else {
-				matches[*i].push_back(set<match*>());
-				//cout << "nm: failed: " << nm->to_string() << endl;
-			}
-
-			//cout << "matcher: " << matches.size() << endl;
-		} 
-	}
-
-	if(matches.size() < rch.size()) {
-		// We didn't obtain enough matches for all the parts of the redex
-		return m->failure();
-	}
-
-	// So we now have a table like this for a term A | A | B | C redex A | B:
-	//    A   A   B   C
-	// A  m1  m2  -   -
-	// 
-	// B  -   -   m5  -
-	// 
-	// match1 = m1 + m5, match2 = m2 + m5
-	
-
-	cout << setw(20) << " ";
-
-	for(set<term *>::iterator j = tch.begin(); j != tch.end();  j++) {
-		cout << "\t" << setw(20) << (*j)->to_string();
-	}
-
-	cout << endl;
-
-	for(set<term *>::iterator i = rch.begin(); i != rch.end();  i++) {
-		cout << setw(20) << (*i)->to_string();
-		int k = 0;
-		for(set<term *>::iterator j = tch.begin(); j != tch.end();  j++) {
-			cout << "\t" << setw(20) << matches[*i][k++].size();
-		}
-
-		cout << endl;
-	}
-
-	
 	int sum = rch.size() * tch.size();
 
 
@@ -154,6 +105,30 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 		match *nn = m->clone(m->root, list<term*>());
 
 		for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
+			if((*i)->type == THOLE) {
+				if(xdim > ydim) {
+					set<term*> nch;
+				
+					nch.insert(cand[xdim-1-k++]);
+
+					for(int l = 0; l<ydim-xdim; l++) {
+						nch.insert(cand[l]);
+					}
+
+					parallel *np = new parallel(nch);
+					nn->add_param(((hole*)(*i))->index, np);
+					succ++;
+					continue;
+				} else if (xdim == ydim) {
+					nn->add_param(((hole*)(*i))->index, cand[xdim-1-k++]);
+					succ++;
+					continue;
+				} else {
+					nn->failure();
+					break;
+				}
+			}
+
 			set<match*> mm = try_match(cand[xdim-1-k++],*i,nn);
 
 			if(nn->has_failed) {
