@@ -33,7 +33,7 @@ public:
 	~mc();
 	bool check();
 	string report(int step);
-	bool step();
+	bool step(int tid);
 	static void add_property(string s, query *q);
 	bool check_properties(node *n);
 	static void *thread_wrapper( void *i );

@@ -102,6 +102,8 @@ void bigraph::set_root(term *n) {
 void bigraph::add_rule(reactionrule *r) {
 	rules.insert(r);
 
+	r->contextify();
+
 	if(!term::matches(r->reactum, r->redex)) return;
 
 	rwarning("bigraph::add_rule") << "=================================================================================\n";

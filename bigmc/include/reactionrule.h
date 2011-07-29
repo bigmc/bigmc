@@ -23,12 +23,14 @@
 #define _REACTIONRULE_H
 
 class reactionrule {
+	static int u_ctx;
 public:
 	term *redex;
 	term *reactum;
 	reactionrule(term *red, term *reac);
 	~reactionrule();
 	string to_string();
+	void contextify();
 };
 
 #endif

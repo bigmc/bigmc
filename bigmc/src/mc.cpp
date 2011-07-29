@@ -33,7 +33,13 @@ using namespace std;
 pthread_mutex_t mcmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t wqmutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t gmutex = PTHREAD_MUTEX_INITIALIZER;
+vector<bool> sigmbx;
 #endif
+
+struct mc_id {
+	mc *data;
+	int id;
+};
 
 map<string,query*> mc::properties;
 
@@ -42,17 +48,6 @@ mc::mc(bigraph *b) {
 	g = new graph(n);
 	workqueue.push_back(n);
 	steps = 0;
-
-	list<st_el*> l = subtree::preorder_string(b->get_root(0));
-
-	cout << "mc::mc: preorder: ";
-
-	for(list<st_el*>::iterator i = l.begin(); i!=l.end(); i++) {
-		cout << (*i)->name << " ";
-	}
-
-	cout << endl;
-
 }
 
 mc::~mc() {
@@ -60,9 +55,9 @@ mc::~mc() {
 }
 
 void *mc::thread_wrapper( void *i ) {
-	mc *nc = reinterpret_cast<mc*>(i);
+	mc_id *nc = reinterpret_cast<mc_id*>(i);
 
-	while(nc->step())
+	while(nc->data->step(nc->id))
 		;
 
 	return NULL;
@@ -71,8 +66,13 @@ void *mc::thread_wrapper( void *i ) {
 bool mc::check() {
 	#ifdef HAVE_PTHREAD
 
+	sigmbx = vector<bool>(global_cfg.threads, false);
+
 	if(global_cfg.threads <= 1) {
-		thread_wrapper(this);
+		mc_id *i = new mc_id;
+		i->data = this;
+		i->id = 0;
+		thread_wrapper(i);
 		cout << "mc::check(): Complete!" << endl;
 		cout << report(steps) << endl;
 
@@ -81,20 +81,30 @@ bool mc::check() {
 
 	pthread_t *threads = new pthread_t[global_cfg.threads];
 	for(int i = 0; i<global_cfg.threads; i++) {
-		rinfo("mc::check") << "Worker thread #" << i << " started" << endl;
-		pthread_create(&threads[i], NULL, &mc::thread_wrapper, this);
+		if(REPORT(1)) 
+			rinfo("mc::check") << "Worker thread #" << i << " started" << endl;
+
+		mc_id *id = new mc_id;
+		id->data = this;
+		id->id = i;
+
+		pthread_create(&threads[i], NULL, &mc::thread_wrapper, id);
 	}
 
 	for(int i = 0; i<global_cfg.threads; i++) {
 		pthread_join(threads[i], NULL);
-		rinfo("mc::check") << "Worker thread #" << i << " finished" << endl;
+		if(REPORT(1))
+			rinfo("mc::check") << "Worker thread #" << i << " finished" << endl;
 	}
 
 	cout << "mc::check(): Complete!" << endl;
 	cout << report(steps) << endl;
 
 	#else
-	thread_wrapper(this);
+	mc_id *i = new mc_id;
+	i->data = this;
+	i->id = 0;
+	thread_wrapper(i);
 	#endif
 
 	return false;
@@ -126,7 +136,7 @@ string mc::report(int step) {
 }
 
 // returns true while there is work to do
-bool mc::step() {
+bool mc::step(int id) {
 	if(steps >= global_cfg.max_steps) {
 		cout << "mc::step(): Interrupted!  Reached maximum steps: " << global_cfg.max_steps << endl;
 		cout << report(steps) << endl;
@@ -141,11 +151,19 @@ bool mc::step() {
 	int step = steps;
 
 	if(workqueue.size() == 0) {
-		// We're done!
+		// We can't see any more work to do...
 
 		#ifdef HAVE_PTHREAD
 
-		cout << "workqueue.size() == 0, exiting thread..." << endl;
+		sigmbx[id] = true;
+
+		for(int i = 0; i<sigmbx.size(); i++) {
+			if(!sigmbx[i]) {
+				pthread_mutex_unlock( &mcmutex );
+				return true;
+			}
+		}
+
 		pthread_mutex_unlock( &mcmutex );
 		return false;
 
@@ -157,6 +175,8 @@ bool mc::step() {
 		exit(0);
 		return false; 
 		#endif
+	} else {
+		sigmbx[id] = false;
 	}
 
 	node *n = workqueue.front();
@@ -242,9 +262,6 @@ bool mc::step() {
 				#endif
 			}
 		}
-
-		if(DEBUG) cout << "BUG: mc::step(): new node" << endl << b2->to_string() << endl;	
-		if(DEBUG) cout << "BUG: mc::step(): workq size: " << workqueue.size() << endl;
 	}
 
 	if(global_cfg.report_interval > 0 && step % global_cfg.report_interval == 0) {

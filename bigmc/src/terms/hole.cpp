@@ -44,6 +44,9 @@ hole::~hole() {
 }
 
 string hole::to_string() {
+	if(index >= 19191911) return "$ctx";
+
+
 	std::string s;
 	std::stringstream out;
 	out << index;
@@ -70,7 +73,7 @@ term *hole::instantiate(match *m) {
 		exit(1);
 	}
 
-	cout << "hole::instantiate: " << m->to_string() << endl;
+	if(DEBUG) rinfo("hole::instantiate") << m->to_string() << endl;
 
 	term *t = m->get_param(index);
 

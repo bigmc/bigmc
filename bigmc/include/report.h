@@ -23,7 +23,7 @@
 #define _REPORT_H
 
 #define DEBUG	global_cfg.debug
-#define REPORT(x) (x >= global_cfg.verbose_level)
+#define REPORT(x) (x <= global_cfg.verbose_level)
 
 #define REPORT_FATAL 1
 #define REPORT_WARN  2

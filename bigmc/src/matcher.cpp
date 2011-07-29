@@ -64,6 +64,11 @@ set<match *> matcher::try_match(parallel *t, prefix *r, match *m) {
 }
 
 set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
+	if(DEBUG) {
+		rinfo("matcher::try_match") << "matching: " << t->to_string() <<
+			" against redex: " << r->to_string() << endl;
+	}
+
 	set<term *> tch = t->get_children();
 	set<term *> rch = r->get_children();
 	map<term *, vector<set<match *> > > matches;
@@ -101,12 +106,13 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	do {
 		int k = 0;
 		int succ = 0;
+		int holecnt = 0;
 		
 		match *nn = m->clone(m->root, list<term*>());
 
 		for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
 			if((*i)->type == THOLE) {
-				if(xdim > ydim) {
+				if(xdim > ydim && holecnt == 0) {
 					// There are "extra" things lying around, 
 					// push these all into the hole.
 					set<term*> nch;
@@ -120,8 +126,9 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 					parallel *np = new parallel(nch);
 					nn->add_param(((hole*)(*i))->index, np);
 					succ++;
+					holecnt++;
 					continue;
-				} else if (xdim == ydim) {
+				} else if (xdim == ydim || holecnt > 0) {
 					nn->add_param(((hole*)(*i))->index, cand[xdim-1-k++]);
 					succ++;
 					continue;
@@ -131,8 +138,6 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 				}
 			}
 
-			// FIXME: We should store matches as they are tried,
-			// and then not repeat them.
 			set<match*> mm = try_match(cand[xdim-1-k++],*i,nn);
 
 			if(nn->has_failed) {
