@@ -31,9 +31,15 @@ then
         exit 1
 fi
 
+cd doc/manual
+
+./format_manual.sh
+
+cd ../../
+
 scp doc/website/* $TARG/
+scp doc/website/manual/* $TARG/manual/
 scp doc/manual/bigmc.pdf $TARG/bigmc.pdf
-scp doc/manual/bigmc.html/* $TARG/manual/
 scp bigmc-$VERSION.tar.gz $TARG/release/
 scp bin/BigMC-$VERSION.pkg $TARG/release/
 
