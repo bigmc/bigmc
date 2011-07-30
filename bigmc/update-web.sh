@@ -33,5 +33,5 @@ scp doc/website/* $TARG/
 scp doc/manual/bigmc.pdf $TARG/bigmc.pdf
 scp doc/manual/bigmc.html/* $TARG/manual/
 scp bigmc-0.1.tar.gz $TARG/release/
-
+scp bin/BigMC-0.1.pkg $TARG/release/
 
