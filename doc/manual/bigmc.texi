@@ -6,6 +6,14 @@
 @syncodeindex pg cp
 @comment %**end of header
 
+@macro htmlheader {}
+@ifhtml
+@html
+<h1>FOO BAR FOO BAR FOO BAR</h1>
+@end html
+@end ifhtml
+@end macro
+
 @copying
 This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
 
@@ -57,6 +65,7 @@ This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
 * Property language::  How to describe specifications
 * Checking::           How to check properties
 * Interactive mode::   How to use BigMC interactively
+* Table of Contents::  All contents of this manual
 @end menu
 
 @node Introduction
@@ -547,6 +556,11 @@ send[x].$0 | recv[x].$1 -> $0 | $1;
 @node Interactive mode
 @chapter Interactive mode
 
+@node Table of Contents
+@chapter Table of Contents
+@unnumberedsec Contents
+
+@contents
 @bye
 
 

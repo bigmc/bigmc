@@ -54,4 +54,4 @@ theory_DIST =
 dist_man_MANS = bigmc.1 
 
 info_TEXINFOS = manual/bigmc.texi
-
+AM_MAKEINFOHTMLFLAGS =  
