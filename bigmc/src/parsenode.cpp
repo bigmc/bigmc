@@ -436,7 +436,7 @@ prednode::~prednode() {
 }
 
 string prednode::to_string() {
-	return name + "(" + prop->to_string() + ")";
+	return name + "(" + ((prop != NULL) ? prop->to_string() : "") + ")";
 }
 
 // NUM 

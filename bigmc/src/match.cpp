@@ -30,6 +30,7 @@ using namespace std;
 #include <match.h>
 #include <term.h>
 #include <reactionrule.h>
+#include <bigraph.h>
 
 long u_match = 1;
 
@@ -86,7 +87,13 @@ term *match::get_mapping(term *targ) {
 	return mapping[targ];
 }
 
+void match::capture_name(name src, name target) {
+	names[src] = target;
+}
 
+map<name,name> match::get_names() {
+	return names;
+}
 
 set<match *> match::failure() {
 	has_failed = true;
@@ -187,6 +194,13 @@ string match::to_string() {
 
 	for(map<term*,term*>::iterator i = mapping.begin(); i!=mapping.end(); i++) {
 		s += "\t" + i->first->to_string() + " -> " + i->second->to_string() + "\n";
+
+	}
+
+	s += "Link Mapping:\n";
+
+	for(map<name,name>::iterator i = names.begin(); i!=names.end(); i++) {
+		s += "\t" + bigraph::name_to_string(i->first) + " -> " + bigraph::name_to_string(i->second) + "\n";
 
 	}
 

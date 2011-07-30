@@ -29,7 +29,7 @@ public:
 	static set<match *> try_match(parallel *t, parallel *r, match *m);
 	static set<match *> try_match(term *t, regions *r, match *m);
 	static set<match *> try_match(term *t, hole *r, match *m);
-	static set<match *> try_match(nil *t, nil *r, match *m);
+	static set<match *> try_match(nil *t, term *r, match *m);
 	static set<match *> try_match(term *t, term *r, match *m);
 
 	static set<match *> try_match(term *t, reactionrule *r);

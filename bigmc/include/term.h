@@ -108,6 +108,7 @@ public:
 	unsigned int size();
 	void accept(termvisitor *t);
 	bool active_context();
+	vector<name> get_ports();
 };
 
 class hole : public term {

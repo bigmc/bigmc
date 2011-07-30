@@ -32,6 +32,7 @@ class reactionrule;
 class match {
 	map<int,term *> parameters;
 	map<term *,term *> mapping;
+	map<name,name> names;
 	reactionrule *rule;
 	list<term *> redex;
 	term *matchhead;
@@ -44,6 +45,8 @@ public:
 	term *get_param(int id);
 	void add_match(term *src, term *target);
 	term *get_mapping(term *src);
+	void capture_name(name src, name target);
+	map<name,name> get_names();
 	reactionrule *get_rule();
 	void set_rule(reactionrule *r);
 	term *root;

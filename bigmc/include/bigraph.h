@@ -35,6 +35,7 @@ public:
 	static map<string,control> control_map;
 	static map<control,bool> activity_map;
 	static map<control,int> arity_map;
+	static set<name> names;
 	static control u_control;
 	static name u_name;
 	bigraph(int roots);
@@ -54,6 +55,7 @@ public:
 	void add_inner_name(name n);
 	void set_root(term *n);
 	void add_rule(reactionrule *r);
+	static bool is_free(name n);
 	bigraph *apply_match(match *m);
 	string to_string();
 };

@@ -1,0 +1,10 @@
+%passive send : 1;
+%passive recv : 1;
+%outer a;
+%outer b;
+%outer c;
+
+send[a].recv[b].recv[c] | recv[a].send[b].send[c] | send[a].recv[a].recv[a];
+send[x].$0 | recv[x].$1 | $2 -> $0 | $1 | $2;
+
+%check

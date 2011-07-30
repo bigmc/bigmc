@@ -196,3 +196,7 @@ bool prefix::active_context() {
 	return active && parent->active_context();
 }
 
+vector<name> prefix::get_ports() {
+	return port;
+}
+

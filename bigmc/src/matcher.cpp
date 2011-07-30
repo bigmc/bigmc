@@ -56,6 +56,41 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 
 		m->add_match(r,t);
 
+		// Check names
+		vector<name> tnm = t->get_ports();
+		vector<name> rnm = r->get_ports();
+
+		if(tnm.size() != rnm.size()) {
+			if(DEBUG) cout << "matcher: tnm: " << tnm.size() << " rnm: " << rnm.size() << endl;
+			return m->failure();
+		}
+
+		for(int i = 0; i<tnm.size(); i++) {
+			if(!bigraph::is_free(rnm[i])) {
+				if(DEBUG) cout << "matcher: !free: " << rnm[i] << endl;
+				if(tnm[i] != rnm[i]) return m->failure();
+
+				m->capture_name(rnm[i],tnm[i]);
+				if(DEBUG) cout << "matcher: !free: captured " << rnm[i] << endl;
+			} else {
+				// This is a symbolic link name, not a literal one
+				// We need to look it up in the existing mappings
+				// If it exists, tnm[i] must match what it previously matched
+				// If not, we bind this name to tnm[i]
+				if(DEBUG) cout << "matcher: free: " << rnm[i] << endl;
+
+				map<name,name> nmap = m->get_names();
+				if(nmap.find(rnm[i]) == nmap.end()) {
+					m->capture_name(rnm[i], tnm[i]);
+					if(DEBUG) cout << "matcher: free: new " << rnm[i] << endl;
+				} else {
+					if(DEBUG) cout << "matcher: free: old " << rnm[i] << endl;
+					if(nmap[rnm[i]] != tnm[i]) return m->failure();
+					if(DEBUG) cout << "matcher: free: old matched " << rnm[i] << endl;
+				}
+			}
+		}
+
 		return try_match(t->get_suffix(), r->get_suffix(), m);
 	} else {
 		return m->failure();
@@ -81,7 +116,7 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	set<term *> rch = r->get_children();
 	map<term *, vector<set<match *> > > matches;
 
-	if(rch.size() > tch.size())
+	if(rch.size()-1 > tch.size())
 		return m->failure();
 
 	// FIXME: We need to distinguish matching behaviour for:
@@ -251,10 +286,18 @@ set<match *> matcher::try_match(term *t, hole *r, match *m) {
 	return match::singleton(m);
 }
 
-set<match *> matcher::try_match(nil *t, nil *r, match *m) {
-	m->add_match(r,t);
-	m->success();
-	return match::singleton(m);
+set<match *> matcher::try_match(nil *t, term *r, match *m) {
+	if(r->type == TNIL) {
+		m->add_match(r,t);
+		m->success();
+		return match::singleton(m);
+	} else if (r->type == THOLE) {
+		m->success();
+		m->add_param(((hole *)r)->index, t);
+		return match::singleton(m);
+	}
+
+	return m->failure();
 }
 
 set<match *> matcher::try_match(term *t, term *r, match *m) {
@@ -271,7 +314,7 @@ set<match *> matcher::try_match(term *t, term *r, match *m) {
 	if(t->type == TNIL && r->type == TNIL)
 		return try_match((nil*)t, (nil*)r, m);
 
-	return set<match *>();
+	return m->failure();
 }
 
 set <match *> matcher::try_match(term *t, reactionrule *r) {

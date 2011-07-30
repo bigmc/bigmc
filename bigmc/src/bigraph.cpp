@@ -34,7 +34,7 @@ map<string,name> bigraph::name_map;
 map<string,control> bigraph::control_map;
 map<control,bool> bigraph::activity_map;
 map<control,int> bigraph::arity_map;
-
+set<name> bigraph::names;
 
 bigraph::bigraph(int roots = 1) {
 	root = NULL;
@@ -89,10 +89,12 @@ control bigraph::add_control(string n, bool act, int ar) {
 
 void bigraph::add_outer_name(name n) {
 	outer.insert(n);
+	names.insert(n);
 }
 
 void bigraph::add_inner_name(name n) {
 	inner.insert(n);
+	names.insert(n);
 }
 
 void bigraph::set_root(term *n) {
@@ -102,7 +104,9 @@ void bigraph::set_root(term *n) {
 void bigraph::add_rule(reactionrule *r) {
 	rules.insert(r);
 
-	r->contextify();
+	//r->contextify();
+
+	return;
 
 	if(!term::matches(r->reactum, r->redex)) return;
 
@@ -236,5 +240,9 @@ string bigraph::to_string() {
 	s += "\tModel:\n\t\t" + root->to_string() + "\n";
 
 	return s;	
+}
+
+bool bigraph::is_free(name n) {
+	return (names.find(n) == names.end());
 }
 
