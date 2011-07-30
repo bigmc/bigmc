@@ -24,7 +24,7 @@
   <ul id="nav">
    <li><a href="/bigmc/">Home</a></li>
    <li><a href="manual/">Manual</a></li>
-   <li><a href="releases.php">Download</a></li>
+   <li><a href="https://github.com/bigmc/bigmc">GitHub</a></li>
   </ul>
  </div>
 </div>
