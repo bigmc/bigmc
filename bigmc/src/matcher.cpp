@@ -171,6 +171,17 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	return res;
 }
 
+bool no_overlap(list<match *> prev, match *cand) {
+	// FIXME can probably optimise this with a LUT
+	for(list<match *>::iterator i = prev.begin(); i!=prev.end(); i++) {
+		if((*i)->root->overlap(cand->root) || cand->root->overlap((*i)->root)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 set<match *> crossprod(set<match *>  m1, set<match *> m2) {
 	// We have two sets {a,b,c} and {d,e,f}:
 	// We want to construct:
@@ -182,8 +193,14 @@ set<match *> crossprod(set<match *>  m1, set<match *> m2) {
 
 	for(set<match*>::iterator i = m1.begin(); i!=m1.end(); i++) {
 		for(set<match*>::iterator j = m2.begin(); j!=m2.end(); j++) {
-			match *nm = (*i)->clone(NULL, list<term*>());
-			nm->incorporate(*j);
+			assert((*i)->is_wide());
+
+			if(!no_overlap(((wide_match *)(*i))->get_submatches(),*j))
+				continue;
+
+			wide_match *nm = (wide_match *)
+				((wide_match *)(*i))->clone(NULL, list<term*>());
+			nm->add_submatch(*j);
 			res.insert(nm);
 		}
 	}
@@ -210,7 +227,9 @@ set<match *> matcher::try_match(term *t, regions *r, match *m) {
 
 	m->root = t;
 	m->add_match(r,t);
-	
+
+
+	matches.insert(new wide_match(m->get_rule()));	
 
 	for(list<term *>::iterator i = ch.begin(); i != ch.end(); i++) {
 		set<match*> ms = try_match_anywhere(t, *i, m->get_rule());
@@ -218,10 +237,7 @@ set<match *> matcher::try_match(term *t, regions *r, match *m) {
 		if(ms.size() == 0)
 			return m->failure();
 
-		if(matches.size() == 0)
-			matches = ms;
-		else
-			matches = crossprod(matches, ms);
+		matches = crossprod(matches, ms);
 	}
 
 	m->success();

@@ -45,6 +45,7 @@ public:
 	void add_match(term *src, term *target);
 	term *get_mapping(term *src);
 	reactionrule *get_rule();
+	void set_rule(reactionrule *r);
 	term *root;
 	//term *next();
 	set<match *> failure();
@@ -55,10 +56,11 @@ public:
 	match *fresh(term *head, list<term *> rem);
 	void advance(term *head, list<term *> rem);
 	static set<match *> merge(set<match *> a, set<match *> b);
-	string to_string();
+	virtual string to_string();
 	bool has_succeeded;
 	bool has_failed;
 	void incorporate(match *other);
+	virtual const bool is_wide();
 
 };
 
@@ -70,6 +72,8 @@ public:
 	void add_submatch(match *m);
 	list<match *> get_submatches();
 	match *clone(term *head, list<term *> rem);
+	const bool is_wide();
+	string to_string();
 };
 
 #endif

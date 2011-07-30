@@ -56,6 +56,7 @@ public:
 	term *parent;
 	virtual bool active_context();
 	virtual set<term*> flatten();
+	bool overlap(term *other);
 };
 
 class parallel : public term {

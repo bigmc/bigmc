@@ -78,6 +78,10 @@ reactionrule *match::get_rule() {
 	return rule;
 }
 
+void match::set_rule(reactionrule *r) {
+	rule = r;
+}
+
 term *match::get_mapping(term *targ) {
 	return mapping[targ];
 }
@@ -199,6 +203,10 @@ void match::incorporate(match *other) {
 	}
 }
 
+const bool match::is_wide() {
+	return false;
+}
+
 wide_match::wide_match(reactionrule *r)
 : match(NULL,list<term*>(),NULL,r)
 {
@@ -223,3 +231,16 @@ match *wide_match::clone(term *head, list<term *> rem) {
 	return m;
 }
 
+const bool wide_match::is_wide() {
+	return true;
+}
+
+string wide_match::to_string() {
+	string s = "WideMatch:\n";
+
+	for(list<match *>::iterator i = submatches.begin(); i!=submatches.end(); i++) {
+		s += (*i)->to_string() + "\n";
+	}
+
+	return s;
+}

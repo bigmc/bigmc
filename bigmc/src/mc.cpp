@@ -176,7 +176,11 @@ bool mc::step(int id) {
 		return false; 
 		#endif
 	} else {
+		#ifdef HAVE_PTHREAD
+
 		sigmbx[id] = false;
+	
+		#endif
 	}
 
 	node *n = workqueue.front();

@@ -292,6 +292,7 @@ as defined in the preamble.  The full grammar is given by:
 @example
 @var{T} ::= @var{K}.@var{T}
 @var{T} ::= @var{T} | @var{T}
+@var{T} ::= @var{T} || @var{T}
 @var{T} ::= $@var{n}
 @var{T} ::= @var{K}
 
@@ -316,6 +317,20 @@ send[x].$0 | recv[x].$1 -> $0 | $1;
 Names that do not appear in @code{%inner} or @code{%outer} definitions are considered free names
 and will be bound during matching.  Names that are defined in the name set will be matched
 literally, and will not be re-bound.
+
+The double-parallel operator (@code{||}) introduces new top-level regions.  These can only appear at the top-level, and only in reaction rules.  The number of regions in the redex and reactum must agree, e.g.:
+
+@example
+a.$0 || b.$1 -> c.$0 || d.$0;
+@end example
+
+is a valid rule, however the following is not:
+
+@example
+a.$0 || b.$1 -> c.$0;
+@end example
+
+A word of warning:  The error detection for wide reaction rules is rather fragile in the current version.  You would be well advised to be careful when constructing complex wide rules.
 
 @section Model Definition
 

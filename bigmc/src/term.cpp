@@ -200,3 +200,13 @@ bool term::matches(term *subj, term *redex) {
 	return false;
 }
 
+bool term::overlap(term *other) {
+	if(other == NULL) {
+		return false;
+	}
+
+	if(other == this) return true;
+
+	return overlap(other->parent);
+}
+

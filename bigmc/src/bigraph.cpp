@@ -172,16 +172,53 @@ set<match *> bigraph::find_matches() {
 
 bigraph *bigraph::apply_match(match *m) {
 	if(DEBUG) cout << "BUG: bigraph::apply_match():\n" << m->to_string() << "\nto:\n" << to_string() << endl;
-	bigraph *b = new bigraph(1);
 
-	b->root = root->apply_match(m);
-	b->inner = inner;
-	b->outer = outer;
-	b->rules = rules;
+	if(!m->is_wide()) {
 
-	// destroy the match -- we're done with it
-	delete m;
-	return b;
+		bigraph *b = new bigraph(1);
+
+		b->root = root->apply_match(m);
+		b->inner = inner;
+		b->outer = outer;
+		b->rules = rules;
+
+		// destroy the match -- we're done with it
+		delete m;
+		return b;
+	} else {
+		if(m->get_rule()->reactum->type != TREGION) {
+			rerror("bigraph::apply_match") <<
+				"Wide redexes must have wide reactums" << endl;
+			exit(1);
+		}
+
+		regions *reactum = (regions *)m->get_rule()->reactum;
+		wide_match *wm = (wide_match *)m;
+
+		if(reactum->get_children().size() != wm->get_submatches().size()) {
+			rerror("bigraph::apply_match") << "Wide rules much match in the number"
+				"of regions in the redex and reactum" << endl;
+			exit(1);
+		}
+
+		bigraph *b = new bigraph(1);
+		b->inner = inner;
+		b->outer = outer;
+		b->rules = rules;
+		b->root = root;
+
+		list<match*> mq = wm->get_submatches();
+		list<term *> rc = reactum->get_children();
+
+		for(list<match*>::iterator i = mq.begin(); i!=mq.end(); i++) {
+			(*i)->set_rule(new reactionrule(NULL, rc.front()));
+			rc.pop_front();
+
+			b->root = b->root->apply_match(*i);
+		}
+
+		return b;
+	}
 }
 
 string bigraph::to_string() {
