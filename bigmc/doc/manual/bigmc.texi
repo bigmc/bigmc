@@ -301,9 +301,15 @@ as defined in the preamble.  The full grammar is given by:
 
 @var{names} ::= @var{n} , @var{names}
 @var{names} ::= @var{n}
+
+@var{n} ::= [a-zA-Z][a-zA-Z0-9]*
+@var{n} ::= -
 @end example
 
-Where @var{n} is drawn from the set of names, and @var{k} is drawn from the set of controls.
+Where @var{k} is drawn from the set of controls.  Using @code{-} as a link name 
+(e.g. @code{foo[-,x].P} leaves the first port of the @var{foo} node unlinked,
+and links the second port to @var{x}.  Ports are linked in-order, so all ports must be
+present at every prefix, whether they are linked or not.
 
 @section Reaction Rules
 

@@ -39,7 +39,7 @@ int  yylex ();
 
 %token UNKNOWN
 %token SEMI ARROW PAR PREF COMMA LSQ RSQ LPAR RPAR
-%token INNER OUTER DPAR 
+%token INNER OUTER DPAR UNLINKED
 %token ACTIVE PASSIVE COLON HOLE IDENT NUM
 %token PROPERTY LAND LOR LNOT FORALL EXISTS
 %token LEQ GEQ LT GT EQ NEQ DOLLAR BTRUE BFALSE IF THEN ELSE
@@ -94,7 +94,9 @@ prefix
 
 names
 : IDENT COMMA names		{ $$ = new seqnode(new namenode($1),$3); }
+| UNLINKED COMMA names		{ $$ = new seqnode(new namenode(""),$3); }
 | IDENT				{ $$ = new namenode($1); }
+| UNLINKED			{ $$ = new namenode(""); }
 ;
 
 property

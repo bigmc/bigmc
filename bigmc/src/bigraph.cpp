@@ -60,6 +60,8 @@ control bigraph::control_from_string(string n) {
 }
 
 name bigraph::name_from_string(string n) {
+	if(n == "") return 0;
+
 	map<string,name>::iterator it;
 	it = bigraph::name_map.find(n);
 	if(it == bigraph::name_map.end()) {

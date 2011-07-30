@@ -130,6 +130,7 @@ IDENTR	[a-zA-Z0-9_]
 "then"		  { return THEN; }
 "else"		  { return ELSE; }
 "#"		  { BEGIN COMMENT; }
+"-"		  { return UNLINKED; }
 
 {DIGIT}+	 {
 		    std::istringstream(yytext) >> yylval.value;
