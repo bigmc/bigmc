@@ -105,8 +105,12 @@ The latest version of BigMC will always be available from the
 @end itemize
 
 The latest version of this manual is available in PDF format from 
-@url{http://bigraph.org/bigmc/bigmc.pdf} or
-in HTML format from @url{http://bigraph.org/bigmc/manual}.
+
+@url{http://bigraph.org/bigmc/bigmc.pdf}
+
+or in HTML format from:
+
+@url{http://bigraph.org/bigmc/manual}.
 
 @section Installation
 
@@ -119,7 +123,7 @@ If you're lucky, the following procedure will install everything to
 
 @example
 tar -xzf bigmc-@value{VERSION}.tar.gz
-cd bigmc/
+cd bigmc-@value{VERSION}/
 ./configure
 make
 sudo make install
@@ -168,7 +172,6 @@ Running @code{bigmc} alone will enter the interactive environment:
 $ bigmc
 BigMC version 0.1-dev (http://www.itu.dk/~gdpe/bigmc)
 Copyright (c) 2011 Gian Perrone <gdpe at itu.dk>
-Hint: remember to enter 'check' once you have finished entering your model!
 bigmc> 
 @end example
 

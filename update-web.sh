@@ -6,6 +6,8 @@ git pull origin master
 ./autogen.sh
 ./configure
 
+VERSION="20110730"
+
 make pdf
 
 if [ $? -ne 0 ]
@@ -32,6 +34,6 @@ fi
 scp doc/website/* $TARG/
 scp doc/manual/bigmc.pdf $TARG/bigmc.pdf
 scp doc/manual/bigmc.html/* $TARG/manual/
-scp bigmc-0.1.tar.gz $TARG/release/
-scp bin/BigMC-0.1.1.pkg $TARG/release/
+scp bigmc-$VERSION.tar.gz $TARG/release/
+scp bin/BigMC-$VERSION.pkg $TARG/release/
 
