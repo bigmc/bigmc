@@ -187,7 +187,7 @@ string match::to_string() {
 	for(map<int,term*>::iterator i = parameters.begin(); i!=parameters.end(); i++) {
 		std::stringstream p;
 		p << i->first;
-		s += "\t" + p.str() + ": " + i->second->to_string() + "\n";
+		s += "\t" + p.str() + ": " + ((i->second != NULL) ? i->second->to_string() : "nil") + "\n";
 	}
 
 	s += "Term Mapping:\n";

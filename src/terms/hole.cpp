@@ -77,7 +77,8 @@ term *hole::instantiate(match *m) {
 
 	term *t = m->get_param(index);
 
-	assert(t != NULL);
+	if(t == NULL)
+		t = new nil();
 
 	if(DEBUG) cout << "BUG: hole::instantiate(): " << t << endl;
 	if(DEBUG) cout << "BUG: hole::instantiate(): " << t->to_string() << endl;

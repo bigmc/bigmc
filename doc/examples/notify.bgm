@@ -1,0 +1,15 @@
+%active z : 0;
+%passive f : 0;
+%passive n : 0;
+%passive u : 0;
+
+z.u | z.(z.(f | f) | z.f);
+
+z.(f | $0) | z.$1 -> z.$0 | z.(f | $1);
+z.(z.(f | $0) | $1) -> z.(z.$0 | f | $1);
+z.(z.$0 | f | $1) -> z.(z.(f | $0) | $1);
+z.(u | f | $0) -> z.(u | f | n | $0);
+
+#%property notify !matches(n);
+
+%check

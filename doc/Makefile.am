@@ -22,6 +22,7 @@ examples/unordered_subtree.bgm \
 examples/wide.bgm \
 examples/wide2.bgm \
 examples/wide3.bgm \
+examples/notify.bgm \
 examples/link.bgm
 
 theory_DATA = theory/match/match.sml 
@@ -46,6 +47,7 @@ examples/unordered_subtree.bgm \
 examples/wide.bgm \
 examples/wide2.bgm \
 examples/wide3.bgm \
+examples/notify.bgm \
 examples/link.bgm
 
 theory_DIST =
