@@ -1,5 +1,5 @@
 bgdocdir = @prefix@/doc
-exampledir = @prefix@/doc/example
+exampledir = @prefix@/doc/examples
 theorydir = @prefix@/doc/theory
 
 example_DATA = \
@@ -28,7 +28,7 @@ examples/link.bgm
 
 theory_DATA = theory/match/match.sml 
 
-example_DIST = \
+EXTRA_DIST = \
 examples/ccs.bgm \
 examples/ccs2.bgm \
 examples/diverge.bgm \
@@ -50,10 +50,8 @@ examples/wide2.bgm \
 examples/wide3.bgm \
 examples/notify.bgm \
 examples/airport.bgm \
-examples/link.bgm
-
-theory_DIST =
-	theory/match/match.sml
+examples/link.bgm \
+theory/match/match.sml
 
 dist_man_MANS = bigmc.1 
 
