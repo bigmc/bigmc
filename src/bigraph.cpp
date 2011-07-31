@@ -179,6 +179,8 @@ set<match *> bigraph::find_matches() {
 }
 
 bigraph *bigraph::apply_match(match *m) {
+	if(m == NULL) return this;
+
 	if(DEBUG) cout << "BUG: bigraph::apply_match():\n" << m->to_string() << "\nto:\n" << to_string() << endl;
 
 	if(!m->is_wide()) {
