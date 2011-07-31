@@ -67,7 +67,7 @@ string prefix::to_string() {
 	else {
 		for(int i = 0; i<port.size(); i++) {
 			if(port[i] == 0) {
-				nm += "_";
+				nm += "-";
 			} else {
 				nm += bigraph::name_to_string(port[i]);
 			}
@@ -178,7 +178,19 @@ term *prefix::apply_match(match *m) {
 term *prefix::instantiate(match *m) {
 	set<term *> n;
 
-	return new prefix(ctrl,port,suffix->instantiate(m));
+
+	if(m == NULL) {
+		return new prefix(ctrl,port,suffix->instantiate(m));
+	}
+
+	vector<name> nport (port.size());
+	map<name,name> names = m->get_names();
+
+	for(int i = 0; i<port.size(); i++) {
+		nport[i] = names[port[i]];
+	}
+
+	return new prefix(ctrl,nport,suffix->instantiate(m));
 }
 
 unsigned int prefix::size() {

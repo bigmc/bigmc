@@ -138,6 +138,8 @@ string bigraph::control_to_string(control c) {
 }
 
 string bigraph::name_to_string(name c) {
+	if(c == 0) return "-";
+
 	map<string,name>::iterator it = bigraph::name_map.begin();
 
 	while(it != name_map.end()) {
@@ -245,6 +247,7 @@ string bigraph::to_string() {
 }
 
 bool bigraph::is_free(name n) {
+	if(n == 0) return false;
 	return (names.find(n) == names.end());
 }
 

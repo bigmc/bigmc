@@ -23,6 +23,7 @@ examples/wide.bgm \
 examples/wide2.bgm \
 examples/wide3.bgm \
 examples/notify.bgm \
+examples/airport.bgm \
 examples/link.bgm
 
 theory_DATA = theory/match/match.sml 
@@ -48,6 +49,7 @@ examples/wide.bgm \
 examples/wide2.bgm \
 examples/wide3.bgm \
 examples/notify.bgm \
+examples/airport.bgm \
 examples/link.bgm
 
 theory_DIST =

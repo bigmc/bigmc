@@ -1,0 +1,33 @@
+# We distinguish zone types
+# The two links are [entry, exit]
+
+%active Zone : 2;
+%active Gate : 2;
+
+# A passenger is linked to a flight
+%passive Pax : 1;
+
+# Names that represent zones
+%outer CheckIn;
+%outer Security;
+%outer DutyFree;
+%outer GateLounge;
+%outer Boarding;
+
+# Rules that allow passengers to move through the airport
+Zone[w,x].Pax[y] | Zone[x,z] | $0 -> 
+	Zone[w,x] | Zone[x,z].Pax[y] | $0;
+
+
+# Airport Model:
+
+Zone[-,CheckIn].Pax[-] | 
+ Zone[CheckIn,Security] | 
+ Zone[Security,DutyFree] | 
+ Zone[DutyFree,GateLounge] |
+ Zone[GateLounge,Boarding] | 
+ Gate[Boarding,-] | 
+ Gate[Boarding,-] |
+ Gate[Boarding,-];
+
+%check
