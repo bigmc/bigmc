@@ -6,7 +6,7 @@ git pull origin master
 ./autogen.sh
 ./configure
 
-VERSION="20110730"
+VERSION="20110801"
 
 make pdf
 

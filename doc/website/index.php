@@ -12,8 +12,8 @@ By model checking, we mean precisely the act of checking whether some specificat
 <p>BigMC is released under the terms of the GNU General Public License Version 3</p>
 <p>
 <ul>
-<li><a href="release/bigmc-20110730.tar.gz">BigMC 20110730 (Source tar.gz, 504kb)</a></li>
-<li><a href="release/BigMC-20110730.pkg">BigMC 20110730 (MacOS 10.6 Binary Installer Package, 470kb)</a></li>
+<li><a href="release/bigmc-20110801.tar.gz">BigMC 20110801 (Source tar.gz, 504kb)</a></li>
+<li><a href="release/BigMC-20110801.pkg">BigMC 20110801 (MacOS 10.6 Binary Installer Package, 470kb)</a></li>
 </ul>
 </p>
 
