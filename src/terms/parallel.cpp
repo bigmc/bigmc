@@ -36,8 +36,18 @@ using namespace std;
 #include <reactionrule.h>
 
 parallel::parallel(set<term *>l) {
+	init(term::u_term++, l);
+}
+
+parallel::parallel(unsigned long sid, set<term *>l) {
+	init(sid,l);
+}
+
+void parallel::init(unsigned long sid, set<term *>l) {
 	terms = l;
 	type = TPAR;
+
+	id = sid;
 
 	for(set<term *>::iterator i = l.begin(); i!=l.end(); i++) {
 		(*i)->parent = this;
@@ -45,6 +55,12 @@ parallel::parallel(set<term *>l) {
 }
 
 parallel::~parallel() {
+	set<term*>::iterator i = terms.begin();
+	while(i != terms.end()) {
+		delete *i;
+		i++;
+	}
+
 	terms.clear();
 }
 
@@ -234,7 +250,7 @@ set<term *> parallel::get_children() {
 }
 
 term *parallel::apply_match(match *m) {
-	if(this == m->root) {
+	if(id == m->root->id) {
 		// This is the match site.  Return the reactum.
 		if(DEBUG) cout << "BUG: parallel::apply_match(): Found match site!" << endl;
 		term *r = m->get_rule()->reactum->instantiate(m);
@@ -248,7 +264,7 @@ term *parallel::apply_match(match *m) {
 		n.insert((*i)->apply_match(m));
 	}
 
-	parallel *pp = new parallel(n);
+	parallel *pp = new parallel(id, n);
 	pp->flatten();
 
 	return pp;
@@ -266,7 +282,7 @@ term *parallel::instantiate(match *m) {
 		}
 	}
 
-	parallel *pp = new parallel(n);
+	parallel *pp = new parallel(id,n);
 	pp->flatten();
 	return pp;
 }

@@ -32,8 +32,10 @@ public:
 	static set<match *> try_match(nil *t, term *r, match *m);
 	static set<match *> try_match(term *t, term *r, match *m);
 
+	static set<match *> region_match(term *t, list<term *> r, set<match *> m);
+
 	static set<match *> try_match(term *t, reactionrule *r);
-	static set<match *> try_match_anywhere(term *t, term *r, reactionrule *rl);
+	static set<match *> try_match_anywhere(term *t, term *r, reactionrule *rl, match *m);
 };
 
 #endif

@@ -224,6 +224,12 @@ bigraph *bigraph::apply_match(match *m) {
 			(*i)->set_rule(new reactionrule(NULL, rc.front()));
 			rc.pop_front();
 
+			if(DEBUG) {
+				cout << "bigraph::apply_match: (wide): " << endl
+					 << (*i)->to_string() << " to " << endl
+					 << b->to_string() << endl;
+			}
+
 			b->root = b->root->apply_match(*i);
 		}
 

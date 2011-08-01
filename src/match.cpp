@@ -32,6 +32,8 @@ using namespace std;
 #include <reactionrule.h>
 #include <bigraph.h>
 
+#include <assert.h>
+
 long u_match = 1;
 
 match::match(term *head, list<term *>red, match *prnt, reactionrule *rl) {
@@ -95,6 +97,15 @@ map<name,name> match::get_names() {
 	return names;
 }
 
+name match::get_name(name n) {
+	if(n == 0) return 0;
+
+	if(parent == NULL)
+		return names[n];
+
+	return parent->get_name(n);
+}
+
 set<match *> match::failure() {
 	has_failed = true;
 	has_succeeded = false;
@@ -129,6 +140,7 @@ match *match::clone(term *head, list<term *> rem) {
 	m->has_succeeded = has_succeeded;
 	m->has_failed = has_failed;
 	m->root = root;
+	m->names = names;
 	if(m->root)
 		if(DEBUG) cout << "BUG: match::clone(): setting root: " << m->root->to_string() << endl;
 	return m;
@@ -215,6 +227,11 @@ void match::incorporate(match *other) {
 	for(map<term*,term*>::iterator i = other->mapping.begin(); i!=other->mapping.end(); i++) {
 		mapping[i->first] = i->second;
 	}
+
+	for(map<name,name>::iterator i = other->names.begin(); i!=other->names.end(); i++) {
+		capture_name(i->first,i->second);
+	}
+
 }
 
 const bool match::is_wide() {
@@ -224,15 +241,17 @@ const bool match::is_wide() {
 wide_match::wide_match(reactionrule *r)
 : match(NULL,list<term*>(),NULL,r)
 {
-	;
+
 }
 
 wide_match::~wide_match() {
-
+	submatches.clear(); // FIXME: leaking matches?
 }
 
 void wide_match::add_submatch(match *m) {
 	submatches.push_back(m);
+	incorporate(m);
+	m->parent = this;
 }
 
 list<match *> wide_match::get_submatches() {
@@ -242,6 +261,9 @@ list<match *> wide_match::get_submatches() {
 match *wide_match::clone(term *head, list<term *> rem) {
 	wide_match *m = new wide_match(get_rule());
 	m->submatches = submatches;
+	m->names = names;
+	m->parameters = parameters;
+	m->mapping = mapping;
 	return m;
 }
 

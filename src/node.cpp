@@ -23,7 +23,7 @@ using namespace std;
 #include <string>
 #include <set>
 #include <iostream>
-
+#include <assert.h>
 #include <bigmc.h>
 
 node::node(bigraph *b, node *psrc, reactionrule *r) {
@@ -50,6 +50,10 @@ node::~node() {
 }
 
 void node::add_target(node *n, reactionrule *r) {
+	cout << "node::add_target: " << n << " + " << r << endl;
+
+	if((unsigned long)r < 256) assert(0);
+
 	target.insert(pair<node*,reactionrule*>(n,r));
 }
 

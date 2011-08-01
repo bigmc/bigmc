@@ -51,7 +51,7 @@ mc::mc(bigraph *b) {
 }
 
 mc::~mc() {
-
+	delete g;
 }
 
 void *mc::thread_wrapper( void *i ) {
@@ -172,7 +172,6 @@ bool mc::step(int id) {
 		cout << report(step) << endl;
 		// TODO: sound the alarms and release the balloons at this point.
 
-		exit(0);
 		return false; 
 		#endif
 	} else {
@@ -266,7 +265,11 @@ bool mc::step(int id) {
 				#endif
 			}
 		}
+
+		delete *it;
 	}
+
+	matches.clear();
 
 	if(global_cfg.report_interval > 0 && step % global_cfg.report_interval == 0) {
 		cout << report(step) << endl;

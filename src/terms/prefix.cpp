@@ -36,7 +36,8 @@ using namespace std;
 #include <bigraph.h>
 #include <reactionrule.h>
 
-prefix::prefix(control c, vector<name> ports, term *suff) {
+
+void prefix::init(unsigned long sid, control c, vector<name> ports, term *suff) {
 	ctrl = c;
 	arity = bigraph::arity(c);
 	active = bigraph::activity(c);
@@ -53,6 +54,16 @@ prefix::prefix(control c, vector<name> ports, term *suff) {
 		cerr << "Error: control " << bigraph::control_to_string(c) << " has arity " << arity << " but " << port.size() << " ports have been linked!" << endl;
 		exit(1);
 	}
+
+	id = sid;
+}
+
+prefix::prefix(unsigned long sid, control c, vector<name> ports, term *suff) {
+	init(sid,c,ports,suff);
+}
+
+prefix::prefix(control c, vector<name> ports, term *suff) {
+	init(term::u_term++, c, ports, suff);
 }
 
 prefix::~prefix() {
@@ -163,7 +174,7 @@ set<match *> prefix::find_matches(match *m) {
 } 
 
 term *prefix::apply_match(match *m) {
-	if(this == m->root) {
+	if(id == m->root->id) {
 		// This is the match site.  Return the reactum.
 		if(DEBUG) cout << "BUG: prefix::apply_match(): Found match site!" << endl;
 		term *r = m->get_rule()->reactum->instantiate(m);
@@ -171,7 +182,7 @@ term *prefix::apply_match(match *m) {
 		return r;
 	} else {
 		if(DEBUG) cout << "BUG: prefix::apply_match(): not match site: " << this << " != " << m->root << endl;
-		return new prefix(ctrl,port,suffix->apply_match(m));
+		return new prefix(id,ctrl,port,suffix->apply_match(m));
 	}
 }
 
@@ -180,17 +191,16 @@ term *prefix::instantiate(match *m) {
 
 
 	if(m == NULL) {
-		return new prefix(ctrl,port,suffix->instantiate(m));
+		return new prefix(id,ctrl,port,suffix->instantiate(m));
 	}
 
 	vector<name> nport (port.size());
-	map<name,name> names = m->get_names();
 
 	for(int i = 0; i<port.size(); i++) {
-		nport[i] = names[port[i]];
+		nport[i] = m->get_name(port[i]);
 	}
 
-	return new prefix(ctrl,nport,suffix->instantiate(m));
+	return new prefix(id,ctrl,nport,suffix->instantiate(m));
 }
 
 unsigned int prefix::size() {

@@ -29,8 +29,16 @@ using namespace std;
 #include <bigmc.h>
 
 regions::regions(list<term *>l) {
+	init(term::u_term++,l);
+}
+regions::regions(unsigned long sid, list<term *>l) {
+	init(sid,l);
+}
+
+void regions::init(unsigned long sid, list<term *>l) {
 	terms = l;
 	type = TREGION;
+	id = sid;
 
 	for(list<term *>::iterator i = l.begin(); i!=l.end(); i++) {
 		(*i)->parent = this;
@@ -38,6 +46,12 @@ regions::regions(list<term *>l) {
 }
 
 regions::~regions() {
+	list<term*>::iterator i = terms.begin();
+	while(i != terms.end()) {
+		delete *i;
+		i++;
+	}
+
 	terms.clear();
 }
 
@@ -66,7 +80,7 @@ list<term *> regions::get_children() {
 }
 
 term *regions::apply_match(match *m) {
-	if(this == m->root) {
+	if(id == m->root->id) {
 		// This is the match site.  Return the reactum.
 		if(DEBUG) cout << "BUG: regions::apply_match(): Found match site!" << endl;
 		term *r = m->get_rule()->reactum->instantiate(m);
@@ -80,7 +94,7 @@ term *regions::apply_match(match *m) {
 		n.push_back((*i)->apply_match(m));
 	}
 
-	regions *pp = new regions(n);
+	regions *pp = new regions(id,n);
 	pp->flatten();
 
 	return pp;
@@ -93,7 +107,7 @@ term *regions::instantiate(match *m) {
 		n.push_back((*i)->instantiate(m));
 	}
 
-	regions *pp = new regions(n);
+	regions *pp = new regions(id,n);
 	return pp;
 }
 

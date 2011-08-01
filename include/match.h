@@ -30,14 +30,14 @@ class term;
 class reactionrule;
 
 class match {
-	map<int,term *> parameters;
-	map<term *,term *> mapping;
-	map<name,name> names;
-	reactionrule *rule;
 	list<term *> redex;
 	term *matchhead;
-	match *parent;
 	long foobar;
+protected:
+	map<name,name> names;
+	map<int,term *> parameters;
+	map<term *,term *> mapping;
+	reactionrule *rule;
 public:
 	match(term *head, list<term *>rem, match *parent, reactionrule *rl);
 	~match();
@@ -47,6 +47,7 @@ public:
 	term *get_mapping(term *src);
 	void capture_name(name src, name target);
 	map<name,name> get_names();
+	name get_name(name n);
 	reactionrule *get_rule();
 	void set_rule(reactionrule *r);
 	term *root;
@@ -64,6 +65,7 @@ public:
 	bool has_failed;
 	void incorporate(match *other);
 	virtual const bool is_wide();
+	match *parent;
 
 };
 

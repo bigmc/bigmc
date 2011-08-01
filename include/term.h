@@ -57,12 +57,16 @@ public:
 	virtual bool active_context();
 	virtual set<term*> flatten();
 	bool overlap(term *other);
+	unsigned long id;
+	static unsigned long u_term;
 };
 
 class parallel : public term {
 	set<term *> terms;
+	void init(unsigned long sid, set<term *> l);
 public:
 	parallel(set<term *> l);
+	parallel(unsigned long sid, set<term *> l);
 	~parallel();
 	string to_string();
 	set<term *> get_children();
@@ -76,8 +80,10 @@ public:
 
 class regions : public term {
 	list<term *> terms;
+	void init(unsigned long sid, list<term *> l);
 public:
 	regions(list<term *> l);
+	regions(unsigned long sid, list<term *> l);
 	~regions();
 	string to_string();
 	list<term *> get_children();
@@ -96,8 +102,10 @@ class prefix : public term {
 	static int u_term;
 	vector<name> port;
 	term *suffix;
+	void init(unsigned long sid, control ctrl, vector<name> ports, term *suff);
 public:
 	prefix(control ctrl, vector<name> ports, term *suff);
+	prefix(unsigned long sid, control ctrl, vector<name> ports, term *suff);
 	~prefix();
 	control get_control();
 	string to_string();

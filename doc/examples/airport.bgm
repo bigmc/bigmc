@@ -1,33 +1,71 @@
+# We distinguish landside and airside
+
+%active Landside : 0;
+%active Airside : 0;
+%active Gates : 0;
+
 # We distinguish zone types
 # The two links are [entry, exit]
 
 %active Zone : 2;
-%active Gate : 2;
+
+# A gate is simply linked to a flight
+%active Gate : 1;
 
 # A passenger is linked to a flight
 %passive Pax : 1;
+
+# The database store
+%passive DB : 0;
+%passive PaxRecord : 2; # Links [passenger,gate]
 
 # Names that represent zones
 %outer CheckIn;
 %outer Security;
 %outer DutyFree;
 %outer GateLounge;
+
+# A gate status at the departure lounge
 %outer Boarding;
 
-# Rules that allow passengers to move through the airport
-Zone[w,x].Pax[y] | Zone[x,z] | $0 -> 
-	Zone[w,x] | Zone[x,z].Pax[y] | $0;
+# Some flights
+%outer SK100;
+%outer SK101;
+%outer SK102;
 
+# A passenger ID
+%outer Gian;
+
+# Rules that allow passengers to move through the airport
+Zone[w,x].Pax[y] || Zone[x,z] -> 
+	Zone[w,x] || Zone[x,z].Pax[y];
+
+
+# A passenger linked to a PaxRecord can proceed to the gate
+Zone[w,Boarding].Pax[y] || Gate[x] || PaxRecord[y,x] ->
+	Zone[w,Boarding] || Gate[x].Pax[y] || PaxRecord[y,x];
+
+
+# A passenger magically disappears once they board the aircraft
+Gate[x].Pax[y] -> Gate[x];
 
 # Airport Model:
 
-Zone[-,CheckIn].Pax[-] | 
- Zone[CheckIn,Security] | 
- Zone[Security,DutyFree] | 
- Zone[DutyFree,GateLounge] |
- Zone[GateLounge,Boarding] | 
- Gate[Boarding,-] | 
- Gate[Boarding,-] |
- Gate[Boarding,-];
+Landside.(
+  Zone[-,CheckIn].Pax[Gian] | 
+  Zone[CheckIn,Security]
+) | 
+Airside.(
+  Zone[Security,GateLounge] | 
+  #Zone[DutyFree,GateLounge] |
+  Zone[GateLounge,Boarding]
+) |
+Gates.(
+  Gate[SK100] | 
+  Gate[-] |
+  Gate[-]
+) | DB.(
+  PaxRecord[Gian,SK100]
+);
 
 %check

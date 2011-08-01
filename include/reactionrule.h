@@ -27,6 +27,7 @@ class reactionrule {
 public:
 	term *redex;
 	term *reactum;
+	reactionrule();
 	reactionrule(term *red, term *reac);
 	~reactionrule();
 	string to_string();

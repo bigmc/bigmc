@@ -37,6 +37,7 @@ using namespace std;
 
 nil::nil() {
 	type = TNIL;
+	id = term::u_term++;
 }
 
 nil::~nil() {
@@ -71,11 +72,11 @@ set<match *> nil::find_matches(match *m) {
 } 
 
 term *nil::apply_match(match *m) {
-	return new nil();
+	return this;
 }
 
 term *nil::instantiate(match *m) {
-	return new nil();
+	return this;
 }
 
 unsigned int nil::size() {

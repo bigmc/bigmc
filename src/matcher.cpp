@@ -248,6 +248,34 @@ set<match *> crossprod(set<match *>  m1, set<match *> m2) {
 	return res;
 }
 
+set<match *> matcher::region_match(term *t, list<term *> redexes, set<match *> m) {
+	if(redexes.size() == 0) {
+		for(set<match*>::iterator i = m.begin(); i!=m.end(); i++)
+			(*i)->success();
+
+		return m;
+	}
+
+	term *redex = redexes.front();
+	redexes.pop_front();
+
+	set<match *> result;
+
+	for(set<match *>::iterator i = m.begin(); i!=m.end(); i++) {
+		// For each existing wide match, we get a new set of matches:
+		set<match*> ms = try_match_anywhere(t, redex, (*i)->get_rule(), *i);
+
+		if(ms.size() == 0)
+			(*i)->failure();
+
+		set<match*> cp = crossprod(match::singleton(*i),ms);
+
+		result.insert(cp.begin(),cp.end());
+	}
+
+	return region_match(t,redexes,result);
+}
+
 set<match *> matcher::try_match(term *t, regions *r, match *m) {
 	if(DEBUG) {
 		rinfo("matcher::try_match") << "matching region: " << t->to_string() <<
@@ -263,21 +291,9 @@ set<match *> matcher::try_match(term *t, regions *r, match *m) {
 	m->root = t;
 	m->add_match(r,t);
 
+	match *wm = new wide_match(m->get_rule());
 
-	matches.insert(new wide_match(m->get_rule()));	
-
-	for(list<term *>::iterator i = ch.begin(); i != ch.end(); i++) {
-		set<match*> ms = try_match_anywhere(t, *i, m->get_rule());
-
-		if(ms.size() == 0)
-			return m->failure();
-
-		matches = crossprod(matches, ms);
-	}
-
-	m->success();
-
-	return matches;
+	return region_match(t,ch,match::singleton(wm));
 }
 
 set<match *> matcher::try_match(term *t, hole *r, match *m) {
@@ -336,12 +352,14 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 	return matches;
 }
 
-set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl) {
+set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl, match *m) {
 	set<match *> matches;
+
 
 	term *p = t->next();
 	while(p != NULL) {
 		match *nm = new match(NULL, term::singleton(r), NULL, rl);
+		nm->incorporate(nm);
 		matches = match::merge(matches, try_match(p, r, nm));
 		p = t->next();
 	}

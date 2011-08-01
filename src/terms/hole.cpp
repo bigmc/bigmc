@@ -38,6 +38,7 @@ using namespace std;
 hole::hole(int idx) {
 	index = idx;
 	type = THOLE;
+	id = term::u_term++;
 }
 
 hole::~hole() {

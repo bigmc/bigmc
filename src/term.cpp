@@ -35,10 +35,13 @@ using namespace std;
 #include <reactionrule.h>
 #include <bigraph.h>
 
+unsigned long term::u_term = 1;
+
 term::term() {
 	type = 0;
 	remaining.push_back(this);
 	parent = NULL;
+	id = u_term++;
 }
 
 term::~term() {

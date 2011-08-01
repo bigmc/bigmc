@@ -37,7 +37,14 @@ graph::graph(node *initial) {
 }
 
 graph::~graph() {
+	set<node*>::iterator i = nodes.begin();
 
+	while(i != nodes.end()) {
+		delete *i;
+		i++;
+	}
+
+	nodes.clear();
 }
 
 void graph::add(node *n) {
@@ -46,7 +53,11 @@ void graph::add(node *n) {
 }
 
 node *graph::get(unsigned long id) {
-	return lut[id];
+	map<unsigned long,node *>::iterator l = lut.find(id);
+
+	if(l == lut.end()) return NULL;
+
+	return l->second;
 }
 
 void graph::report() {
@@ -155,6 +166,8 @@ string graph::dump_dot_forward() {
 	out << "   N_" << root->hash << " [shape=doublecircle, color=lightblue2, style=filled, label=\"" << root->bg->get_root(0)->to_string() << "\"];" << endl;
 
 	for(set<node *>::iterator i = nodes.begin(); i!=nodes.end(); i++) {
+		if(DEBUG)
+			cout << "graph::dump: printing: " << (*i)->bg->to_string() << endl;
 		string rr = "root";
 
 		string dc = "";
@@ -166,14 +179,19 @@ string graph::dump_dot_forward() {
 
 		for(set<pair<node *, reactionrule *> >::iterator j = (*i)->target.begin();
 			j != (*i)->target.end(); j++) {
+
+			if(DEBUG)
+				cout << "graph::dump: node printing: " << j->second << " & " << 
+					j->first->bg->to_string() << endl;
+
 			rr = "?";
 			
 			if(j->second != NULL)
-			rr = j->second->to_string();
+				rr = j->second->to_string();
 
 			if(j->first != NULL)
-			out << "   N_" << (*i)->hash << " -> N_" << j->first->hash << 
-				" [ label = \"" << rr << "\" ];" << endl;
+				out << "   N_" << (*i)->hash << " -> N_" << j->first->hash << 
+					" [ label = \"" << rr << "\" ];" << endl;
 
 		}
 

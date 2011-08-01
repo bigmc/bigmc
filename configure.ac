@@ -21,7 +21,7 @@ AC_PROG_LEX
 AC_PROG_YACC
 AC_CHECK_LIB([readline], [readline])
 #AC_CHECK_LIB([pthread], [pthread_create])
-AC_CHECK_LIB([tcmalloc], [malloc])
+#AC_CHECK_LIB([tcmalloc], [malloc])
 AC_HEADER_ASSERT
 
 AC_CHECK_HEADER([readline/readline.h],[],AC_MSG_ERROR([Missing readline/readline.h... is GNU Readline installed correctly?]))
