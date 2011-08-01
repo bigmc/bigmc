@@ -65,28 +65,43 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 			return m->failure();
 		}
 
+		if(DEBUG) cout << "MATCHER LINK START" << endl;
+
 		for(int i = 0; i<tnm.size(); i++) {
+			if(DEBUG)
+				cout << "MATCH: " << i << ": of term: " << t->to_string() << ". " << m->to_string() << endl;
 			if(!bigraph::is_free(rnm[i])) {
-				if(DEBUG) cout << "matcher: !free: " << rnm[i] << endl;
-				if(tnm[i] != rnm[i]) return m->failure();
+				if(DEBUG) 
+					cout << "matcher: !free: " << bigraph::name_to_string(rnm[i]) << endl;
+
+				if(tnm[i] != rnm[i]) {
+					if(DEBUG)
+					cout << "MATCH FAILED: expected: " << bigraph::name_to_string(rnm[i]) << " got " << bigraph::name_to_string(tnm[i]) << endl;
+					return m->failure();
+				}
 
 				m->capture_name(rnm[i],tnm[i]);
-				if(DEBUG) cout << "matcher: !free: captured " << rnm[i] << endl;
+				if(DEBUG) 
+					cout << "matcher: !free: captured " << rnm[i] << endl;
 			} else {
 				// This is a symbolic link name, not a literal one
 				// We need to look it up in the existing mappings
 				// If it exists, tnm[i] must match what it previously matched
 				// If not, we bind this name to tnm[i]
-				if(DEBUG) cout << "matcher: free: " << rnm[i] << endl;
+				if(DEBUG) 
+					cout << "matcher: free: " << rnm[i] << " match object: " << m->to_string() << endl;
 
 				map<name,name> nmap = m->get_names();
 				if(nmap.find(rnm[i]) == nmap.end()) {
 					m->capture_name(rnm[i], tnm[i]);
-					if(DEBUG) cout << "matcher: free: new " << rnm[i] << endl;
+					if(DEBUG) 
+						cout << "matcher: free: new " << bigraph::name_to_string(rnm[i]) << " = " << bigraph::name_to_string(tnm[i]) << endl;
 				} else {
-					if(DEBUG) cout << "matcher: free: old " << rnm[i] << endl;
+					if(DEBUG) 
+						cout << "matcher: free: old " << rnm[i] << endl;
 					if(nmap[rnm[i]] != tnm[i]) return m->failure();
-					if(DEBUG) cout << "matcher: free: old matched " << rnm[i] << endl;
+					if(DEBUG) 
+						cout << "matcher: free: old matched " << rnm[i] << endl;
 				}
 			}
 		}
@@ -354,11 +369,15 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl, match *m) {
 	set<match *> matches;
 
+	if(DEBUG)
+		cout << "matcher::try_match_anywhere: " << m->to_string() << endl;
+
 
 	term *p = t->next();
 	while(p != NULL) {
 		match *nm = new match(rl);
-		nm->incorporate(nm);
+		nm->incorporate(m);
+		if(DEBUG) cout << "matcher::try_match_anywhere: nm: " << nm->to_string() << endl;
 		matches = match::merge(matches, try_match(p, r, nm));
 		p = t->next();
 	}

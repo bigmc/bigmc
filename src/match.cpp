@@ -86,17 +86,23 @@ term *match::get_mapping(term *targ) {
 
 void match::capture_name(name src, name target) {
 	names[src] = target;
+
+	if(parent != NULL)
+		parent->names[src] = target;
 }
 
 map<name,name> match::get_names() {
+	if(parent != NULL) return parent->names;
+
 	return names;
 }
 
 name match::get_name(name n) {
 	if(n == 0) return 0;
 
-	if(parent == NULL)
+	if(parent == NULL) {
 		return names[n];
+	}
 
 	return parent->get_name(n);
 }
@@ -189,8 +195,18 @@ string match::to_string() {
 
 	s += "Link Mapping:\n";
 
-	for(map<name,name>::iterator i = names.begin(); i!=names.end(); i++) {
-		s += "\t" + bigraph::name_to_string(i->first) + " -> " + bigraph::name_to_string(i->second) + "\n";
+	map<name,name> pn;
+
+	if(parent != NULL)
+		pn = parent->names;
+	else
+		pn = names;
+
+	for(map<name,name>::iterator i = pn.begin(); i!=pn.end(); i++) {
+		std::stringstream p;
+		p << i->first << " -> " << i->second;
+		s += "\t" + bigraph::name_to_string(i->first) + " -> " + bigraph::name_to_string(i->second) + 
+			"(" + p.str() + ")\n";
 
 	}
 

@@ -16,8 +16,8 @@
 %passive Pax : 1;
 
 # The database store
-%passive DB : 0;
-%passive PaxRecord : 2; # Links [passenger,gate]
+%active DB : 0;
+%active PaxRecord : 2; # Links [passenger,gate]
 
 # Names that represent zones
 %outer CheckIn;
@@ -42,30 +42,35 @@ Zone[w,x].Pax[y] || Zone[x,z] ->
 
 
 # A passenger linked to a PaxRecord can proceed to the gate
-Zone[w,Boarding].Pax[y] || Gate[x] || PaxRecord[y,x] ->
-	Zone[w,Boarding] || Gate[x].Pax[y] || PaxRecord[y,x];
+Zone[m,Boarding].Pax[y] || Gate[x] || PaxRecord[y,x] ->
+	Zone[m,Boarding] || Gate[x].Pax[y] || PaxRecord[y,x];
 
+#Zone[m,Boarding].Pax[y] || PaxRecord[y,x] -> Zone[m,Boarding] || PaxRecord[y,x];
 
 # A passenger magically disappears once they board the aircraft
 Gate[x].Pax[y] -> Gate[x];
 
+# Passengers can spontaneously spawn
+
+Zone[-,CheckIn] -> Zone[-,CheckIn].Pax[Gian];
+
 # Airport Model:
 
 Landside.(
-  Zone[-,CheckIn].Pax[Gian] | 
-  Zone[CheckIn,Security]
+	Zone[-,CheckIn].Pax[Gian] | 
+	Zone[CheckIn,Security]
 ) | 
 Airside.(
-  Zone[Security,GateLounge] | 
-  #Zone[DutyFree,GateLounge] |
-  Zone[GateLounge,Boarding]
+	Zone[Security,GateLounge] | 
+	#Zone[DutyFree,GateLounge] |
+	Zone[GateLounge,Boarding]
 ) |
 Gates.(
-  Gate[SK100] | 
-  Gate[-] |
-  Gate[-]
+	Gate[SK100] | 
+	Gate[-] |
+	Gate[-]
 ) | DB.(
-  PaxRecord[Gian,SK100]
+	PaxRecord[Gian,SK100]
 );
 
 %check

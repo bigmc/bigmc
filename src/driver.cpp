@@ -39,4 +39,5 @@ void driver::check(bigraph *b) {
 	
 	delete m;
 
+	exit(0);
 }

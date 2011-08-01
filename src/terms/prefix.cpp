@@ -197,6 +197,8 @@ term *prefix::instantiate(match *m) {
 
 	for(int i = 0; i<port.size(); i++) {
 		nport[i] = m->get_name(port[i]);
+		if(DEBUG)
+			cout << "prefix::instantiate: nport[" << i << "] = getname(" << port[i] << ") == " << nport[i] << endl;
 	}
 
 	return new prefix(id,ctrl,nport,suffix->instantiate(m));

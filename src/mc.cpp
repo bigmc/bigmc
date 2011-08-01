@@ -120,6 +120,7 @@ bool mc::check_properties(node *n) {
 			cout << "*** " << i->first << ": " << i->second->to_string() << endl;
 			if(!global_cfg.check_local) cout << g->backtrace(n);
 			else cout << "[Backtrace unavailable in local checking mode]" << endl;
+
 			return false;
 		}
 	}
@@ -171,7 +172,7 @@ bool mc::step(int id) {
 		cout << "mc::step(): Complete!" << endl;
 		cout << report(step) << endl;
 		// TODO: sound the alarms and release the balloons at this point.
-
+		exit(0);
 		return false; 
 		#endif
 	} else {
