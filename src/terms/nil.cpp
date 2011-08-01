@@ -72,11 +72,11 @@ set<match *> nil::find_matches(match *m) {
 } 
 
 term *nil::apply_match(match *m) {
-	return this;
+	return new nil();
 }
 
 term *nil::instantiate(match *m) {
-	return this;
+	return new nil();
 }
 
 unsigned int nil::size() {

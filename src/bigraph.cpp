@@ -221,7 +221,8 @@ bigraph *bigraph::apply_match(match *m) {
 		list<term *> rc = reactum->get_children();
 
 		for(list<match*>::iterator i = mq.begin(); i!=mq.end(); i++) {
-			(*i)->set_rule(new reactionrule(NULL, rc.front()));
+			reactionrule *nr = new reactionrule(NULL, rc.front());
+			(*i)->set_rule(nr);
 			rc.pop_front();
 
 			if(DEBUG) {
@@ -231,8 +232,11 @@ bigraph *bigraph::apply_match(match *m) {
 			}
 
 			b->root = b->root->apply_match(*i);
+
+			delete nr;
 		}
 
+		delete m;
 		return b;
 	}
 }

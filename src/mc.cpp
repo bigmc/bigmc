@@ -215,8 +215,14 @@ bool mc::step(int id) {
 	}
 
 	for(set<match *>::iterator it = matches.begin(); it != matches.end(); ++it) {
+		reactionrule *rr = (*it)->get_rule();
+		
 		bigraph *b2 = b->apply_match(*it);
-		node *n2 = new node(b2,n,(*it)->get_rule());
+		
+		// It's important not to touch the match object again after this --
+		// apply_match destroys it!
+
+		node *n2 = new node(b2,n,rr);
 
 		if(!global_cfg.check_local) {
 			node *n3 = g->get(n2->hash);
@@ -228,7 +234,7 @@ bool mc::step(int id) {
 				pthread_mutex_lock( &mcmutex );
 				#endif
 
-				n->add_target(n2,(*it)->get_rule());
+				n->add_target(n2,rr);
 	
 				#ifdef HAVE_PTHREAD
 				pthread_mutex_unlock( &mcmutex );
@@ -242,7 +248,7 @@ bool mc::step(int id) {
 				workqueue.push_back(n2);
 
 				g->add(n2);
-				n->add_target(n2,(*it)->get_rule());
+				n->add_target(n2,rr);
 	
 				#ifdef HAVE_PTHREAD
 				pthread_mutex_unlock( &mcmutex );
@@ -265,8 +271,6 @@ bool mc::step(int id) {
 				#endif
 			}
 		}
-
-		delete *it;
 	}
 
 	matches.clear();

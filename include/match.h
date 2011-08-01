@@ -30,16 +30,13 @@ class term;
 class reactionrule;
 
 class match {
-	list<term *> redex;
-	term *matchhead;
-	long foobar;
 protected:
 	map<name,name> names;
 	map<int,term *> parameters;
 	map<term *,term *> mapping;
 	reactionrule *rule;
 public:
-	match(term *head, list<term *>rem, match *parent, reactionrule *rl);
+	match(reactionrule *rl);
 	~match();
 	void add_param(int id, term *c);
 	term *get_param(int id);
@@ -56,7 +53,7 @@ public:
 	void success();
 	static set<match *> singleton(match *t);	
 	list<term *> remaining();
-	virtual match *clone(term *head, list<term *> rem);
+	virtual match *clone();
 	match *fresh(term *head, list<term *> rem);
 	void advance(term *head, list<term *> rem);
 	static set<match *> merge(set<match *> a, set<match *> b);
@@ -76,7 +73,7 @@ public:
 	~wide_match();
 	void add_submatch(match *m);
 	list<match *> get_submatches();
-	match *clone(term *head, list<term *> rem);
+	match *clone();
 	const bool is_wide();
 	string to_string();
 };

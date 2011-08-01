@@ -151,7 +151,7 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 		int succ = 0;
 		int holecnt = 0;
 		
-		match *nn = m->clone(m->root, list<term*>());
+		match *nn = m->clone();
 
 		for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
 			if((*i)->type == THOLE) {
@@ -234,7 +234,7 @@ set<match *> crossprod(set<match *>  m1, set<match *> m2) {
 				continue;
 
 			wide_match *nm = (wide_match *)
-				((wide_match *)(*i))->clone(NULL, list<term*>());
+				((wide_match *)(*i))->clone();
 			nm->add_submatch(*j);
 			res.insert(nm);
 		}
@@ -337,12 +337,11 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 	set<match *> matches;
 
 	if(r->redex->type == TREGION)
-		return try_match(t, r->redex, 
-			new match(NULL, term::singleton(r->redex), NULL, r));
+		return try_match(t, r->redex, new match(r));
 
 	term *p = t->next();
 	while(p != NULL) {
-		match *nm = new match(NULL, term::singleton(r->redex), NULL, r);
+		match *nm = new match(r);
 		matches = match::merge(matches, try_match(p, r->redex, nm));
 		p = t->next();
 	}
@@ -358,7 +357,7 @@ set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl, ma
 
 	term *p = t->next();
 	while(p != NULL) {
-		match *nm = new match(NULL, term::singleton(r), NULL, rl);
+		match *nm = new match(rl);
 		nm->incorporate(nm);
 		matches = match::merge(matches, try_match(p, r, nm));
 		p = t->next();

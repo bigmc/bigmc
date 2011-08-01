@@ -40,8 +40,7 @@ reactionrule::reactionrule(term *red, term *reac) {
 }
 
 reactionrule::~reactionrule() {
-	cout << "****** DESTROYING REACTION RULE!" << endl;
-	assert(0);
+
 }
 
 string reactionrule::to_string() {

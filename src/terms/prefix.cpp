@@ -189,7 +189,6 @@ term *prefix::apply_match(match *m) {
 term *prefix::instantiate(match *m) {
 	set<term *> n;
 
-
 	if(m == NULL) {
 		return new prefix(id,ctrl,port,suffix->instantiate(m));
 	}

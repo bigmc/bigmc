@@ -36,20 +36,15 @@ using namespace std;
 
 long u_match = 1;
 
-match::match(term *head, list<term *>red, match *prnt, reactionrule *rl) {
+match::match(reactionrule *rl) {
 	root = NULL;
 
 	if(DEBUG) cout << "BUG: match::match(): new match created" << endl;
 
-	matchhead = head;
-	parent = prnt;
+	parent = NULL;
 	rule = rl;
-	redex = red;
 	has_failed = false;
 	has_succeeded = false;
-	u_match++;
-	foobar = u_match;
-	//id = u_match++;
 }
 
 match::~match() {
@@ -109,6 +104,7 @@ name match::get_name(name n) {
 set<match *> match::failure() {
 	has_failed = true;
 	has_succeeded = false;
+	delete this;
 	return set<match *>();
 }
 
@@ -129,18 +125,18 @@ set<match *> match::singleton(match *t) {
 }
 
 list<term *> match::remaining() {
-	return redex;
 }
 
-match *match::clone(term *head, list<term *> rem) {
+match *match::clone() {
 	if(DEBUG) cout << "BUG: match::clone(): new match created" << endl;
-	match *m = new match(head, rem, NULL, rule);
+	match *m = new match(rule);
 	m->parameters = parameters;
 	m->mapping = mapping;
 	m->has_succeeded = has_succeeded;
 	m->has_failed = has_failed;
 	m->root = root;
 	m->names = names;
+
 	if(m->root)
 		if(DEBUG) cout << "BUG: match::clone(): setting root: " << m->root->to_string() << endl;
 	return m;
@@ -148,13 +144,10 @@ match *match::clone(term *head, list<term *> rem) {
 
 match *match::fresh(term *head, list<term *> rem) {
 	if(DEBUG) cout << "BUG: match::fresh(): new match created" << endl;
-	return new match(head, rem, NULL, rule);
+	return new match(rule);
 }
 
 void match::advance(term *head, list<term *> rem) {
-	// Update the match in-place
-	matchhead = head;
-	redex = rem;
 }
 
 set<match *> match::merge(set<match *> a, set<match *> b) {
@@ -166,12 +159,8 @@ set<match *> match::merge(set<match *> a, set<match *> b) {
 }
 
 string match::to_string() {
-	string s = "";
+	string s = "Match: ";
 
-	std::stringstream out;
-	out << foobar;
-	s += "Match #" + out.str() + ": ";
-	
 	if(root == NULL) 
 		s += "Root: NULL";
 	else
@@ -184,17 +173,6 @@ string match::to_string() {
 	if(has_failed) {
 		s += " Failed";
 	}
-
-	s += " Redex: [";
-
-	unsigned int j = 0;
-	for(list<term*>::iterator i = redex.begin(); i!=redex.end(); i++) {
-		s += (*i)->to_string();
-		if(j != redex.size()-1) s += ", ";
-		j++;
-	}
-
-	s += "]\n";
 
 	for(map<int,term*>::iterator i = parameters.begin(); i!=parameters.end(); i++) {
 		std::stringstream p;
@@ -239,12 +217,19 @@ const bool match::is_wide() {
 }
 
 wide_match::wide_match(reactionrule *r)
-: match(NULL,list<term*>(),NULL,r)
+: match(r)
 {
 
 }
 
 wide_match::~wide_match() {
+	list<match *>::iterator i = submatches.begin();
+
+	while(i != submatches.end()) {
+		delete *i;
+		i++;
+	}
+
 	submatches.clear(); // FIXME: leaking matches?
 }
 
@@ -258,7 +243,7 @@ list<match *> wide_match::get_submatches() {
 	return submatches;
 }
 
-match *wide_match::clone(term *head, list<term *> rem) {
+match *wide_match::clone() {
 	wide_match *m = new wide_match(get_rule());
 	m->submatches = submatches;
 	m->names = names;

@@ -161,12 +161,13 @@ void term::reset() {
 }
 
 set<match *> term::find_all_matches(term *t, reactionrule *r) {
+	assert(0);
 	set<match *> matches;
-
+/*
 	term *p = t->next();
 	while(p != NULL) {
 		if(DEBUG) cout << "P: " << p->to_string() << endl;
-		match *newmatch = new match(NULL, term::singleton(r->redex), NULL, r);
+		match *newmatch = new match(r);
 		matches = match::merge(matches, p->find_matches(newmatch));
 		if(DEBUG) cout << "BUG: term::find_all_matches(): " << newmatch->has_succeeded << "p: " << p->to_string() << endl;
 		// FIXME: leaking newmatch here?
@@ -174,12 +175,13 @@ set<match *> term::find_all_matches(term *t, reactionrule *r) {
 	}
 
 	t->reset();
-
+*/
 	return matches;
 }
 
 bool term::matches(term *subj, term *redex) {
-	term *p = subj->next();
+	assert(0);
+/*	term *p = subj->next();
 
 	while(p != NULL) {
 		match *newmatch = new match(NULL, term::singleton(redex), NULL, NULL);
@@ -198,7 +200,7 @@ bool term::matches(term *subj, term *redex) {
 		p = subj->next();
 	}
 
-	subj->reset();
+	subj->reset();*/
 
 	return false;
 }

@@ -81,6 +81,8 @@ string parallel::to_string() {
 }
 
 set<match *> parallel::find_matches(match *m) {
+
+/*
 	if(DEBUG) cout << "BUG: parallel::find_matches()" << endl;
 
 	if(m->has_succeeded || m->has_failed) return set<match *>();
@@ -119,7 +121,7 @@ set<match *> parallel::find_matches(match *m) {
 				}
 			}
 
-			match *mp = m->clone(NULL, cl);
+			match *mp = m->clone();
 			set<match *> res = find_matches(mp);
 
 			matches = match::merge(matches,res);
@@ -128,7 +130,7 @@ set<match *> parallel::find_matches(match *m) {
 		return matches;
 	}
 
-	if(r.size() > 1) {
+	if(r.size() > 1) { */
 		/* So we have a situation like this:
 			The current node is a parallel term like this:
 			( A | B | C )
@@ -143,7 +145,7 @@ set<match *> parallel::find_matches(match *m) {
 			We can't just match directly, to avoid spoiling the
 			match object.  Instead we clone it, and on a successful match,
 			we incorporate the match.
-		*/
+		*/ /*
 
 		if(DEBUG) { cout << "BUG: Ready to match permutation against: " << to_string() << " Permutation: ";
 		for(list<term *>::iterator i = r.begin(); i!=r.end(); i++) {
@@ -201,7 +203,7 @@ set<match *> parallel::find_matches(match *m) {
 
 			if(DEBUG) cout << "BUG: parallel::find_matches(): matching " << (*i)->to_string() << " against " << nm->to_string() << endl;
 			// Clone the match and attempt to match
-			match *cl = m->clone(NULL, term::singleton(nm));
+			match *cl = m->clone();
 
 			if(DEBUG) cout << "cl: " << cl->to_string() << endl;
 
@@ -241,7 +243,8 @@ set<match *> parallel::find_matches(match *m) {
 		}
 	}
 	
-
+*/
+	assert(0);
 	return m->failure();
 } 
 

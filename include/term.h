@@ -40,7 +40,7 @@ protected:
 	deque<term *> remaining;
 public:
 	term();
-	~term();
+	virtual ~term();
 	virtual string to_string();
 	int type;
 	virtual set<match *> find_matches(match *m);
@@ -67,7 +67,7 @@ class parallel : public term {
 public:
 	parallel(set<term *> l);
 	parallel(unsigned long sid, set<term *> l);
-	~parallel();
+	virtual ~parallel();
 	string to_string();
 	set<term *> get_children();
 	set<match *> find_matches(match *m);
@@ -84,7 +84,7 @@ class regions : public term {
 public:
 	regions(list<term *> l);
 	regions(unsigned long sid, list<term *> l);
-	~regions();
+	virtual ~regions();
 	string to_string();
 	list<term *> get_children();
 	set<match *> find_matches(match *m);
@@ -106,7 +106,7 @@ class prefix : public term {
 public:
 	prefix(control ctrl, vector<name> ports, term *suff);
 	prefix(unsigned long sid, control ctrl, vector<name> ports, term *suff);
-	~prefix();
+	virtual ~prefix();
 	control get_control();
 	string to_string();
 	term *get_suffix();
@@ -122,7 +122,7 @@ public:
 class hole : public term {
 public:
 	hole(int idx);
-	~hole();
+	virtual ~hole();
 	string to_string();
 	set<match *> find_matches(match *m);
 	int index;
@@ -136,7 +136,7 @@ public:
 class nil : public term {
 public:
 	nil();
-	~nil();
+	virtual ~nil();
 	string to_string();
 	set<match *> find_matches(match *m);
 	term *apply_match(match *m);
