@@ -43,6 +43,10 @@ public:
 	static list<st_el*> preorder_string(parallel *t);
 	static list<st_el*> preorder_string(nil *t);
 	static list<st_el*> preorder_string(hole *t);
+
+	static string fports(vector<name> prt);
+
+	static string ordered_string(term *t);
 };
 
 #endif

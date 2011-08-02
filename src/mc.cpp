@@ -192,8 +192,8 @@ bool mc::step(int id) {
 	node *n = workqueue.front();
 	workqueue.pop_front();
 
-	if(global_cfg.print_mode) {
-		cout << step << ": " << n->bg->get_root(0)->to_string() << endl;
+	if(checked.find(n->hash) != checked.end()) {
+		return true;
 	}
 
 	#ifdef HAVE_PTHREAD
@@ -209,17 +209,15 @@ bool mc::step(int id) {
 		return true;
 	}
 
-	if(global_cfg.check_local) {
-		#ifdef HAVE_PTHREAD
-		pthread_mutex_lock( &mcmutex );
-		#endif
+	#ifdef HAVE_PTHREAD
+	pthread_mutex_lock( &mcmutex );
+	#endif
 
-		checked[n->hash] = true;
+	checked[n->hash] = true;
 		
-		#ifdef HAVE_PTHREAD
-		pthread_mutex_unlock( &mcmutex );
-		#endif
-	}
+	#ifdef HAVE_PTHREAD
+	pthread_mutex_unlock( &mcmutex );
+	#endif
 
 	for(set<match *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 		reactionrule *rr = (*it)->get_rule();
@@ -263,7 +261,7 @@ bool mc::step(int id) {
 			}
 			
 		} else {
-			if(checked[n2->hash]) {
+			if(checked.find(n2->hash) != checked.end()) {
 				// We've already checked this one!
 				delete n2;
 			} else {
@@ -288,6 +286,9 @@ bool mc::step(int id) {
 		cout << report(step) << endl;
 	}
 
+	if(global_cfg.print_mode) {
+		cout << step << ": " << n->bg->get_root(0)->to_string() << endl;
+	}
 	
 	if(!check_properties(n)) {
 		rinfo("mc::step") << "Counter-example found." << endl;
@@ -322,6 +323,6 @@ void mc::match_gc() {
 
 	match_discard.clear();
 
-	rinfo("mc::match_gc") << "Destroyed " << count << " objects" << endl;
+	if(REPORT(1)) rinfo("mc::match_gc") << "Destroyed " << count << " objects" << endl;
 }
 

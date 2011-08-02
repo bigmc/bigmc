@@ -38,7 +38,7 @@ node::node(bigraph *b, node *psrc, reactionrule *r) {
 	// sdbm hash over the to_string() of the bigraph (!!!!!!!!!!!)
 	hash = 0;
         int c;
-	string s = b->get_root(0)->to_string();
+	string s = subtree::ordered_string(b->get_root(0));
 
 	int i = 0;
         while ((c = s[i++]) != '\0')

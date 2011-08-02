@@ -59,7 +59,7 @@ list<st_el*> subtree::preorder_string(term *t) {
 }
 
 list<st_el*> subtree::preorder_string(prefix *t) {
-	st_el* e = new st_el(t, bigraph::control_to_string(t->get_control()));
+	st_el* e = new st_el(t, bigraph::control_to_string(t->get_control()) + fports(t->get_ports()));
 
 	list<st_el*> tl = preorder_string(t->get_suffix());
 
@@ -78,7 +78,6 @@ list<st_el*> subtree::preorder_string(nil *t) {
 }
 
 list<st_el*> subtree::preorder_string(parallel *t) {
-	cout << "subtree::preorder_string: parallel: " << t->to_string() << endl;
 	set<term *> ch = t->get_children();
 	list<st_el*> sorted_ch;
 	list<st_el*> res;
@@ -88,7 +87,7 @@ list<st_el*> subtree::preorder_string(parallel *t) {
 		case TPREF:
 			sorted_ch.push_back(
 				new st_el(*i,bigraph::control_to_string(
-					((prefix *)(*i))->get_control())));
+					((prefix *)(*i))->get_control()) + fports(((prefix *)(*i))->get_ports())));
 			break;
 		case THOLE:
 			sorted_ch.push_back(new st_el(*i, "[-]"));
@@ -113,6 +112,37 @@ list<st_el*> subtree::preorder_string(hole *t) {
 	list<st_el*> l;
 	l.push_back(new st_el(t, "[-]"));
 	return l;
+}
+
+string subtree::fports(vector<name> prt) {
+	if(prt.size() == 0) return "[]";
+
+	string res = "[";
+	int i = 0;
+	res += bigraph::name_to_string(prt[i]);
+
+
+	for(i = 1;i<prt.size();i++) {
+		res += "," + bigraph::name_to_string(prt[i]);
+	}
+
+	return res + "]";
+}
+
+string subtree::ordered_string(term *t) {
+	list<st_el*> l = preorder_string(t);
+
+	if(l.size() == 0) return "";
+
+	string res = l.front()->name;
+	l.pop_front();
+
+	for(list<st_el*>::iterator i = l.begin(); i != l.end(); i++) {
+		res += " " + (*i)->name;
+		delete *i;
+	}
+
+	return res;
 }
 
 st_el::st_el(term *t, string n) {

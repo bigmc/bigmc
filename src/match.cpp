@@ -95,6 +95,8 @@ map<name,name> match::get_names() {
 name match::get_name(name n) {
 	if(n == 0) return 0;
 
+	if(!bigraph::is_free(n)) return n;
+
 	if(parent == NULL) {
 		return names[n];
 	}
