@@ -149,9 +149,6 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	if(rch.size()-1 > tch.size())
 		return m->failure();
 
-	// FIXME: We need to distinguish matching behaviour for:
-	// a.(a | b) vs. a | b -- the former will not match a.(a | b | c), latter will.
-
 	if(m->root == NULL) {
 		if(!t->active_context()) return m->failure();
 	
@@ -173,14 +170,23 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 
 	sort(cand,cand+xdim);
 
+	set<string> checked;
+
 	set<match *> res;
 
 	do {
-		cout << "PERM: ";
-		for(int i = 0; i<xdim; i++) {
-			cout << " " << cand[i];
+		// FIXME: This is a giant hack and is really gross, but it works this early in the morning.
+		stringstream permstr;
+
+		for(int i = 1; i<=ydim; i++) {
+			permstr << cand[xdim-i];
 		}
-		cout << endl;
+
+		if(checked.find(permstr.str()) != checked.end()) {
+			continue; // We've already checked this permutation
+		} else {
+			checked.insert(permstr.str());
+		}
 
 		int k = 0;
 		int succ = 0;
@@ -210,11 +216,8 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 		} 
 
 		if(succ < ydim) {
-			cout << "fail\n";
 			continue;
 		}
-
-		cout << "success\n";
 
 		if(has_hole != NULL) {
 			if(xdim - ydim > 1) {
