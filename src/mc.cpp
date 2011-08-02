@@ -27,6 +27,8 @@ using namespace std;
 
 #include <bigmc.h>
 
+#include <assert.h>
+
 #ifdef HAVE_PTHREAD
 #include <pthread.h>
 
@@ -42,6 +44,7 @@ struct mc_id {
 };
 
 map<string,query*> mc::properties;
+set<match *> mc::match_discard;
 
 mc::mc(bigraph *b) {
 	node *n = new node(b,NULL,NULL);
@@ -60,6 +63,8 @@ void *mc::thread_wrapper( void *i ) {
 	while(nc->data->step(nc->id))
 		;
 
+	match_gc();
+
 	return NULL;
 }
 
@@ -73,7 +78,7 @@ bool mc::check() {
 		i->data = this;
 		i->id = 0;
 		thread_wrapper(i);
-		cout << "mc::check(): Complete!" << endl;
+		rinfo("mc::check") << "Complete!" << endl;
 		cout << report(steps) << endl;
 
 		return false;
@@ -97,7 +102,7 @@ bool mc::check() {
 			rinfo("mc::check") << "Worker thread #" << i << " finished" << endl;
 	}
 
-	cout << "mc::check(): Complete!" << endl;
+	rinfo("mc::check") << "Complete!" << endl;
 	cout << report(steps) << endl;
 
 	#else
@@ -139,7 +144,7 @@ string mc::report(int step) {
 // returns true while there is work to do
 bool mc::step(int id) {
 	if(steps >= global_cfg.max_steps) {
-		cout << "mc::step(): Interrupted!  Reached maximum steps: " << global_cfg.max_steps << endl;
+		rinfo("mc::step") << "Interrupted!  Reached maximum steps: " << global_cfg.max_steps << endl;
 		cout << report(steps) << endl;
 		return false;
 	}
@@ -169,8 +174,9 @@ bool mc::step(int id) {
 		return false;
 
 		#else
-		cout << "mc::step(): Complete!" << endl;
+		rinfo("mc::step") << "Complete!" << endl;
 		cout << report(step) << endl;
+		match_gc();
 		// TODO: sound the alarms and release the balloons at this point.
 		exit(0);
 		return false; 
@@ -276,13 +282,15 @@ bool mc::step(int id) {
 
 	matches.clear();
 
+	match_gc();
+
 	if(global_cfg.report_interval > 0 && step % global_cfg.report_interval == 0) {
 		cout << report(step) << endl;
 	}
 
 	
 	if(!check_properties(n)) {
-		cout << "mc::step(): Counter-example found." << endl;
+		rinfo("mc::step") << "Counter-example found." << endl;
 		return false;
 	}
 
@@ -295,3 +303,25 @@ bool mc::step(int id) {
 void mc::add_property(string s,query *q) {
 	properties[s] = q;
 }
+
+void mc::match_mark_delete( match *m ) {
+	assert(m != NULL);
+
+	match_discard.insert(m);
+}
+
+void mc::match_gc() {
+	set<match *>::iterator i = match_discard.begin();
+
+	unsigned long count = match_discard.size();
+
+	while(i != match_discard.end()) {
+		delete *i;
+		i++;
+	}
+
+	match_discard.clear();
+
+	rinfo("mc::match_gc") << "Destroyed " << count << " objects" << endl;
+}
+

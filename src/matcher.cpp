@@ -44,6 +44,8 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 			" against redex: " << r->to_string() << endl;
 	}
 
+	assert(m != NULL);
+
 	if(t->get_control() == r->get_control()) {
 
 		if(m->root == NULL && t->active_context()) {
@@ -122,6 +124,7 @@ set<match *> matcher::try_match(parallel *t, prefix *r, match *m) {
 }
 
 set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
+	// FIXME: This approach can be optimised considerably!
 	if(DEBUG) {
 		rinfo("matcher::try_match") << "matching: " << t->to_string() <<
 			" against redex: " << r->to_string() << endl;
@@ -130,6 +133,18 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	set<term *> tch = t->get_children();
 	set<term *> rch = r->get_children();
 	map<term *, vector<set<match *> > > matches;
+
+	hole *has_hole = NULL; // Is there a top level hole?  e.g. A | B | $0
+			 	// Something like A.$0 | B | C does not count.
+				// This will be the hole term itself, or NULL.
+
+	for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
+		if((*i)->type == THOLE) {
+			has_hole = (hole *)*i;
+			rch.erase(i);
+			break;
+		}
+	}
 
 	if(rch.size()-1 > tch.size())
 		return m->failure();
@@ -142,7 +157,6 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	
 		m->root = t;
 	}
-	
 	m->add_match(r,t);
 
 	int sum = rch.size() * tch.size();
@@ -162,58 +176,74 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	set<match *> res;
 
 	do {
+		cout << "PERM: ";
+		for(int i = 0; i<xdim; i++) {
+			cout << " " << cand[i];
+		}
+		cout << endl;
+
 		int k = 0;
 		int succ = 0;
-		int holecnt = 0;
 		
 		match *nn = m->clone();
 
 		for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
 			if((*i)->type == THOLE) {
-				if(xdim > ydim && holecnt == 0) {
-					// There are "extra" things lying around, 
-					// push these all into the hole.
-					set<term*> nch;
-				
-					nch.insert(cand[xdim-1-k++]);
-
-					for(int l = 0; l<xdim-ydim; l++) {
-						nch.insert(cand[l]);
-					}
-
-					parallel *np = new parallel(nch);
-					nn->add_param(((hole*)(*i))->index, np);
-					succ++;
-					holecnt++;
-					continue;
-				} else if (xdim == ydim || holecnt > 0) {
-					nn->add_param(((hole*)(*i))->index, cand[xdim-1-k++]);
-					succ++;
-					continue;
-				} else {
-					nn->failure();
-					break;
-				}
+				rerror("matcher::try_match") << "A hole remains at the top-level in the redex" <<
+					".  This is a bug.  Please report it." << endl;
+				exit(1);
 			}
 
 			set<match*> mm = try_match(cand[xdim-1-k++],*i,nn);
 
-			if(nn->has_failed) {
-				delete nn;
-				mm.clear();
+			if(mm.size() == 0) {
+				//delete nn;
+				//mm.clear();
+				nn->failure();
 				break;
 			}
 
-			nn->has_succeeded = false;
 
-			res = match::merge(res,mm);		
+			//res = match::merge(res,mm);		
 
 			succ++;
+		} 
+
+		if(succ < ydim) {
+			cout << "fail\n";
+			continue;
 		}
+
+		cout << "success\n";
+
+		if(has_hole != NULL) {
+			if(xdim - ydim > 1) {
+				// There are "extra" things lying around, 
+				// push these all into the hole.
+				// The previous loop has matched cand[size - 1] ... cand[size - 1 - k]
+				// elements and has incremented k once more.
+				// Therefore we have cand[0] ... cand[size - k] elements to put in the hole.
+				set<term*> nch;
+			
+				for(int l = 0; l<xdim-k; l++) {
+					nch.insert(cand[l]);
+					succ++;
+				}
+
+				parallel *np = new parallel(nch);
+				nn->add_param(has_hole->index, np);
+			} else if (xdim - ydim == 1) {
+				nn->add_param(has_hole->index, cand[0]);
+				succ++;
+			} else {
+				nn->add_param(has_hole->index, new nil());
+			}
+		}
+
 
 		if(succ >= ydim) {
 			res.insert(nn);
-		}
+		} 
 	} while(next_permutation(cand, cand+xdim));
 
 	if(res.size() == 0) return m->failure();

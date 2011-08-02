@@ -39,5 +39,7 @@ void driver::check(bigraph *b) {
 	
 	delete m;
 
+	query_predicate::cleanup();
+
 	exit(0);
 }

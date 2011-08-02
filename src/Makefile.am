@@ -3,17 +3,20 @@ AM_YFLAGS = -y -d
 BUILT_SOURCES = bgparser.h
 
 bin_PROGRAMS = bigmc
-bigmc_SOURCES = bgparser.ypp \
+
+noinst_LIBRARIES = libbigmc.a
+
+libbigmc_a_SOURCES = bgparser.ypp \
 	bgscanner.ll \
 	parser.cpp \
 	report.cpp \
 	bigraph.cpp \
 	driver.cpp \
 	graph.cpp \
-	main.cpp \
 	match.cpp \
 	mc.cpp \
 	node.cpp \
+	globals.cpp \
 	parsenode.cpp \
 	predicate.cpp \
 	query.cpp \
@@ -44,6 +47,7 @@ bigmc_SOURCES = bgparser.ypp \
 	../include/matcher.h \
 	../include/subtree.h
 
+
 noinst_HEADERS = ../include/bigmc.h \
 	../include/bigraph.h \
 	../include/driver.h \
@@ -61,8 +65,11 @@ noinst_HEADERS = ../include/bigmc.h \
 	../include/matcher.h \
 	../include/subtree.h
 
+libbigmc_a_CPPFLAGS = -I../include
 bigmc_CPPFLAGS = -I../include
+bigmc_SOURCES = main.cpp
+bigmc_LDADD = libbigmc.a
+
 includes = ../include
 SUBDIRS = predicates
-
 

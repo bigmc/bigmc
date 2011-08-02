@@ -55,7 +55,7 @@ class parsenode {
 public:
 	int type;
 	parsenode();
-	~parsenode();
+	virtual ~parsenode();
 	virtual string to_string();
 	virtual bool is_valid();
 	virtual vector<parsenode *> get_children();

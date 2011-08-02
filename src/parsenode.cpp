@@ -67,6 +67,9 @@ prefixnode::prefixnode(parsenode *p, parsenode *q) {
 }
 
 prefixnode::~prefixnode() {
+	delete prefix;
+	if(suffix)
+		delete suffix;
 }
 
 string prefixnode::to_string() {
@@ -96,6 +99,8 @@ parallelnode::parallelnode(parsenode *l, parsenode *r) {
 }
 
 parallelnode::~parallelnode() {
+	delete lhs;
+	delete rhs;
 }
 
 string parallelnode::to_string() {
@@ -122,6 +127,8 @@ regionnode::regionnode(parsenode *l, parsenode *r) {
 }
 
 regionnode::~regionnode() {
+	delete lhs;
+	delete rhs;
 }
 
 string regionnode::to_string() {
@@ -148,6 +155,8 @@ reactionnode::reactionnode(parsenode *red, parsenode *reac) {
 }
 
 reactionnode::~reactionnode() {
+	delete redex;
+	delete reactum;
 }
 
 string reactionnode::to_string() {
@@ -169,12 +178,13 @@ vector<parsenode *> reactionnode::get_children() {
 // NAME 
 
 namenode::namenode(char *id) {
-	nme = strdup(id);
+	nme = id;
 	// TODO compute hash
 	type = NODE_NAME;
 }
 
 namenode::~namenode() {
+	free(nme);
 }
 
 string namenode::to_string() {
@@ -226,6 +236,8 @@ seqnode::seqnode(parsenode *l, parsenode *r) {
 }
 
 seqnode::~seqnode() {
+	delete lhs;
+	delete rhs;
 }
 
 string seqnode::to_string() {
@@ -252,6 +264,7 @@ interfacenode::interfacenode(parsenode *n, bool is_outer) {
 }
 
 interfacenode::~interfacenode() {
+	delete name;
 }
 
 string interfacenode::to_string() {
@@ -281,6 +294,7 @@ signaturenode::signaturenode(parsenode *n, bool is_active, int ar) {
 }
 
 signaturenode::~signaturenode() {
+	delete name;
 }
 
 string signaturenode::to_string() {
@@ -321,6 +335,7 @@ controlnode::controlnode(namenode *id, parsenode *linkseq) {
 }
 
 controlnode::~controlnode() {
+	delete name;
 }
 
 string controlnode::to_string() {
@@ -351,7 +366,7 @@ propertynode::propertynode(char *nm, parsenode *p) {
 }
 
 propertynode::~propertynode() {
-	
+	delete prop;
 }
 
 string propertynode::to_string() {
@@ -368,7 +383,8 @@ binnode::binnode(parsenode *l, int opr, parsenode *r) {
 }
 
 binnode::~binnode() {
-	
+	delete lprop;
+	delete rprop;
 }
 
 string binnode::to_string() {
@@ -416,7 +432,7 @@ notnode::notnode(parsenode *l) {
 }
 
 notnode::~notnode() {
-	
+	delete prop;
 }
 
 string notnode::to_string() {
@@ -432,7 +448,7 @@ prednode::prednode(char *n, parsenode *l) {
 }
 
 prednode::~prednode() {
-	
+	delete prop;
 }
 
 string prednode::to_string() {
@@ -465,7 +481,7 @@ querynode::querynode(char *n, parsenode *l) {
 }
 
 querynode::~querynode() {
-	
+	delete prop;
 }
 
 string querynode::to_string() {
@@ -482,7 +498,9 @@ ifnode::ifnode(parsenode *c, parsenode *t, parsenode *f) {
 }
 
 ifnode::~ifnode() {
-	
+	delete cond;
+	delete tbranch;
+	delete fbranch;
 }
 
 string ifnode::to_string() {

@@ -193,7 +193,7 @@ bigraph *bigraph::apply_match(match *m) {
 		b->rules = rules;
 
 		// destroy the match -- we're done with it
-		delete m;
+		mc::match_mark_delete(m);
 		return b;
 	} else {
 		if(m->get_rule()->reactum->type != TREGION) {
@@ -236,7 +236,7 @@ bigraph *bigraph::apply_match(match *m) {
 			delete nr;
 		}
 
-		delete m;
+		mc::match_mark_delete(m);
 		return b;
 	}
 }

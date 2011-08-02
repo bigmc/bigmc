@@ -28,6 +28,7 @@ class mc {
 	unsigned long steps;
 	static map<string,query *> properties;
 	map<unsigned long,bool> checked;
+	static set<match *> match_discard;
 public:
 	mc(bigraph *b);
 	~mc();
@@ -37,6 +38,8 @@ public:
 	static void add_property(string s, query *q);
 	bool check_properties(node *n);
 	static void *thread_wrapper( void *i );
+	static void match_mark_delete( match *m );
+	static void match_gc();
 };
 
 #endif

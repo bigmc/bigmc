@@ -24,13 +24,7 @@ using namespace std;
 #include <set>
 #include <iostream>
 
-#include <config.h>
-#include <globals.h>
-#include <report.h>
-#include <match.h>
-#include <term.h>
-#include <reactionrule.h>
-#include <bigraph.h>
+#include <bigmc.h>
 
 #include <assert.h>
 
@@ -45,6 +39,7 @@ match::match(reactionrule *rl) {
 	rule = rl;
 	has_failed = false;
 	has_succeeded = false;
+	mc::match_mark_delete(this);
 }
 
 match::~match() {
@@ -110,7 +105,7 @@ name match::get_name(name n) {
 set<match *> match::failure() {
 	has_failed = true;
 	has_succeeded = false;
-	delete this;
+	mc::match_mark_delete(this);
 	return set<match *>();
 }
 
@@ -180,6 +175,8 @@ string match::to_string() {
 		s += " Failed";
 	}
 
+	s += "\nParameters:\n";
+
 	for(map<int,term*>::iterator i = parameters.begin(); i!=parameters.end(); i++) {
 		std::stringstream p;
 		p << i->first;
@@ -242,7 +239,7 @@ wide_match::~wide_match() {
 	list<match *>::iterator i = submatches.begin();
 
 	while(i != submatches.end()) {
-		delete *i;
+		mc::match_mark_delete(*i);
 		i++;
 	}
 

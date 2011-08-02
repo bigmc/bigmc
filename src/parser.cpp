@@ -439,6 +439,8 @@ bigraph *parser::finish() {
 				cerr << (*it)->to_string() << endl;
 				break;
 		}
+
+		delete *it;
 	}
 
 	return b;

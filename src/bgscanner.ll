@@ -95,6 +95,9 @@ IDENTR	[a-zA-Z0-9_]
 "%outer"          {
                     return OUTER;
                   }
+"%name"           {
+                    return OUTER;
+                  }
 "%active"         {
                     return ACTIVE;
                   }

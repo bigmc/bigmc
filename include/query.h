@@ -102,6 +102,7 @@ public:
 	bool check(node *n);
 	int eval(node *n);
 	static void register_predicate(string name, predicate *p);
+	static void cleanup();
 };
 
 class query_scope : public query {

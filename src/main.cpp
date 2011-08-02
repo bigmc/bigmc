@@ -7,8 +7,6 @@ using namespace std;
 
 #include <bigmc.h>
 
-global_config global_cfg;
-
 void print_usage(char **argv) {
 	fprintf(stderr,
 	"Usage: %s [options] <modelfile>\n"
@@ -128,6 +126,8 @@ void config_read() {
 
 		}
 	}
+
+	free(configfile);
 }
 
 int main(int argc, char**argv) {
@@ -218,6 +218,7 @@ int main(int argc, char**argv) {
 	}
 
 	parser::cleanup();
+	query_predicate::cleanup();
 
 	return 0;
 }

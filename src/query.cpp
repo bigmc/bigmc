@@ -197,6 +197,14 @@ int query_predicate::eval(node *n) {
 	return p->invoke_eval(n,params);
 }
 
+void query_predicate::cleanup() {
+	for(map<string,predicate *>::iterator i = predicates.begin(); i != predicates.end(); i++) {
+		if(i->second != NULL)
+			delete i->second;
+	}
+
+	predicates.clear();
+}
 
 // query_val
 query_val::query_val() {
