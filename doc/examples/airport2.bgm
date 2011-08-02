@@ -1,3 +1,12 @@
+#################################################################################
+# Airport Example #2
+# Gian Perrone, August 2011
+#
+# This is a very crude model of an airport with two passengers.
+# Passengers travel to their flights through a series of steps,
+# and enter a gate based upon their associated record in the
+# passenger database.
+############################## Definitions Section ##############################
 # We distinguish landside and airside
 
 %active Landside : 0;
@@ -20,22 +29,24 @@
 %active PaxRecord : 2; # Links [passenger,gate]
 
 # Names that represent zones
-%outer CheckIn;
-%outer Security;
-%outer DutyFree;
-%outer GateLounge;
+%name CheckIn;
+%name Security;
+%name DutyFree;
+%name GateLounge;
 
 # A gate status at the departure lounge
-%outer Boarding;
+%name Boarding;
 
 # Some flights
-%outer SK100;
-%outer SK101;
-%outer SK102;
+%name SK100;
+%name SK101;
+%name SK102;
 
 # A passenger ID
 %name Bob;
 %name Joe;
+
+############################## Reaction Rules ####################################
 
 # Rules that allow passengers to move through the airport
 Zone[w,x].(Pax[y] | $0) || Zone[x,z].$1 -> 
@@ -46,24 +57,18 @@ Zone[w,x].(Pax[y] | $0) || Zone[x,z].$1 ->
 Zone[m,Boarding].(Pax[y] | $0) || Gate[x].$1 || PaxRecord[y,x] | $2 ->
 	Zone[m,Boarding].$0 || Gate[x].(Pax[y] | $1) || PaxRecord[y,x] | $2;
 
-#Zone[m,Boarding].Pax[y] || PaxRecord[y,x] -> Zone[m,Boarding] || PaxRecord[y,x];
-
 # A passenger magically disappears once they board the aircraft
 Gate[x].(Pax[y] | $0) -> Gate[x].$0;
 
-# Passengers can spontaneously spawn
-
-#Zone[-,CheckIn] -> Zone[-,CheckIn].Pax[Gian];
-
-# Airport Model:
+############################## Airport Model  ####################################
 
 Landside.(
 	Zone[-,CheckIn].(Pax[Bob] | Pax[Joe]) | 
 	Zone[CheckIn,Security]
 ) | 
 Airside.(
-	Zone[Security,GateLounge] | 
-	#Zone[DutyFree,GateLounge] |
+	Zone[Security,DutyFree] | 
+	Zone[DutyFree,GateLounge] |
 	Zone[GateLounge,Boarding]
 ) |
 Gates.(

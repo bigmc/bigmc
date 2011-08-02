@@ -6,14 +6,6 @@
 @syncodeindex pg cp
 @comment %**end of header
 
-@macro htmlheader {}
-@ifhtml
-@html
-<h1>FOO BAR FOO BAR FOO BAR</h1>
-@end html
-@end ifhtml
-@end macro
-
 @copying
 This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
 
@@ -293,19 +285,21 @@ All of the information must be present.  For example:
 
 @section Inner and outer names
 
-The top-level inner and outer names are defined as follows:
+The top-level outer names are defined as follows:
 
 @example
-%outer @var{name};
-%inner @var{name};
+%name @var{name};
 @end example
 
 For example:
 
 @example
-%outer a;
-%outer b;
+%name a;
+%name b;
 @end example
+
+The alternative keyword @var{%outer} is also accepted to make explicit the fact
+ that these are specifically @emph{outer} names.
 
 Names need not be unique with respect to control names; however, it might be best to keep them
 that way to avoid confusion.
