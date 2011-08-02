@@ -344,6 +344,33 @@ set<match *> matcher::try_match(term *t, regions *r, match *m) {
 	return region_match(t,ch,match::singleton(wm));
 }
 
+set<match *> matcher::try_match(prefix *t, parallel *r, match *m) {
+	// This covers cases like redex: a.(b | $0) matching against a.b where $0 = nil
+
+	set<term *> ch = r->get_children();
+
+	if(ch.size() > 2) return m->failure();
+	
+	hole *has_hole = NULL;
+	term *non_hole = NULL;
+
+	for(set<term *>::iterator i = ch.begin(); i != ch.end(); i++) {
+		if((*i)->type == THOLE) {
+			if(has_hole != NULL) return m->failure();
+			has_hole = (hole *)*i;
+		} else {
+			if(non_hole != NULL) return m->failure();
+			non_hole = *i;
+		}
+	}
+
+	if(non_hole == NULL || has_hole == NULL) return m->failure();
+
+	m->add_param(has_hole->index, new nil());
+
+	return try_match(t,non_hole,m);
+}
+
 set<match *> matcher::try_match(term *t, hole *r, match *m) {
 	m->success();
 	m->add_param(r->index, t);
@@ -369,6 +396,8 @@ set<match *> matcher::try_match(term *t, term *r, match *m) {
 		return try_match((prefix*)t, (prefix*)r, m);
 	if(t->type == TPAR && r->type == TPREF)
 		return try_match((parallel*)t, (prefix*)r, m);
+	if(t->type == TPREF && r->type == TPAR) 
+		return try_match((prefix*)t, (parallel*)r, m);
 	if(t->type == TPAR && r->type == TPAR)
 		return try_match((parallel*)t, (parallel*)r, m);
 	if(r->type == TREGION)
