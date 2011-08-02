@@ -14,7 +14,7 @@
 %active Gates : 0;
 
 # We distinguish zone types
-# The two links are [entry, exit]
+# The two links are [identifier, exit]
 
 %active Zone : 2;
 
@@ -42,13 +42,13 @@
 %name SK101;
 %name SK102;
 
-# A passenger ID
+# Two example passengers
 %name Bob;
 %name Joe;
 
 ############################## Reaction Rules ####################################
 
-# Rules that allow passengers to move through the airport
+# Rule that allow passengers to move through the airport
 Zone[w,x].(Pax[y] | $0) || Zone[x,z].$1 -> 
 	Zone[w,x].$0 || Zone[x,z].(Pax[y] | $1);
 

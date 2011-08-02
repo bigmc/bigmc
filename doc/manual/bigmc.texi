@@ -57,7 +57,7 @@ This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
 * Term language::      How to describe bigraphical reactive systems
 * Property language::  How to describe specifications
 * Checking::           How to check properties
-* Interactive mode::   How to use BigMC interactively
+* Example::            An example model of a simple airport
 * Table of Contents::  All contents of this manual
 @end menu
 @end ifhtml
@@ -71,7 +71,7 @@ This manual is for BigMC (version @value{VERSION}, @value{UPDATED}).
 * Term language::      How to describe bigraphical reactive systems
 * Property language::  How to describe specifications
 * Checking::           How to check properties
-* Interactive mode::   How to use BigMC interactively
+* Example::            An example model of a simple airport
 @end menu
 @end ifnothtml
 
@@ -248,7 +248,7 @@ The basic structure for a bigraph model file is as follows:
 # Comments
 <control definitions>
 
-<inner and outer names>
+<names>
 
 <reaction rules>
 
@@ -283,7 +283,7 @@ All of the information must be present.  For example:
 %active foo : 3;
 @end example
 
-@section Inner and outer names
+@section Names
 
 The top-level outer names are defined as follows:
 
@@ -341,7 +341,7 @@ model under construction.  Order is not significant.  For example:
 send[x].$0 | recv[x].$1 -> $0 | $1;
 @end example
 
-Names that do not appear in @code{%inner} or @code{%outer} definitions are considered free names
+Names that do not appear in @code{%name} definitions are considered free names
 and will be bound during matching.  Names that are defined in the name set will be matched
 literally, and will not be re-bound.
 
@@ -369,8 +369,8 @@ model:
 @example
 %passive send : 1;
 %passive recv : 1;
-%outer a;
-%outer b;
+%name a;
+%name b;
 
 send[x].$0 | recv[x].$1 -> $0 | $1;
 
@@ -541,29 +541,96 @@ We interpret the backtrace as showing us a state that violated the property @cod
 States are displayed from ``newest'' to ``oldest'', interleaved with the reaction rule
 that was applied to reach that state from the previous one.
 
-@section A successful example
+@node Example
+@chapter Example 
 
-This example is included as @file{ccs.bgm} in the @file{examples} directory:
+This example can be found in @file{doc/examples/airport2.bgm} in the BigMC distribution.
 
 @example
-%passive send : 1;
-%passive recv : 1;
-%outer a;
-%outer b;
+#######################################################################
+# Airport Example #2
+# Gian Perrone, August 2011
+#
+# This is a very crude model of an airport with two passengers.
+# Passengers travel to their flights through a series of steps,
+# and enter a gate based upon their associated record in the
+# passenger database.
+######################## Definitions Section ##########################
+# We distinguish landside and airside
 
-send[a].recv[b].recv[a] | recv[a].send[b].send[a];
+%active Landside : 0;
+%active Airside : 0;
+%active Gates : 0;
 
-send[x].$0 | recv[x].$1 -> $0 | $1;
+# We distinguish zone types
+# The two links are [identifier, exit]
 
-%property shrink $pred->empty() || size() < $pred->size();
+%active Zone : 2;
 
-%check;
+# A gate is simply linked to a flight
+%active Gate : 1;
+
+# A passenger is linked to a flight
+%passive Pax : 1;
+
+# The database store
+%active DB : 0;
+%active PaxRecord : 2; # Links [passenger,gate]
+
+# Names that represent zones
+%name CheckIn;
+%name Security;
+%name DutyFree;
+%name GateLounge;
+
+# A gate status at the departure lounge
+%name Boarding;
+
+# Some flights
+%name SK100;
+%name SK101;
+%name SK102;
+
+# Two example passengers
+%name Bob;
+%name Joe;
+
+######################### Reaction Rules ##############################
+
+# Rule that allow passengers to move through the airport
+Zone[w,x].(Pax[y] | $0) || Zone[x,z].$1 -> 
+	Zone[w,x].$0 || Zone[x,z].(Pax[y] | $1);
+
+
+# A passenger linked to a PaxRecord can proceed to the gate
+Zone[m,Boarding].(Pax[y] | $0) || Gate[x].$1 || PaxRecord[y,x] | $2 ->
+	Zone[m,Boarding].$0 || Gate[x].(Pax[y] | $1) || PaxRecord[y,x] | $2;
+
+# A passenger magically disappears once they board the aircraft
+Gate[x].(Pax[y] | $0) -> Gate[x].$0;
+
+######################## Airport Model  ###############################
+
+Landside.(
+	Zone[-,CheckIn].(Pax[Bob] | Pax[Joe]) | 
+	Zone[CheckIn,Security]
+) | 
+Airside.(
+	Zone[Security,DutyFree] | 
+	Zone[DutyFree,GateLounge] |
+	Zone[GateLounge,Boarding]
+) |
+Gates.(
+	Gate[SK100] | 
+	Gate[SK102] |
+	Gate[SK101]
+) | DB.(
+	PaxRecord[Joe,SK100] |
+	PaxRecord[Bob,SK101]
+);
+
+%check
 @end example
-
-
-
-@node Interactive mode
-@chapter Interactive mode
 
 @ifhtml
 @node Table of Contents
