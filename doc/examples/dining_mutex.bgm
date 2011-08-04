@@ -1,0 +1,40 @@
+%name P1;
+%name P2;
+%name P3;
+%name P4;
+%name P5;
+
+%name F1;
+%name F2;
+%name F3;
+%name F4;
+%name F5;
+
+%passive F : 1; # Fork-id
+%passive P : 3; # Left-fork, Phil-id, Right-fork
+%passive Q : 1; # Fork-id - placeholder
+%passive M : 0;
+%passive L : 0;
+
+# Acquire the lock
+P[lf,p,rf] || M  -> P[lf,p,rf].M || L;
+# Acquire a left fork
+P[lf1,p1,rf1].M || F[lf1] -> P[lf1,p1,rf1].(M | F[lf1]) || Q[lf1];
+# Acquire a right fork
+P[lf2,p2,rf2].(M | F[lf2]) || F[rf2] -> P[lf2,p2,rf2].(M | F[lf2] | F[rf2]) || Q[rf2];
+# Drop left fork
+P[lf3,p3,rf3].(F[lf3] | F[rf3] | M) || Q[lf3] -> P[lf3,p3,rf3].(F[rf3] | M) || F[lf3];
+# Drop right fork
+P[lf4,p4,rf4].(F[rf4] | M) || Q[rf4] -> P[lf4,p4,rf4].M || F[rf4];
+# Drop the lock
+P[lf,p,rf].M || L -> P[lf,p,rf] || M;
+
+
+# The philosopher's table!
+
+M | F[F1] | P[F1,P1,F2] | F[F2] | P[F2,P2,F3] | F[F3] | P[F3,P3,F4] | F[F4] | P[F4,P4,F5] | F[F5] | P[F5,P5,F1];
+
+%property deadlock_free !terminal();
+
+%check;
+

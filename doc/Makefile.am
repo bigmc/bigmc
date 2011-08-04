@@ -26,6 +26,7 @@ examples/notify.bgm \
 examples/airport.bgm \
 examples/airport2.bgm \
 examples/dining.bgm \
+examples/dining_mutex.bgm \
 examples/link.bgm
 
 theory_DATA = theory/match/match.sml 
@@ -55,6 +56,7 @@ examples/airport.bgm \
 examples/airport2.bgm \
 examples/link.bgm \
 examples/dining.bgm \
+examples/dining_mutex.bgm \
 theory/match/match.sml
 
 dist_man_MANS = bigmc.1 

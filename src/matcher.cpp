@@ -147,7 +147,7 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 		}
 	}
 
-	if(rch.size()-1 > tch.size())
+	if(has_hole == NULL && rch.size() > tch.size())
 		return m->failure();
 
 	if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
@@ -159,8 +159,6 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	m->add_match(r,t);
 
 	int sum = rch.size() * tch.size();
-
-
 	unsigned int xdim = tch.size();
 	unsigned int ydim = rch.size();
 	term *cand[xdim];
