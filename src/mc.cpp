@@ -205,8 +205,6 @@ bool mc::step(int id) {
 	set<match *> matches = b->find_matches();
 	if(matches.size() == 0) {
 		n->terminal = true;
-
-		return true;
 	}
 
 	#ifdef HAVE_PTHREAD

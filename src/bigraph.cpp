@@ -232,6 +232,7 @@ bigraph *bigraph::apply_match(match *m) {
 			}
 
 			b->root = b->root->apply_match(*i);
+			if(DEBUG) cout << "BUG: bigraph::apply_match() (wide): result\n" << b->root->to_string() << endl;
 
 			delete nr;
 		}

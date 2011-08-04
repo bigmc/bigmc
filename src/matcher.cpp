@@ -48,12 +48,13 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 
 	if(t->get_control() == r->get_control()) {
 
-		if(m->root == NULL && t->active_context()) {
-			m->root = t;
-		} 
+		if(DEBUG)
+		rinfo("matcher::try_match") << "Prefix match: " << t->to_string() << " with " << r->to_string() << " Active: " << t->active_context() << endl;
 
-		if(m->root == NULL && !t->active_context()) {
+		if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
 			return m->failure();
+		} else {
+			m->root = t;
 		}
 
 		m->add_match(r,t);
@@ -149,11 +150,12 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	if(rch.size()-1 > tch.size())
 		return m->failure();
 
-	if(m->root == NULL) {
-		if(!t->active_context()) return m->failure();
-	
+	if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
+		return m->failure();
+	} else {
 		m->root = t;
 	}
+	
 	m->add_match(r,t);
 
 	int sum = rch.size() * tch.size();
@@ -418,8 +420,10 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 
 	term *p = t->next();
 	while(p != NULL) {
-		match *nm = new match(r);
-		matches = match::merge(matches, try_match(p, r->redex, nm));
+		if(p->active_context()) {
+			match *nm = new match(r);
+			matches = match::merge(matches, try_match(p, r->redex, nm));
+		}
 		p = t->next();
 	}
 
@@ -434,13 +438,22 @@ set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl, ma
 	if(DEBUG)
 		cout << "matcher::try_match_anywhere: " << m->to_string() << endl;
 
+	if(m->parent != NULL)
+		m = m->parent;
 
 	term *p = t->next();
 	while(p != NULL) {
-		match *nm = new match(rl);
-		nm->incorporate(m);
-		if(DEBUG) cout << "matcher::try_match_anywhere: nm: " << nm->to_string() << endl;
-		matches = match::merge(matches, try_match(p, r, nm));
+		if(DEBUG) cout << "p: " << p->to_string() << ": ";
+		if(p->parent == NULL || p->parent->active_context()) {
+			if(DEBUG) cout << "active" << endl;
+			match *nm = new match(rl);
+			nm->incorporate(m);
+			//cout << "matcher::try_match_anywhere: nm: " << nm->to_string() << endl;
+			matches = match::merge(matches, try_match(p, r, nm));
+		} else {
+			if(DEBUG) cout << "passive" << endl;
+		}
+
 		p = t->next();
 	}
 

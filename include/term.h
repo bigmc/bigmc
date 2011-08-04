@@ -76,6 +76,7 @@ public:
 	unsigned int size();
 	void accept(termvisitor *t);
 	set<term*> flatten();
+	bool active_context();
 };
 
 class regions : public term {
@@ -97,7 +98,6 @@ public:
 
 class prefix : public term {
 	control ctrl;
-	bool active;
 	int arity;
 	static int u_term;
 	vector<name> port;
@@ -117,6 +117,7 @@ public:
 	void accept(termvisitor *t);
 	bool active_context();
 	vector<name> get_ports();
+	bool active;
 };
 
 class hole : public term {

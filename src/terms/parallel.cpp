@@ -280,7 +280,7 @@ term *parallel::instantiate(match *m) {
 		if((*i)->type != TPAR)
 			n.insert((*i)->instantiate(m));
 		else {
-			parallel *p = (parallel *)(*i);
+			parallel *p = (parallel *)((*i)->instantiate(m));
 			n.insert(p->terms.begin(), p->terms.end());
 		}
 	}
@@ -294,6 +294,8 @@ set<term*> parallel::flatten() {
 	set<term *> t;
 
 	for(set<term *>::iterator i = terms.begin(); i != terms.end(); i++) {
+		if((*i)->type == TNIL) continue;
+
 		set<term *> l = (*i)->flatten();
 		t.insert(l.begin(), l.end());
 	}
@@ -303,6 +305,11 @@ set<term*> parallel::flatten() {
 }
 
 
+bool parallel::active_context() {
+	if(parent == NULL) return true;
+
+	return parent->active_context();
+}
 
 unsigned int parallel::size() {
 	unsigned int sz = 0;

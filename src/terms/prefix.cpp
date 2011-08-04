@@ -214,8 +214,6 @@ void prefix::accept(termvisitor *t) {
 }
 
 bool prefix::active_context() {
-	if(parent == NULL || (parent->type == TPAR && parent->active_context())) return true;
-
 	return active && parent->active_context();
 }
 
