@@ -229,10 +229,13 @@ bigraph *bigraph::apply_match(match *m) {
 				cout << "bigraph::apply_match: (wide): " << endl
 					 << (*i)->to_string() << " to " << endl
 					 << b->to_string() << endl;
+				cout << "Bigraph B: " << b->root->to_string() << endl;
 			}
 
+
 			b->root = b->root->apply_match(*i);
-			if(DEBUG) cout << "BUG: bigraph::apply_match() (wide): result\n" << b->root->to_string() << endl;
+			if(DEBUG) 
+				cout << "Match M: " << (*i)->to_string() << "\nBigraph B'::\n" << b->root->to_string() << endl;
 
 			delete nr;
 		}

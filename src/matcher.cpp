@@ -53,7 +53,7 @@ set<match *> matcher::try_match(prefix *t, prefix *r, match *m) {
 
 		if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
 			return m->failure();
-		} else {
+		} else if(m->root == NULL) {
 			m->root = t;
 		}
 
@@ -152,7 +152,7 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 
 	if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
 		return m->failure();
-	} else {
+	} else if(m->root == NULL) {
 		m->root = t;
 	}
 	
@@ -438,9 +438,6 @@ set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl, ma
 	if(DEBUG)
 		cout << "matcher::try_match_anywhere: " << m->to_string() << endl;
 
-	if(m->parent != NULL)
-		m = m->parent;
-
 	term *p = t->next();
 	while(p != NULL) {
 		if(DEBUG) cout << "p: " << p->to_string() << ": ";
@@ -448,6 +445,7 @@ set <match *> matcher::try_match_anywhere(term *t, term *r, reactionrule *rl, ma
 			if(DEBUG) cout << "active" << endl;
 			match *nm = new match(rl);
 			nm->incorporate(m);
+			if(m->parent != NULL) nm->incorporate(m->parent);
 			//cout << "matcher::try_match_anywhere: nm: " << nm->to_string() << endl;
 			matches = match::merge(matches, try_match(p, r, nm));
 		} else {

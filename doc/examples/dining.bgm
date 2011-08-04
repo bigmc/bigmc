@@ -25,7 +25,8 @@ P[lf4,p4,rf4].F[rf4] || Q[rf4] -> P[lf4,p4,rf4] || F[rf4];
 
 # The philosopher's table!
 
-F[F1] | P[F1,P1,F2] | F[F2] | P[F2,P2,F3] | F[F3] | P[F3,P3,F4] | F[F4] | P[F4,P4,F5] | F[F5] | P[F5,P5,F1];
+#F[F1] | P[F1,P1,F2] | F[F2] | P[F2,P2,F3] | F[F3] | P[F3,P3,F4] | F[F4] | P[F4,P4,F5] | F[F5] | P[F5,P5,F1];
+F[F1] | P[F1,P1,F2] | F[F2] | P[F2,P2,F3] | F[F3] | P[F3,P3,F4] | F[F4] | P[F4,P4,F1];
 
 %property deadlock_free !terminal();
 
