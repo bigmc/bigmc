@@ -23,11 +23,43 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include <assert.h>
+
 #include <bigmc.h>
 #include "bgparser.h"
+
+#ifndef _WIN32
+#include <readline/readline.h>
+#include <readline/history.h>
+#else
+
+char *readline(char *prmpt) {
+	size_t size = 0;
+	size_t len  = 0;
+	size_t last = 0;
+	char * buf  = NULL;
+
+	printf("%s",prmpt);
+
+	do {
+		size += 1024; 
+		buf = (char *)realloc(buf,size);
+		fgets(buf+last,size,stdin);
+		len = strlen(buf);
+		last = len - 1;
+	} while (!feof(stdin) && buf[last]!='\n');
+	return buf;
+}
+
+void using_history() {
+	;
+}
+
+void add_history(char *s) {
+	;
+}
+
+#endif
 
 static char *g_inputbuffer = (char *)NULL;
 int g_inputbuffer_len = 0;
@@ -36,9 +68,6 @@ FILE *g_fp = NULL;
 bool g_userbreak = false;
 vector<parsenode *> g_parsetree;
 bool g_has_check = false;
-
-
-
 
 void parser_add_result(parsenode *p) {
 	if(DEBUG) cout << "BUG: parser_add_result: " << p->to_string() << endl;
