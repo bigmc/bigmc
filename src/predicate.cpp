@@ -26,7 +26,17 @@ using namespace std;
 #include <sstream>
 #include <assert.h>
 #include <bigmc.h>
+
+#ifndef _WIN32
+
 #include <dlfcn.h>
+
+#else
+
+#include <windows.h>
+
+#endif
+
 
 predicate::predicate(string name, char *filename) {
 	pred_check = NULL;
@@ -36,15 +46,25 @@ predicate::predicate(string name, char *filename) {
 		if(global_cfg.verbose_level) 
 			rinfo("predicate::predicate") << "loading predicate from " <<
 				filename << endl;
+
+		#ifndef _WIN32
 		handle = dlopen(filename, RTLD_LAZY);
+		#else
+		handle = LoadLibrary(filename);
+		#endif
 	} else {
 		char buf[2048];
 		sprintf(buf,"%s/lib/%s", global_cfg.bigmc_home, filename);
 		if(global_cfg.verbose_level) 
 		rinfo("predicate::predicate") << "loading predicate from " << buf << endl;
+		#ifndef _WIN32
 		handle = dlopen(buf, RTLD_LAZY);
+		#else
+		handle = LoadLibrary(buf);
+		#endif
 	}
 
+	#ifndef _WIN32
 	if (!handle) {
 	        rerror("predicate::predicate") << "loading failed: " << dlerror() << endl;
 		exit(1);
@@ -71,12 +91,28 @@ predicate::predicate(string name, char *filename) {
 		dlclose(handle);
 		exit(1);
 	}
+	#else
+	// WINDOWS
+
+	if (!handle) {
+	        rerror("predicate::predicate") << "DLL loading failed" << endl;
+		exit(1);
+	}
+
+	pred_check = (predfn_check_t) GetProcAddress(handle, ("pred_check_" + name).c_str());
+	pred_eval = (predfn_eval_t) GetProcAddress(handle, ("pred_eval_" + name).c_str());
+
+	#endif
 
 }
 
 predicate::~predicate() {
 	if(handle)
+		#ifndef _WIN32
 		dlclose(handle);
+		#else
+		FreeLibrary(handle);
+		#endif
 }
 
 bool predicate::invoke_check(node *n,list<query_val *> param) {

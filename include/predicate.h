@@ -27,10 +27,19 @@ class query_val;
 typedef bool (*predfn_check_t)(node*,list<query_val*>);
 typedef int (*predfn_eval_t)(node*,list<query_val*>);
 
+#ifndef _WIN32
+typedef void* DLHANDLE;
+#else
+
+#include <windows.h>
+
+typedef HINSTANCE DLHANDLE;
+#endif
+
 class predicate {
 	predfn_check_t pred_check;
 	predfn_eval_t pred_eval;
-	void *handle;
+	DLHANDLE handle;
 public:
 	predicate(string name, char *filename);
 	~predicate();
@@ -39,7 +48,11 @@ public:
 };
 
 // Make it a bit prettier to define predicates in modules
+#ifndef _WIN32
 #define PRED_EXPORT extern "C"
+#else
+#define PRED_EXPORT extern "C" __declspec( dllexport ) 
+#endif
 
 #define PRED_FAIL_NO_EVAL(x) do { rerror("predicate") << "Type error: pred_" << x << \
 				" is of type 'bool', but is being used as type 'int'" << endl; \
