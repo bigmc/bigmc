@@ -29,6 +29,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	terms/prefix.cpp \
 	terms/hole.cpp \
 	terms/nil.cpp \
+	wingetopt.c \
 	../include/bigmc.h \
 	../include/bigraph.h \
 	../include/driver.h \
@@ -45,7 +46,8 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	../include/globals.h \
 	../include/term.h \
 	../include/matcher.h \
-	../include/subtree.h
+	../include/subtree.h \
+	../include/wingetopt.h
 
 
 noinst_HEADERS = ../include/bigmc.h \
@@ -63,6 +65,7 @@ noinst_HEADERS = ../include/bigmc.h \
 	../include/globals.h \
 	../include/term.h \
 	../include/matcher.h \
+	../include/wingetopt.h \
 	../include/subtree.h
 
 libbigmc_a_CPPFLAGS = -I../include

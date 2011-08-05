@@ -7,6 +7,10 @@ using namespace std;
 
 #include <bigmc.h>
 
+#ifdef _WIN32
+#include <wingetopt.h>
+#endif
+
 void print_usage(char **argv) {
 	fprintf(stderr,
 	"Usage: %s [options] <modelfile>\n"
