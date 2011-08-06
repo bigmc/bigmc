@@ -26,11 +26,19 @@ using namespace std;
 #include <iostream>
 #include <list>
 
-PRED_EXPORT bool pred_check_terminal(node *n, list<query_val *> param) {
+pred_terminal::pred_terminal() {
+
+}
+
+pred_terminal::~pred_terminal() {
+
+}
+
+bool pred_terminal::check(node *n, list<query_val *> param) {
 	return n->terminal;
 }
 
-PRED_EXPORT int pred_eval_terminal(node *n, list<query_val *> param) {
+int pred_terminal::eval(node *n, list<query_val *> param) {
 	return n->terminal;
 }
 

@@ -34,6 +34,8 @@ void print_version() {
 }
 
 void config_read() {
+	// We don't use this anymore.  Gave up on loadable modules for w32 support.
+
 	// We try to locate bigmc.conf in this order:
 	// If BIGMC_HOME is set:
 	// $BIGMC_HOME/conf/bigmc.conf
@@ -121,8 +123,8 @@ void config_read() {
 
 			string psname = string(sname);
 
-			query_predicate::register_predicate(psname, 
-				new predicate(psname, fname));
+			//query_predicate::register_predicate(psname, 
+			//	new predicate(psname, fname));
 		} else {
 			cout << "Error: " << configfile << ":" << clineno << 
 					": invalid configuration option" << endl;
@@ -132,6 +134,13 @@ void config_read() {
 	}
 
 	free(configfile);
+}
+
+void register_predicates() {
+	predicate::register_predicate("empty", new pred_empty());
+	predicate::register_predicate("size", new pred_size());
+	predicate::register_predicate("matches", new pred_matches());
+	predicate::register_predicate("terminal", new pred_terminal());
 }
 
 int main(int argc, char**argv) {
@@ -190,7 +199,7 @@ int main(int argc, char**argv) {
 			abort ();
            	}
 
-	config_read();
+	register_predicates();
 
 	int index;
 	char *modelfile = NULL;
@@ -222,7 +231,6 @@ int main(int argc, char**argv) {
 	}
 
 	parser::cleanup();
-	query_predicate::cleanup();
 
 	return 0;
 }

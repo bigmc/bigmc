@@ -29,6 +29,10 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	terms/prefix.cpp \
 	terms/hole.cpp \
 	terms/nil.cpp \
+	predicates/pred_size.cpp \
+	predicates/pred_empty.cpp \
+	predicates/pred_matches.cpp \
+	predicates/pred_terminal.cpp \
 	wingetopt.c \
 	../include/bigmc.h \
 	../include/bigraph.h \
@@ -74,5 +78,4 @@ bigmc_SOURCES = main.cpp
 bigmc_LDADD = libbigmc.a
 
 includes = ../include
-SUBDIRS = predicates
 

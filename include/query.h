@@ -92,7 +92,7 @@ public:
 
 
 class query_predicate : public query {
-	static map<string,predicate *> predicates;
+	predicate *pred;
 public:
 	list<query_val *> params;
 	string name;
@@ -101,7 +101,6 @@ public:
 	string to_string();
 	bool check(node *n);
 	int eval(node *n);
-	static void register_predicate(string name, predicate *p);
 	static void cleanup();
 };
 

@@ -26,11 +26,19 @@ using namespace std;
 #include <iostream>
 #include <list>
 
-PRED_EXPORT bool pred_check_size(node *n, list<query_val *> param) {
+pred_size::pred_size() {
+
+}
+
+pred_size::~pred_size() {
+
+}
+
+bool pred_size::check(node *n, list<query_val *> param) {
 	PRED_FAIL_NO_CHECK("empty");
 	return false;
 }
 
-PRED_EXPORT int pred_eval_size(node *n, list<query_val *> param) {
+int pred_size::eval(node *n, list<query_val *> param) {
 	return n->bg->get_root(0)->size();
 }

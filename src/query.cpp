@@ -149,11 +149,11 @@ bool query_not::check(node *n) {
 
 // PREDICATE 
 
-map<string,predicate *> query_predicate::predicates;
-
 query_predicate::query_predicate(string nm, list<query_val *> p) {
 	name = nm;
 	params = p;
+	pred = predicate::get_predicate(nm);
+	assert(pred != NULL);
 }
 
 query_predicate::~query_predicate() {
@@ -171,39 +171,15 @@ string query_predicate::to_string() {
 }
 
 bool query_predicate::check(node *n) {
-	predicate *p = predicates[name];
-
-	if(!p) {
-		cerr << "query_predicate()::check: unknown predicate '" << name << "'" << endl;
-		exit(1);
-	}
-
-	return p->invoke_check(n,params);
+	return pred->check(n,params);
 }
-
-void query_predicate::register_predicate(string name, predicate *p) {
-	predicates[name] = p;
-}
-
 
 int query_predicate::eval(node *n) {
-	predicate *p = predicates[name];
-
-	if(!p) {
-		cerr << "query_predicate()::eval: unknown predicate '" << name << "'" << endl;
-		exit(1);
-	}
-
-	return p->invoke_eval(n,params);
+	return pred->eval(n,params);
 }
 
 void query_predicate::cleanup() {
-	for(map<string,predicate *>::iterator i = predicates.begin(); i != predicates.end(); i++) {
-		if(i->second != NULL)
-			delete i->second;
-	}
 
-	predicates.clear();
 }
 
 // query_val

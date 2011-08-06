@@ -24,35 +24,16 @@
 
 class query_val;
 
-typedef bool (*predfn_check_t)(node*,list<query_val*>);
-typedef int (*predfn_eval_t)(node*,list<query_val*>);
-
-#ifndef _WIN32
-typedef void* DLHANDLE;
-#else
-
-#include <windows.h>
-
-typedef HINSTANCE DLHANDLE;
-#endif
-
 class predicate {
-	predfn_check_t pred_check;
-	predfn_eval_t pred_eval;
-	DLHANDLE handle;
+	static map<string,predicate *> predicates;
 public:
-	predicate(string name, char *filename);
+	predicate();
 	~predicate();
-	bool invoke_check(node *n, list<query_val *> params);
-	int invoke_eval(node *n, list<query_val *> params);
+	virtual bool check(node *n, list<query_val *> params);
+	virtual int eval(node *n, list<query_val *> params);
+	static void register_predicate(string name, predicate *p);
+	static predicate *get_predicate(string name);
 };
-
-// Make it a bit prettier to define predicates in modules
-#ifndef _WIN32
-#define PRED_EXPORT extern "C"
-#else
-#define PRED_EXPORT extern "C" __declspec( dllexport ) 
-#endif
 
 #define PRED_FAIL_NO_EVAL(x) do { rerror("predicate") << "Type error: pred_" << x << \
 				" is of type 'bool', but is being used as type 'int'" << endl; \
@@ -71,5 +52,36 @@ public:
 				exit(1); \
 				} while(0);
 
+class pred_empty : public predicate {
+public:
+	pred_empty();
+	~pred_empty();
+	bool check(node *n, list<query_val *> params);
+	int eval(node *n, list<query_val *> params);
+};
+
+class pred_size : public predicate {
+public:
+	pred_size();
+	~pred_size();
+	bool check(node *n, list<query_val *> params);
+	int eval(node *n, list<query_val *> params);
+};
+
+class pred_matches : public predicate {
+public:
+	pred_matches();
+	~pred_matches();
+	bool check(node *n, list<query_val *> params);
+	int eval(node *n, list<query_val *> params);
+};
+
+class pred_terminal : public predicate {
+public:
+	pred_terminal();
+	~pred_terminal();
+	bool check(node *n, list<query_val *> params);
+	int eval(node *n, list<query_val *> params);
+};
 
 #endif

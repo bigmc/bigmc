@@ -24,114 +24,37 @@ using namespace std;
 #include <set>
 #include <iostream>
 #include <sstream>
+#include <map>
+
 #include <assert.h>
 #include <bigmc.h>
 
-#ifndef _WIN32
+map<string,predicate*> predicate::predicates;
 
-#include <dlfcn.h>
-
-#else
-
-#include <windows.h>
-
-#endif
-
-
-predicate::predicate(string name, char *filename) {
-	pred_check = NULL;
-	pred_eval = NULL;
-
-	if(filename[0] == '/') {
-		if(global_cfg.verbose_level) 
-			rinfo("predicate::predicate") << "loading predicate from " <<
-				filename << endl;
-
-		#ifndef _WIN32
-		handle = dlopen(filename, RTLD_LAZY);
-		#else
-		handle = LoadLibrary(filename);
-		#endif
-	} else {
-		char buf[2048];
-		sprintf(buf,"%s/lib/%s", global_cfg.bigmc_home, filename);
-		if(global_cfg.verbose_level) 
-		rinfo("predicate::predicate") << "loading predicate from " << buf << endl;
-		#ifndef _WIN32
-		handle = dlopen(buf, RTLD_LAZY);
-		#else
-		handle = LoadLibrary(buf);
-		#endif
-	}
-
-	#ifndef _WIN32
-	if (!handle) {
-	        rerror("predicate::predicate") << "loading failed: " << dlerror() << endl;
-		exit(1);
-	}
-
-	dlerror();
-	pred_check = (predfn_check_t) dlsym(handle, ("pred_check_" + name).c_str());
-	const char *dlsym_error = dlerror();
-
-	if (dlsym_error) {
-		cerr << "predicate::predicate(): error loading symbol 'pred_check_" << name << 
-			"': " << dlsym_error << '\n';
-		dlclose(handle);
-		exit(1);
-	}
-
-	dlerror();
-	pred_eval = (predfn_eval_t) dlsym(handle, ("pred_eval_" + name).c_str());
-	const char *dlsym_error2 = dlerror();
-
-	if (dlsym_error2) {
-		cerr << "predicate::predicate(): error loading symbol 'pred_eval_" << name << 
-			"': " << dlsym_error2 << '\n';
-		dlclose(handle);
-		exit(1);
-	}
-	#else
-	// WINDOWS
-
-	if (!handle) {
-	        rerror("predicate::predicate") << "DLL loading failed" << endl;
-		exit(1);
-	}
-
-	pred_check = (predfn_check_t) GetProcAddress(handle, ("pred_check_" + name).c_str());
-	pred_eval = (predfn_eval_t) GetProcAddress(handle, ("pred_eval_" + name).c_str());
-
-	#endif
+predicate::predicate() {
 
 }
 
 predicate::~predicate() {
-	if(handle)
-		#ifndef _WIN32
-		dlclose(handle);
-		#else
-		FreeLibrary(handle);
-		#endif
 }
 
-bool predicate::invoke_check(node *n,list<query_val *> param) {
-	if(!pred_check) {
-		cout << "predicate::invoke_check(): Implementation is NULL!" << endl;
-		exit(1);
-	}
-
-	return pred_check(n,param);
+bool predicate::check(node *n,list<query_val *> param) {
+	assert(0);
+	return false;
 }
 
 
-int predicate::invoke_eval(node *n,list<query_val *> param) {
-	if(!pred_eval) {
-		cout << "predicate::invoke_check(): Implementation is NULL!" << endl;
-		exit(1);
-	}
-
-	return pred_eval(n,param);
+int predicate::eval(node *n,list<query_val *> param) {
+	assert(0);
+	return false;
 }
 
+void predicate::register_predicate(string name, predicate *p) {
+	predicates[name] = p;
+}
 
+predicate *predicate::get_predicate(string name) {
+	if(predicates.find(name) == predicates.end()) return NULL;
+
+	return predicates[name];
+}

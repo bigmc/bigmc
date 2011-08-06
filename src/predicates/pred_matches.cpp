@@ -26,23 +26,44 @@ using namespace std;
 #include <iostream>
 #include <list>
 
-PRED_EXPORT bool pred_check_matches(node *n, list<query_val *> param) {
+pred_matches::pred_matches() {
+
+}
+
+pred_matches::~pred_matches() {
+
+}
+
+bool pred_matches::check(node *n, list<query_val *> param) {
+	return eval(n,param) > 0;
+}
+
+int pred_matches::eval(node *n, list<query_val *> param) {
 	if(param.size() == 0 || param.size() > 1) {
-		PRED_FAIL_PARAM("matches", "term -> bool", "_ -> bool");
+		PRED_FAIL_PARAM("matches", "term -> int", "_ -> int");
 		exit(1);
 	}
 
 	query_term *t = dynamic_cast<query_term *>(param.front());
 
 	if(t == NULL) {
-		PRED_FAIL_PARAM("matches", "term -> bool", "??? -> bool");
+		PRED_FAIL_PARAM("matches", "term -> int", "??? -> int");
 		exit(1);
 	}
 
-	return term::matches(n->bg->get_root(0), t->data);
-}
+	reactionrule *r = new reactionrule(t->data, NULL);
+	match *mt = new match(r);
 
-PRED_EXPORT int pred_eval_matches(node *n, list<query_val *> param) {
-	PRED_FAIL_NO_EVAL("matches");
-	return 0;
+	set<match *> m = matcher::try_match_anywhere(n->bg->get_root(0), t->data, r, mt);
+
+	int sz = m.size();
+
+	mt->failure();
+	delete r;
+	
+	for(set<match *>::iterator i = m.begin(); i!=m.end(); i++) {
+		(*i)->failure();
+	}
+
+	return sz;
 }
