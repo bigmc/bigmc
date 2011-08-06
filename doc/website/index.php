@@ -13,8 +13,13 @@ By model checking, we mean precisely the act of checking whether some specificat
 <p>
 <ul>
 <li><a href="release/bigmc-20110806.tar.gz">BigMC 20110806 (Source tar.gz, 513KB)</a></li>
-<li><a href="release/BigMC-20110806.pkg">BigMC 20110806 (MacOS 10.6 Binary Installer Package, 1.2MB)</a></li>
+<li><a href="release/BigMC-20110806.dmg">BigMC 20110806 (MacOS 10.6 Binary Installer Package, 1.2MB)</a></li>
 <li><a href="release/BigMC-20110806.exe">BigMC 20110806 (Windows 32-bit Binary Installer Package, 1.9MB)</a></li>
+</ul>
+</p>
+<p>The binary packages above already contain a self-contained version of the BigMC Java GUI tool.  If you build from source, or run BigMC on another platform, you can use the stand-alone executable JAR version of the GUI:</p>
+<ul>
+<li><a href="release/BigMC-GUI-20110806.jar">BigMC-GUI 20110806 (Java 1.6 JAR, 509KB)</a></li>
 </ul>
 </p>
 
