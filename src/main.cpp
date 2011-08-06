@@ -5,6 +5,9 @@ using namespace std;
 #include <string>
 #include <set>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <bigmc.h>
 
 #ifdef _WIN32
