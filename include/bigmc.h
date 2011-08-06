@@ -27,6 +27,7 @@ using namespace std;
 #include <vector>
 #include <map>
 #include <string>
+#include <stdlib.h>
 
 #include "config.h"
 
