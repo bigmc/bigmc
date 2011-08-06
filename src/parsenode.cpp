@@ -26,6 +26,7 @@ using namespace std;
 #include <vector>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include <globals.h>
 #include <parsenode.h>
