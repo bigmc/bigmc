@@ -34,6 +34,7 @@ using namespace std;
 #else
 
 #include <stdlib.h>
+#include <string.h>
 
 char *readline(char *prmpt) {
 	size_t size = 0;
