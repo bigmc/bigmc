@@ -40,6 +40,6 @@ cd ../../
 scp doc/website/* $TARG/
 scp doc/website/manual/* $TARG/manual/
 scp doc/manual/bigmc.pdf $TARG/bigmc.pdf
-scp bigmc-$VERSION.tar.gz $TARG/release/
-scp bin/BigMC-$VERSION.pkg $TARG/release/
-
+scp bin/bigmc-$VERSION.tar.gz $TARG/release/
+scp bin/BigMC-$VERSION.dmg $TARG/release/
+scp bin/BigMC-$VERSION.exe $TARG/release/
