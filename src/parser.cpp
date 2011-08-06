@@ -33,6 +33,8 @@ using namespace std;
 #include <readline/history.h>
 #else
 
+#include <stdlib.h>
+
 char *readline(char *prmpt) {
 	size_t size = 0;
 	size_t len  = 0;
