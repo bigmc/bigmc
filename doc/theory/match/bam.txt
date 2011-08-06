@@ -1,0 +1,40 @@
+
+m(k[X].T, k[Y].R, (-,N,P)) = m(T, R, k[X], (-, N + (X := Y), P))
+
+m(k[X].T, k[Y].R, (r,N,P)) = m(T, R, root, (r, N + (X := Y), P))
+
+m(k[X].T, l[Y].R, _) = {}
+
+m(T_1 | T_2, R, _) = {}
+
+m(T_1 | T_2, R_1 | R_2, (r, N, P)) = 
+let
+	M' = m(T_1, R_1, (r,N,P))
+in
+	fold (fn (a,b) => m(T_2, R_2, a) union b) (r,N,P) M'
+end 
+  union
+let
+	M' = m(T_2, R_2, (r,N,P))
+in
+	fold (fn (a,b) => m(T_1, R_1, a) union b) (r,N,P) M'
+end union
+
+m(k[X].T, P | -_i, (r,N,P)) = m(k[X].T, P, (r,N,P + [i -> nil]))
+
+m(T, -_i, (r,N,P)) = {(r,N,P + [i -> T])}
+
+m(nil, nil, M) = {M}
+
+m(T, nil, M) = {}
+
+These rules need to actually track active contexts and not apply 'm' if the context
+is not active:
+
+match(t_1.T :: S, R) = 
+	m(t_1.T, R, (-,[],[])) union match(S @ [T], R) 
+match(t_1 | t_2 :: S, R) = 
+	m(t_1 | t_2, R, (-,[],[])) union match(S @ [t_1, t_2], R)
+match(nil :: S, R) = m(nil, R, (-,[],[])) union match(S, R)
+
+match([],R) = {}
