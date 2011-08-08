@@ -477,17 +477,48 @@ local checking mode!
 
 @section Pre-defined Predicates
 
-@itemize
-@item @code{size()}
-@item @code{matches(@var{t})}
-@item @code{empty()}
-@end itemize
+@subsection @code{size()} Predicate
 
-@section Defining your own predicates
+This predicate returns a count of the number of place-graph nodes in the current agent.  For example:
 
-Predicates are loadable modules that live in @file{$BIGMC_HOME/lib/}.  The predicates to load
-are defined in @file{bigmc.conf}.
+@example
+a.a.a.nil --> 3
+a.nil | b.nil --> 2
+nil | nil | nil --> 0
+nil --> 0
+@end example
 
+This can be used to construct properties such as:
+
+@example
+%property growth $pred->size() <= size();
+@end example
+
+@section @code{matches(@var{t})} Predicate
+
+This checks whether a given redex @var{t} matches anywhere within the current agent, subject to the usual active contexts restriction.  For example:
+
+@example
+%active a : 0;
+%active b : 0;
+%active c : 0;
+
+a.b | a.c;
+
+a.$1 | $0 -> c.$1 | $0;
+
+%property cc !matches(c.c);
+
+%check
+@end example
+
+@subsection @code{empty()}
+
+This is equivalent to the property @code{size() == 0}.
+
+@subsection @code{terminal()}
+
+This checks the property of the current node in the transition system and returns @code{false} if the node has outgoing edges (i.e. there are further agents reachable by the application of some reaction rule to this agent), or @code{true} otherwise.  See @file{doc/examples/dining.bgm} for an example use of this predicate to define deadlock-freedom.
 
 @node Checking
 @chapter Checking

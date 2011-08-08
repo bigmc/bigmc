@@ -15,13 +15,13 @@
 %passive Q : 1; # Fork-id - placeholder
 
 # Acquire a left fork
-P[lf1,p1,rf1] || F[lf1] -> P[lf1,p1,rf1].F[lf1] || Q[lf1];
+P[lf,p,rf] || F[lf] -> P[lf,p,rf].F[lf] || Q[lf];
 # Acquire a right fork
-P[lf2,p2,rf2].F[lf2] || F[rf2] -> P[lf2,p2,rf2].(F[lf2] | F[rf2]) || Q[rf2];
+P[lf,p,rf].F[lf] || F[rf] -> P[lf,p,rf].(F[lf] | F[rf]) || Q[rf];
 # Drop left fork
-P[lf3,p3,rf3].(F[lf3] | F[rf3]) || Q[lf3] -> P[lf3,p3,rf3].F[rf3] || F[lf3];
+P[lf,p,rf].(F[lf] | F[rf]) || Q[lf] -> P[lf,p,rf].F[rf] || F[lf];
 # Drop right fork
-P[lf4,p4,rf4].F[rf4] || Q[rf4] -> P[lf4,p4,rf4] || F[rf4];
+P[lf,p,rf].F[rf] || Q[rf] -> P[lf,p,rf] || F[rf];
 
 # The philosopher's table!
 

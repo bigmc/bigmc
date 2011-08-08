@@ -1,4 +1,4 @@
-AC_INIT([BigMC], [20110806], [gdpe@itu.dk], [bigmc], [http://bigraph.org/bigmc/])
+AC_INIT([BigMC], [20110808], [gdpe@itu.dk], [bigmc], [http://bigraph.org/bigmc/])
 AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.10 no-define])
 AC_CONFIG_HEADERS([config.h])
