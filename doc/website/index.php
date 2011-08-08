@@ -12,14 +12,14 @@ By model checking, we mean precisely the act of checking whether some specificat
 <p>BigMC is released under the terms of the GNU General Public License Version 3</p>
 <p>
 <ul>
-<li><a href="release/bigmc-20110806.tar.gz">BigMC 20110806 (Source tar.gz, 513KB)</a></li>
-<li><a href="release/BigMC-20110806.dmg">BigMC 20110806 (MacOS 10.6 Binary Installer Package, 1.2MB)</a></li>
-<li><a href="release/BigMC-20110806.exe">BigMC 20110806 (Windows 32-bit Binary Installer Package, 1.9MB)</a></li>
+<li><a href="release/bigmc-20110808.tar.gz">BigMC 20110808 (Source tar.gz, 513KB)</a></li>
+<li><a href="release/BigMC-20110808.dmg">BigMC 20110808 (MacOS 10.6 Binary Installer Package, 1.2MB)</a></li>
+<li><a href="release/BigMC-20110808.exe">BigMC 20110808 (Windows 32-bit Binary Installer Package, 1.9MB)</a></li>
 </ul>
 </p>
 <p>The binary packages above already contain a self-contained version of the BigMC Java GUI tool.  If you build from source, or run BigMC on another platform, you can use the stand-alone executable JAR version of the GUI:</p>
 <ul>
-<li><a href="release/BigMC-GUI-20110806.jar">BigMC-GUI 20110806 (Java 1.6 JAR, 509KB)</a></li>
+<li><a href="release/BigMC-GUI-20110808.jar">BigMC-GUI 20110808 (Java 1.6 JAR, 509KB)</a></li>
 </ul>
 </p>
 

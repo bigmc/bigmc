@@ -494,7 +494,7 @@ This can be used to construct properties such as:
 %property growth $pred->size() <= size();
 @end example
 
-@section @code{matches(@var{t})} Predicate
+@subsection @code{matches(@var{t})} Predicate
 
 This checks whether a given redex @var{t} matches anywhere within the current agent, subject to the usual active contexts restriction.  For example:
 
@@ -512,11 +512,11 @@ a.$1 | $0 -> c.$1 | $0;
 %check
 @end example
 
-@subsection @code{empty()}
+@subsection @code{empty() Predicate}
 
 This is equivalent to the property @code{size() == 0}.
 
-@subsection @code{terminal()}
+@subsection @code{terminal() Predicate}
 
 This checks the property of the current node in the transition system and returns @code{false} if the node has outgoing edges (i.e. there are further agents reachable by the application of some reaction rule to this agent), or @code{true} otherwise.  See @file{doc/examples/dining.bgm} for an example use of this predicate to define deadlock-freedom.
 
