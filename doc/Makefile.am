@@ -11,10 +11,13 @@ examples/foo.bgm \
 examples/foo2.bgm \
 examples/foo3.bgm \
 examples/hole.bgm \
+examples/hole2.bgm \
 examples/match.bgm \
 examples/nil.bgm \
 examples/par.bgm \
 examples/par2.bgm \
+examples/par3.bgm \
+examples/par4.bgm \
 examples/prop.bgm \
 examples/subtree.bgm \
 examples/terminal.bgm \
@@ -27,6 +30,7 @@ examples/airport.bgm \
 examples/airport2.bgm \
 examples/dining.bgm \
 examples/dining_mutex.bgm \
+examples/unary.bgm \
 examples/link.bgm
 
 theory_DATA = theory/match/match.sml 
@@ -40,10 +44,14 @@ examples/foo.bgm \
 examples/foo2.bgm \
 examples/foo3.bgm \
 examples/hole.bgm \
+examples/hole2.bgm \
 examples/match.bgm \
 examples/nil.bgm \
 examples/par.bgm \
 examples/par2.bgm \
+examples/par3.bgm \
+examples/par4.bgm \
+examples/unary.bgm \
 examples/prop.bgm \
 examples/subtree.bgm \
 examples/terminal.bgm \

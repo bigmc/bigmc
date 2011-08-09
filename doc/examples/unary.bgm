@@ -1,0 +1,12 @@
+%active Plus : 0;
+%active Succ : 0;
+%passive Zero : 0;
+%passive Res : 0;
+
+Plus.(Succ.Succ.Succ.Zero | Succ.Succ.Zero) | Res.Zero;
+
+Plus.(Succ.$0 | $1) | Res.$2 -> Plus.($0 | $1) | Res.Succ.$2;
+Plus.(Zero | Zero) -> Zero;
+
+%check;
+
