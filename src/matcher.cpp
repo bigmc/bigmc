@@ -124,6 +124,172 @@ set<match *> matcher::try_match(parallel *t, prefix *r, match *m) {
 	return m->failure();
 }
 
+bool is_compat(match *m1, match *m2) {
+	if(m2->has_failed) return false;
+
+	map<name,name> m1n = m1->get_names();
+	map<name,name> m2n = m2->get_names();
+
+	for(map<name,name>::iterator i = m1n.begin(); i != m1n.end(); i++) {
+		if(m2n.find(i->first) == m2n.end()) continue;
+
+		if(m2n[i->first] != i->second) return false;
+	}
+
+	map<term*,term*> mapping = m1->get_mappings();
+	
+	for(map<term*,term*>::iterator i = mapping.begin(); i!=mapping.end(); i++) {
+		if(m2->get_mapping(i->first) == NULL) continue;
+
+		if(m2->get_mapping(i->first) != i->second) return false;
+	}
+
+	return true;
+}
+
+set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
+	// FIXME: This approach can be optimised considerably!
+	if(DEBUG) {
+		rinfo("matcher::try_match") << "matching: " << t->to_string() <<
+			" against redex: " << r->to_string() << endl;
+	}
+
+	set<term *> tch = t->get_children();
+	set<term *> rch = r->get_children();
+	map<term *, set<match *> > matches;
+
+	hole *has_hole = NULL; // Is there a top level hole?  e.g. A | B | $0
+			 	// Something like A.$0 | B | C does not count.
+				// This will be the hole term itself, or NULL.
+
+	for(set<term *>::iterator i = rch.begin(); i != rch.end(); i++) {
+		if((*i)->type == THOLE) {
+			has_hole = (hole *)*i;
+			rch.erase(i);
+			break;
+		}
+	}
+
+	if(has_hole == NULL && rch.size() > tch.size())
+		return m->failure();
+
+	if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
+		return m->failure();  // We can't start a new match here.
+	} else if(m->root == NULL) {
+		m->root = t;  // We can start a new match here!
+	}
+	
+	m->add_match(r,t);
+
+	for(set<term*>::iterator i = rch.begin(); i!= rch.end(); i++) {
+		int mcount = 0;
+
+		for(set<term*>::iterator j = tch.begin(); j != tch.end(); j++) {
+			if(DEBUG)
+				cout << "Matching: " << (*i)->to_string() << " against " << (*j)->to_string();
+	
+			match *mn = m->clone();
+			set<match *> crossmatch = try_match(*j, *i, mn);
+
+			if(crossmatch.size() > 0) {
+				mcount++;
+				matches[*i].insert(crossmatch.begin(), crossmatch.end());
+				if(DEBUG)
+					cout << ": matches " << crossmatch.size() << " times" << endl;
+			} else {
+				if(DEBUG) cout << ": no match" << endl;
+			}
+		}
+
+		// We found nothing matching this part of the redex, so fail now.
+		if(mcount == 0)
+			return m->failure();
+	}
+
+	if(DEBUG) {
+		cout << "PARALLEL MATCH:" << endl;
+
+		for(map<term*,set<match *> >::iterator i = matches.begin(); i!=matches.end(); i++) {
+			cout << "REDEX PART: " << i->first->to_string() << endl;
+			cout << "MATCH SET: " << endl;
+
+			for(set<match *>::iterator j = i->second.begin(); j!=i->second.end(); j++) {
+				cout << (*j)->to_string() << endl;
+			}
+		}
+	}
+
+	set<match*> cand;
+	for(set<term*>::iterator i = rch.begin(); i!=rch.end(); i++) {
+		if(cand.size() == 0) {
+			if(i != rch.begin()) return m->failure();
+
+			cand = matches[*i];
+			continue;
+		}
+
+		set<match *> ns = matches[*i];
+		set<match *> newcand;
+
+		for(set<match*>::iterator j = cand.begin(); j!=cand.end(); j++) {
+			for(set<match*>::iterator k = ns.begin(); k!=ns.end(); k++) {
+				if(is_compat(*j,*k)) {
+					match *mm = (*j)->clone();
+					mm->root = m->root;
+					mm->incorporate(*k);
+					newcand.insert(mm);
+				}
+			}
+		}
+
+		cand = newcand;
+	}
+
+	if(cand.size() == 0) return m->failure();
+
+	// OK, now we have to go through and populate the parameter
+	// with everything that was not matched.
+	if(has_hole != NULL || t->parent == NULL) {
+		if(t->parent == NULL && has_hole == NULL) {
+			has_hole = new hole(999999);
+		}
+
+		for(set<match*>::iterator i = cand.begin(); i!=cand.end(); i++) {
+			set<term*> ctx;
+
+			for(set<term*>::iterator j = tch.begin(); j != tch.end(); j++) {
+				if((*i)->get_mapping(*j) == NULL) {
+					ctx.insert(*j);
+				}
+			}
+
+			if(ctx.size() == 0) {
+				(*i)->add_param(has_hole->index, new nil());
+				continue;
+			}
+
+			if(ctx.size() == 1) {
+				(*i)->add_param(has_hole->index, *(ctx.begin()));
+				continue;
+			}
+
+			(*i)->add_param(has_hole->index, new parallel(ctx));
+		}
+	}
+
+	if(DEBUG) {
+		cout << "PARALLEL MATCH: RESULT:" << endl;
+
+		for(set<match *>::iterator j = cand.begin(); j!=cand.end(); j++) {
+			cout << (*j)->to_string() << endl;
+		}
+	}
+
+
+	return cand;
+}
+
+/*
 set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 	// FIXME: This approach can be optimised considerably!
 	if(DEBUG) {
@@ -149,6 +315,8 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 
 	if(has_hole == NULL && rch.size() > tch.size())
 		return m->failure();
+
+	if(tch.size() == 0) return m->failure();
 
 	if(m->root == NULL && !(t->parent == NULL || (t->parent != NULL && t->parent->active_context()))) {
 		return m->failure();
@@ -253,6 +421,7 @@ set<match *> matcher::try_match(parallel *t, parallel *r, match *m) {
 
 	return res;
 }
+*/
 
 bool no_overlap(list<match *> prev, match *cand) {
 	// FIXME can probably optimise this with a LUT

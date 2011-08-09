@@ -144,6 +144,7 @@ void register_predicates() {
 	predicate::register_predicate("size", new pred_size());
 	predicate::register_predicate("matches", new pred_matches());
 	predicate::register_predicate("terminal", new pred_terminal());
+	predicate::register_predicate("equal", new pred_equal());
 }
 
 int main(int argc, char**argv) {

@@ -42,6 +42,7 @@ public:
 	term *get_param(int id);
 	void add_match(term *src, term *target);
 	term *get_mapping(term *src);
+	map<term*,term*> get_mappings();
 	void capture_name(name src, name target);
 	map<name,name> get_names();
 	name get_name(name n);

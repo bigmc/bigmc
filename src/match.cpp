@@ -55,6 +55,8 @@ void match::add_param(int id, term *c) {
 }
 
 term *match::get_param(int id) {
+	if(parameters.find(id) == parameters.end()) return NULL;
+
 	return parameters[id];
 }
 
@@ -76,7 +78,13 @@ void match::set_rule(reactionrule *r) {
 }
 
 term *match::get_mapping(term *targ) {
+	if(mapping.find(targ) == mapping.end()) return NULL;
+
 	return mapping[targ];
+}
+
+map<term *,term *> match::get_mappings() {
+	return mapping;
 }
 
 void match::capture_name(name src, name target) {

@@ -33,6 +33,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	predicates/pred_empty.cpp \
 	predicates/pred_matches.cpp \
 	predicates/pred_terminal.cpp \
+	predicates/pred_equal.cpp \
 	wingetopt.c \
 	../include/bigmc.h \
 	../include/bigraph.h \

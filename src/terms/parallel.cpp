@@ -253,7 +253,26 @@ set<term *> parallel::get_children() {
 }
 
 term *parallel::apply_match(match *m) {
+
 	if(id == m->root->id) {
+		if(parent == NULL && m->get_param(999999) != NULL) {
+			term *r = m->get_rule()->reactum->instantiate(m);
+			if(r->type != TPAR) return r;
+
+			parallel *rp = (parallel *) r;
+
+			term *ht = m->get_param(999999)->instantiate(NULL);
+
+			if(ht->type == TNIL) return rp;
+
+			if(ht->type == TPAR)
+				rp->terms.insert(((parallel *)ht)->terms.begin(), ((parallel*)ht)->terms.end());
+			else 
+				rp->terms.insert(ht);
+
+			return rp;
+		}
+	
 		// This is the match site.  Return the reactum.
 		if(DEBUG) cout << "BUG: parallel::apply_match(): Found match site!" << endl;
 		term *r = m->get_rule()->reactum->instantiate(m);

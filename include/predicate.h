@@ -84,4 +84,12 @@ public:
 	int eval(node *n, list<query_val *> params);
 };
 
+class pred_equal : public predicate {
+public:
+	pred_equal();
+	~pred_equal();
+	bool check(node *n, list<query_val *> params);
+	int eval(node *n, list<query_val *> params);
+};
+
 #endif
