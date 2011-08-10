@@ -227,6 +227,29 @@ vector<parsenode *> holenode::get_children() {
 	return v;
 }
 
+// NIL
+
+nilnode::nilnode() {
+	type = NODE_NIL;
+}
+
+nilnode::~nilnode() {
+}
+
+string nilnode::to_string() {
+	return "nil";
+}
+
+bool nilnode::is_valid() {
+	return true;
+}
+
+vector<parsenode *> nilnode::get_children() {
+	vector<parsenode *> v;
+	return v;
+}
+
+
 
 // SEQ
 

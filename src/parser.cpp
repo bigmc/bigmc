@@ -219,7 +219,9 @@ set<term *> parser::bg_collapse(parsenode *p) {
 		return bg_collapse((parallelnode *)p);
 
 	set<term *> s;
-	s.insert(bg_mknode(p));
+
+	if(p->type != NODE_NIL)
+		s.insert(bg_mknode(p));
 	return s; 
 }
 
@@ -267,6 +269,12 @@ term *parser::bg_mknode(holenode *p) {
 	if(DEBUG) cerr << p->to_string() << endl;
 	
 	return new hole(p->n);
+}
+
+term *parser::bg_mknode(nilnode *p) {
+	if(DEBUG) fprintf(stderr, "BUG: parser::bg_mknode(nilnode): ");
+
+	return new nil();
 }
 
 vector<name> parser::bg_names(seqnode *p) {
@@ -333,6 +341,9 @@ term *parser::bg_mknode(parsenode *p) {
 		break;
 	case NODE_HOLE:
 		return bg_mknode((holenode *) p);
+		break;
+	case NODE_NIL:
+		return bg_mknode((nilnode *) p);
 		break;
 	case NODE_REGION:
 		return bg_mknode((regionnode *) p);

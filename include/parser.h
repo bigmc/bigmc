@@ -27,6 +27,7 @@ class parser {
 	static term		*bg_mknode(prefixnode *p);
 	static term		*bg_mknode(parallelnode *p);
 	static term		*bg_mknode(holenode *p);
+	static term		*bg_mknode(nilnode *p);
 	static term		*bg_mknode(parsenode *p);
 	static term		*bg_mknode(controlnode *p);
 	static term		*bg_mknode(regionnode *p);

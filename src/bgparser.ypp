@@ -41,7 +41,7 @@ int  yylex ();
 %token SEMI ARROW PAR PREF COMMA LSQ RSQ LPAR RPAR
 %token INNER OUTER DPAR UNLINKED
 %token ACTIVE PASSIVE COLON HOLE IDENT NUM
-%token PROPERTY LAND LOR LNOT FORALL EXISTS
+%token PROPERTY LAND LOR LNOT FORALL EXISTS NIL
 %token LEQ GEQ LT GT EQ NEQ DOLLAR BTRUE BFALSE IF THEN ELSE
 
 %type <node> model dec reaction exp expel property
@@ -85,6 +85,7 @@ expel
 | prefix			{ $$ = new prefixnode($1,NULL); }
 | DOLLAR NUM			{ $$ = new holenode($2); }
 | LPAR exp RPAR			{ $$ = $2; }
+| NIL				{ $$ = new nilnode(); }
 ;
 
 prefix

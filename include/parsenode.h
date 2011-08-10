@@ -40,6 +40,7 @@
 #define NODE_NUM	16384
 #define NODE_IF		32768
 #define NODE_REGION	65536
+#define NODE_NIL	131072
 
 #define OPR_NEQ	1
 #define OPR_EQ	2
@@ -136,6 +137,15 @@ public:
 	int n;
 	holenode(int id);
 	~holenode();
+	string to_string();
+	bool is_valid();
+	vector<parsenode *> get_children();
+};
+
+class nilnode : public parsenode {
+public:
+	nilnode();
+	~nilnode();
 	string to_string();
 	bool is_valid();
 	vector<parsenode *> get_children();

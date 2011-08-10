@@ -316,6 +316,7 @@ as defined in the preamble.  The full grammar is given by:
 @var{T} ::= @var{T} || @var{T}
 @var{T} ::= $@var{n}
 @var{T} ::= @var{K}
+@var{T} ::= @var{nil}
 
 @var{K} ::= @var{k}[@var{names}]
 @var{K} ::= @var{k}

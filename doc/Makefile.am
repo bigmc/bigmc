@@ -29,6 +29,7 @@ examples/notify.bgm \
 examples/airport.bgm \
 examples/airport2.bgm \
 examples/dining.bgm \
+examples/dining_nil.bgm \
 examples/dining_mutex.bgm \
 examples/unary.bgm \
 examples/link.bgm
@@ -64,6 +65,7 @@ examples/airport.bgm \
 examples/airport2.bgm \
 examples/link.bgm \
 examples/dining.bgm \
+examples/dining_nil.bgm \
 examples/dining_mutex.bgm \
 theory/match/match.sml
 
