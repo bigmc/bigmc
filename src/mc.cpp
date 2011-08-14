@@ -54,7 +54,8 @@ mc::mc(bigraph *b) {
 }
 
 mc::~mc() {
-	delete g;
+	if(!global_cfg.check_local)
+		delete g;
 }
 
 void *mc::thread_wrapper( void *i ) {
