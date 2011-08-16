@@ -44,6 +44,7 @@ using namespace std;
 #include "parsenode.h"
 #include "subtree.h"
 #include "matcher.h"
+#include "analyser.h"
 #include "mc.h"
 #include "driver.h"
 #include "parser.h"

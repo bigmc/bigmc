@@ -19,28 +19,30 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 * USA.
 *********************************************************************************/
-#ifndef _MC_H
-#define _MC_H
+#ifndef _ANALYSER_H
+#define _ANALYSER_H
 
-class mc {
-	graph *g;
-	analyser *analyse;
-	deque<node *> workqueue;
-	unsigned long steps;
-	static map<string,query *> properties;
-	map<unsigned long,bool> checked;
-	static set<match *> match_discard;
+class controlvisitor : public termvisitor {
 public:
-	mc(bigraph *b);
-	~mc();
-	bool check();
-	string report(int step);
-	bool step(int tid);
-	static void add_property(string s, query *q);
-	bool check_properties(node *n);
-	static void *thread_wrapper( void *i );
-	static void match_mark_delete( match *m );
-	static void match_gc();
+	controlvisitor();
+	~controlvisitor();
+	void visit(term *t);
+	void visit(parallel *t);
+	void visit(regions *t);
+	void visit(prefix *t);
+	void visit(hole *t);
+	void visit(nil *t);
+	set<control> controls;
+	bool has_holes;
+};
+
+class analyser {
+	bigraph *bg;
+public:
+	analyser(bigraph *b);
+	~analyser();
+	void interference();
+	set<control> interference_set(set<control> s1, set<control> s2);
 };
 
 #endif

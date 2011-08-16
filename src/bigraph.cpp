@@ -267,3 +267,6 @@ bool bigraph::is_free(name n) {
 	return (names.find(n) == names.end());
 }
 
+set<reactionrule *> bigraph::get_rules() {
+	return rules;
+}

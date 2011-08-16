@@ -33,6 +33,7 @@ struct global_config {
 	char *bigmc_home;
 	int threads;
 	bool print_mode;
+	bool analyse_only;
 };
 
 extern global_config global_cfg; 

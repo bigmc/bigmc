@@ -215,3 +215,27 @@ bool term::overlap(term *other) {
 	return overlap(other->parent);
 }
 
+void termvisitor::visit(term *t) {
+
+}
+
+void termvisitor::visit(parallel *t) {
+
+}
+
+void termvisitor::visit(regions *t) {
+
+}
+
+void termvisitor::visit(prefix *t) {
+
+}
+
+void termvisitor::visit(hole *t) {
+
+}
+
+void termvisitor::visit(nil *t) {
+
+}
+

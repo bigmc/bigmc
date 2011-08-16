@@ -51,6 +51,7 @@ mc::mc(bigraph *b) {
 	g = new graph(n);
 	workqueue.push_back(n);
 	steps = 0;
+	analyse = new analyser(b);
 }
 
 mc::~mc() {
@@ -70,6 +71,11 @@ void *mc::thread_wrapper( void *i ) {
 }
 
 bool mc::check() {
+	if(global_cfg.analyse_only) {
+		analyse->interference();
+		exit(1);
+	}
+
 	#ifdef HAVE_PTHREAD
 
 	sigmbx = vector<bool>(global_cfg.threads, false);

@@ -11,6 +11,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	parser.cpp \
 	report.cpp \
 	bigraph.cpp \
+	analyser.cpp \
 	driver.cpp \
 	graph.cpp \
 	match.cpp \
@@ -37,6 +38,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	wingetopt.c \
 	../include/bigmc.h \
 	../include/bigraph.h \
+	../include/analyser.h \
 	../include/driver.h \
 	../include/graph.h \
 	../include/match.h \
@@ -57,6 +59,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 
 noinst_HEADERS = ../include/bigmc.h \
 	../include/bigraph.h \
+	../include/analyser.h \
 	../include/driver.h \
 	../include/graph.h \
 	../include/match.h \

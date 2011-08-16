@@ -53,6 +53,7 @@ public:
 	static control add_control(string n, bool act, int ar);
 	void add_outer_name(name n);
 	void add_inner_name(name n);
+	set<reactionrule*> get_rules();
 	void set_root(term *n);
 	void add_rule(reactionrule *r);
 	static bool is_free(name n);
