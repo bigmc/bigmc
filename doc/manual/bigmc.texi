@@ -342,6 +342,14 @@ model under construction.  Order is not significant.  For example:
 send[x].$0 | recv[x].$1 -> $0 | $1;
 @end example
 
+Reaction rules may optionally be given names using the syntax:
+
+@example
+%rule @var{rule-name} @var{redex} -> @var{reactum};
+@end example
+
+These names are for display purposes only, and have no semantic signficance.
+
 Names that do not appear in @code{%name} definitions are considered free names
 and will be bound during matching.  Names that are defined in the name set will be matched
 literally, and will not be re-bound.

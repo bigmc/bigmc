@@ -37,6 +37,7 @@ reactionrule::reactionrule() {
 reactionrule::reactionrule(term *red, term *reac) {
 	redex = red;
 	reactum = reac;
+	name = "";
 }
 
 reactionrule::~reactionrule() {
@@ -45,6 +46,8 @@ reactionrule::~reactionrule() {
 
 string reactionrule::to_string() {
 	assert(this != NULL);
+
+	if(name != "") return name;
 
 	if(redex != NULL && reactum != NULL)
 		return redex->to_string() + " -> " + reactum->to_string();
@@ -83,5 +86,13 @@ void reactionrule::contextify() {
 	}
 
 	u_ctx++;
+}
+
+void reactionrule::set_name(string n) {
+	name = n;
+}
+
+string reactionrule::get_name() {
+	return name;
 }
 

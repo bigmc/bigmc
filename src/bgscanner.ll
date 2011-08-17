@@ -107,6 +107,9 @@ IDENTR	[a-zA-Z0-9_]
 "%property"       {
                     return PROPERTY;
                   }
+"%rule"		  {
+		    return RULE;
+		  }
 "&&"       	  {
                     return LAND;
                   }

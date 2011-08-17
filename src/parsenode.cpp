@@ -153,6 +153,7 @@ reactionnode::reactionnode(parsenode *red, parsenode *reac) {
 	redex = red;
 	reactum = reac;
 	type = NODE_REACTION;
+	name = "";
 }
 
 reactionnode::~reactionnode() {

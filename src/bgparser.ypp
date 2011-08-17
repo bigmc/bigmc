@@ -39,7 +39,7 @@ int  yylex ();
 
 %token UNKNOWN
 %token SEMI ARROW PAR PREF COMMA LSQ RSQ LPAR RPAR
-%token INNER OUTER DPAR UNLINKED
+%token INNER OUTER DPAR UNLINKED RULE
 %token ACTIVE PASSIVE COLON HOLE IDENT NUM
 %token PROPERTY LAND LOR LNOT FORALL EXISTS NIL
 %token LEQ GEQ LT GT EQ NEQ DOLLAR BTRUE BFALSE IF THEN ELSE
@@ -66,6 +66,7 @@ dec
 | ACTIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),true,$4); }
 | PASSIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),false,$4); }
 | PROPERTY IDENT property	{ $$ = new propertynode($2,$3); }
+| RULE IDENT reaction		{ ((reactionnode*)$3)->name = string(strdup($2)); $$ = $3; }
 | reaction			{ $$ = $1; }
 | exp				{ $$ = $1; }
 ;

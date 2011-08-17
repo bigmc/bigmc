@@ -464,9 +464,11 @@ bigraph *parser::finish() {
 				if(DEBUG) printf("NODE_REACTION\n");
 				reactionnode *t = (reactionnode *)(*it);
 
-				b->add_rule(
-					new reactionrule(bg_mknode(t->redex),bg_mknode(t->reactum))
-				);
+				reactionrule *rr = new reactionrule(bg_mknode(t->redex),bg_mknode(t->reactum));
+
+				rr->set_name(t->name);
+
+				b->add_rule(rr);
 
 				break;
 			}

@@ -121,6 +121,7 @@ public:
 
 class reactionnode : public parsenode {
 public:
+	string name;
 	parsenode *redex;
 	parsenode *reactum;
 	reactionnode(parsenode *red, parsenode *reac);

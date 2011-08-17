@@ -33,7 +33,84 @@ public:
 	void visit(hole *t);
 	void visit(nil *t);
 	set<control> controls;
-	bool has_holes;
+	int nholes;
+	int depth;
+	int size;
+};
+
+// A delta can be invalid because it doesn't actually represent a lower bound on size change.
+// For example, a.$0 -> a.($0 | $0) has size 2*sz($0), but we can't predict the size of $0.
+struct delta_t {
+	bool valid;
+	int delta;
+
+	string to_string() {
+		std::stringstream out;
+		if(valid) {
+			out << delta;
+		} else {
+			return "<<unknown>>";
+		}
+
+		return out.str();
+	}
+};
+
+struct ruleattr {
+	reactionrule *rule;
+	delta_t size_delta;
+	delta_t depth_delta;
+	set<control> precond;
+	set<control> postcond;
+
+	string to_string() {
+		string cs = "";
+
+		set<control> intersect;
+		std::set_intersection( precond.begin(), precond.end(), postcond.begin(), postcond.end(), std::inserter( intersect, intersect.begin() ) );
+
+		for(set<control>::iterator i = intersect.begin(); i!=intersect.end(); i++) {
+			cs += " " + bigraph::control_to_string(*i);
+		}
+
+		string ds;
+		set<control> diff1;
+		std::set_difference( precond.begin(), precond.end(), postcond.begin(), postcond.end(), std::inserter( diff1, diff1.begin() ) );
+
+		for(set<control>::iterator i = diff1.begin(); i!=diff1.end(); i++) {
+			ds += " " + bigraph::control_to_string(*i);
+		}
+		
+		string is;
+		set<control> diff2;
+		std::set_difference( postcond.begin(), postcond.end(), precond.begin(), precond.end(), std::inserter( diff2, diff2.begin() ) );
+
+		for(set<control>::iterator i = diff2.begin(); i!=diff2.end(); i++) {
+			is += " " + bigraph::control_to_string(*i);
+		}
+
+		string pc = "";
+
+		for(set<control>::iterator i = precond.begin(); i!=precond.end(); i++) {
+			pc += " " + bigraph::control_to_string(*i);
+		}
+
+		string psc = "";
+
+		for(set<control>::iterator i = postcond.begin(); i!=postcond.end(); i++) {
+			psc += " " + bigraph::control_to_string(*i);
+		}
+
+
+		return "Rule Attribute Analysis: " + rule->to_string() + "\n" +
+			"  * Size delta: " + size_delta.to_string() + "\n" +
+			"  * Depth delta: " + depth_delta.to_string() + "\n" +
+			"  * Precondition: " + pc + "\n" +
+			"  * Postcondition: " + psc + "\n" + 
+			"  * Insertion set: " + is + "\n" +
+			"  * Deletion set: " + ds + "\n" +
+			"  * Constant set: " + cs;
+	}
 };
 
 class analyser {
@@ -43,6 +120,8 @@ public:
 	~analyser();
 	void interference();
 	set<control> interference_set(set<control> s1, set<control> s2);
+	static ruleattr *analyse(reactionrule *r);
+	
 };
 
 #endif

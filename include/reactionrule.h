@@ -24,6 +24,7 @@
 
 class reactionrule {
 	static int u_ctx;
+	string name;
 public:
 	term *redex;
 	term *reactum;
@@ -32,6 +33,8 @@ public:
 	~reactionrule();
 	string to_string();
 	void contextify();
+	void set_name(string n);
+	string get_name();
 };
 
 #endif

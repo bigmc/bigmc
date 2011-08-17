@@ -14,13 +14,13 @@
 %passive P : 3; # Left-fork, Phil-id, Right-fork
 
 # Acquire a left fork
-P[lf,p,rf] || F[lf] -> P[lf,p,rf].F[lf] || nil;
+%rule pickup_left P[lf,p,rf] || F[lf] -> P[lf,p,rf].F[lf] || nil;
 # Acquire a right fork
-P[lf,p,rf].F[lf] || F[rf] -> P[lf,p,rf].(F[lf] | F[rf]) || nil;
+%rule pickup_right P[lf,p,rf].F[lf] || F[rf] -> P[lf,p,rf].(F[lf] | F[rf]) || nil;
 # Drop left fork
-P[lf,p,rf].(F[lf] | F[rf]) -> P[lf,p,rf].F[rf] | F[lf];
+%rule drop_left P[lf,p,rf].(F[lf] | F[rf]) -> P[lf,p,rf].F[rf] | F[lf];
 # Drop right fork
-P[lf,p,rf].F[rf] -> P[lf,p,rf] | F[rf];
+%rule drop_right P[lf,p,rf].F[rf] -> P[lf,p,rf] | F[rf];
 
 # The philosopher's table!
 

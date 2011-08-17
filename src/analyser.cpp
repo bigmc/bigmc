@@ -51,7 +51,26 @@ set<control> analyser::interference_set(set<control> s1, set<control> s2) {
 // Y does not interfere with X or Y
 // Z does not interfere with X or Y
 
-// 
+// For a property like size() > 10, we can come up with a size trajectory metric.
+// If only reaction rules that grow the size are able to be applied, we need not check
+// anything with size() > 11.
+
+// For match rules, we know the alphabet A of the match.  If the initial alphabet
+// of the agent is B, for any branch that has reaction rules that can only introduce
+// elements of C (not in A), then we know inductively that the match will never apply
+// to that branch, and so we can stop checking it.
+
+// The general strategy is to come up with some rule attributes P that are not satisfied
+// at the root, and then prune any branches for which P(x+1) can never be true
+// (because no rule can ever make P true), because we know that branch will never violate
+// the property.
+
+// The best metrics are the alphabet of controls (for match), a lower bound on
+// the size of the term (for size and empty), and the depth of the term (also for match).
+// If a match redex is x places deep, then an agent of depth y (where y < x) is never
+// going to violate that property.
+
+// I haven't thought of a good way to check terminal properties.
 
 void analyser::interference() {
 	set<reactionrule *> rules = bg->get_rules();
@@ -59,31 +78,57 @@ void analyser::interference() {
 	map<reactionrule *, map<reactionrule *, set<control> > > infset;
 
 	for(set<reactionrule*>::iterator k = rules.begin(); k!=rules.end(); k++) {
-		cout << "Rule: " << (*k)->to_string() << ": " << endl;
-		for(set<reactionrule*>::iterator i = rules.begin(); i!=rules.end(); i++) {
-			controlvisitor *c1 = new controlvisitor();
-			controlvisitor *c2 = new controlvisitor();
-
-			(*k)->redex->accept(c1);
-			(*i)->reactum->accept(c2);
-
-			infset[*k][*i] = interference_set(c1->controls, c2->controls);
-
-			if(infset[*k][*i].size() == 0) {
-				cout << "  * Is not interfered with by " << (*i)->to_string() << endl;
-			} else {
-				cout << "  * Is interfered with by " << (*i)->to_string() << endl;
-			}
-
-			delete c1;
-			delete c2;
-		}
+		ruleattr *a = analyse(*k);
+		cout << a->to_string() << endl;
 	}
 }
 
+ruleattr *analyser::analyse(reactionrule *r) {
+	controlvisitor *c1 = new controlvisitor();
+	controlvisitor *c2 = new controlvisitor();
+
+	r->redex->accept(c1);
+	r->reactum->accept(c2);
+
+	ruleattr *a = new ruleattr();
+
+	a->rule = r;
+
+	delta_t sd;
+	sd.delta = c2->size - c1->size;
+	
+	delta_t dd;
+	dd.delta = c2->depth - c1->depth;
+
+	// FIXME: need to check for cases like:
+	// a.($0 | b.$1) -> a.($0 | $0) for validity
+	if(c1->nholes == c2->nholes) {
+		sd.valid = true;
+		dd.valid = true;
+	} else if (c2->nholes < c1->nholes) {
+		sd.valid = true;
+		dd.valid = true;
+	} else {
+		sd.valid = false;
+		dd.valid = false;
+	}
+
+	a->size_delta = sd;
+	a->depth_delta = dd;
+
+	a->precond = c1->controls;
+	a->postcond = c2->controls;
+
+	delete c1;
+	delete c2;
+	
+	return a;
+}
 
 controlvisitor::controlvisitor() {
-	has_holes = false;
+	nholes = 0;
+	size = 0;
+	depth = 0;
 }
 
 controlvisitor::~controlvisitor() {
@@ -91,7 +136,7 @@ controlvisitor::~controlvisitor() {
 }
 
 void controlvisitor::visit(term *t) {
-
+	size++;
 }
 
 void controlvisitor::visit(parallel *t) {
@@ -99,19 +144,23 @@ void controlvisitor::visit(parallel *t) {
 }
 
 void controlvisitor::visit(regions *t) {
-
+	
 }
 
 void controlvisitor::visit(prefix *t) {
 	controls.insert(t->get_control());
+	size++;
+	depth++;
 }
 
 void controlvisitor::visit(hole *t) {
-	has_holes = true;
+	nholes++;
+	size++;
+	depth++;
 }
 
 void controlvisitor::visit(nil *t) {
-
+	depth++;
 }
 
 
