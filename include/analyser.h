@@ -121,6 +121,7 @@ public:
 	void interference();
 	set<control> interference_set(set<control> s1, set<control> s2);
 	static ruleattr *analyse(reactionrule *r);
+	static bool interferes(term *reactum, term *redex);
 	
 };
 

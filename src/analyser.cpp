@@ -78,8 +78,13 @@ void analyser::interference() {
 	map<reactionrule *, map<reactionrule *, set<control> > > infset;
 
 	for(set<reactionrule*>::iterator k = rules.begin(); k!=rules.end(); k++) {
-		ruleattr *a = analyse(*k);
-		cout << a->to_string() << endl;
+		for(set<reactionrule*>::iterator j = rules.begin(); j!=rules.end(); j++) {
+			if(interferes((*k)->reactum, (*j)->redex)) {
+				cout << "Interference: " << (*k)->to_string() << " with " << (*j)->to_string() << endl;
+			} else {
+				cout << "No Interference: " << (*k)->to_string() << " with " << (*j)->to_string() << endl;
+			}
+		}
 	}
 }
 
@@ -89,6 +94,7 @@ ruleattr *analyser::analyse(reactionrule *r) {
 
 	r->redex->accept(c1);
 	r->reactum->accept(c2);
+
 
 	ruleattr *a = new ruleattr();
 
@@ -123,6 +129,103 @@ ruleattr *analyser::analyse(reactionrule *r) {
 	delete c2;
 	
 	return a;
+}
+
+set<term *> all_children_of(term *p) {
+	switch(p->type) {
+		case TPAR:
+			return ((parallel*)p)->get_children();
+		case TPREF: {
+			set<term*> r;
+			r.insert(((prefix*)p)->get_suffix());
+			return r;
+		}
+		case TREGION: {
+			set<term*> r;
+			list<term *> c = ((regions*)p)->get_children();
+			r.insert(c.begin(), c.end());
+			return r;
+		}
+		default:
+			return set<term*>();
+	}
+}
+
+list<list<term *> > all_paths(term *t) {
+	list<list<term *> > partial;
+
+	set<term*> ch = all_children_of(t);
+
+	if(ch.size() == 0) {
+		list<term*> l;
+		l.push_back(t);
+		partial.push_back(l);
+		return partial;
+	}
+
+	for(set<term*>::iterator c = ch.begin(); c != ch.end(); c++) {
+		list<list<term*> > paths = all_paths(*c);
+		
+		for(list<list<term *> >::iterator i = paths.begin(); i!=paths.end(); i++) {
+			if(t->type != TPAR && t->type != TREGION) {
+				i->push_front(t);
+			}
+			partial.push_back(*i);
+		}
+	}
+
+	return partial;
+}
+
+bool pref_cmp(term *t, term *u) {
+	if(t->type != TPREF || u->type != TPREF) return false;
+
+	return ((prefix*)t)->get_control() == ((prefix*)u)->get_control();
+}
+
+// Determines whether some redex could possibly be found in an agent consisting of a reactum and
+// given a decomposition C o R' o d
+bool analyser::interferes(term *reactum, term *redex) {
+	list<list<term*> > redpaths = all_paths(redex);
+	list<list<term*> > reacpaths = all_paths(reactum);
+
+	for(list<list<term *> >::iterator i = redpaths.begin(); i!=redpaths.end(); i++) {
+		for(list<list<term*> >::iterator j = reacpaths.begin(); j!=reacpaths.end(); j++) {
+			for(list<term*>::iterator k = i->begin(); k!= i->end(); k++) {
+				// k is the head of the redex path we need to check,
+				// by iterating over it we start checking from every position,
+				// Equivalent to matching every suffix.
+				list<term*>::iterator m = j->begin();
+				int pathlen = 0;
+
+				for(list<term*>::iterator l = k; l!=i->end(); l++) {
+					if(m == j->end()) break;
+
+					if((*m)->type == TPREF && (*l)->type == TPREF) {
+						if(!pref_cmp(*m,*l))
+							break;
+
+						pathlen++;
+					}
+
+					if((*m)->type == TNIL && (*l)->type == TNIL) {
+						// We found a full path and therefore interference.
+						return true;
+					}
+
+					if((*l)->type == THOLE) {
+						if(pathlen == 0) break;
+
+						if(pathlen > 0) return true;
+					}
+
+					m++;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 controlvisitor::controlvisitor() {
