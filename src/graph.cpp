@@ -110,15 +110,15 @@ string graph::dump_dot() {
 
 	stringstream coda;
 
-	out << "   N_" << root->hash << " [shape=doublecircle, color=lightblue2, style=filled, label=\"" << root->bg->get_root(0)->to_string() << "\"];" << endl;
+	out << "   N_" << root->hash << " [shape=ellipse, color=lightblue2, style=filled, label=\"" << root->bg->get_root(0)->to_string() << "\"];" << endl;
 
 	for(set<node *>::iterator i = nodes.begin(); i!=nodes.end(); i++) {
 		string rr = "root";
 
-		string dc = "";
+		string dc = "shape = ellipse, ";
 
 		if((*i)->terminal)
-			dc = "shape = doublecircle, ";
+			dc = "shape = doubleoctagon, ";
 
 		out << "N_" << (*i)->hash << " [ " << dc << "label=\"" << (*i)->bg->get_root(0)->to_string() << "\"];" << endl;
 
@@ -159,23 +159,25 @@ string graph::dump_dot_forward() {
 	//string terminals = "LR_1 LR_2 LR_3";
 
 	//out << "node [shape = doublecircle];" << terminals << ";" << endl;
-	out << "   node [shape = circle];" << endl;
+	out << "   node [shape = none];" << endl;
 
 	stringstream coda;
 
-	out << "   N_" << root->hash << " [shape=doublecircle, color=lightblue2, style=filled, label=\"" << root->bg->get_root(0)->to_string() << "\"];" << endl;
+	//out << "   N_" << root->hash << " [shape=ellipse, color=lightblue2, style=filled, label=\"" << root->bg->get_root(0)->to_string() << "\"];" << endl;
+	out << "   N_" << root->hash << " [shape=rectangle, color=lightblue2, style=filled, label=\"" << root->hash << "\"];" << endl;
 
 	for(set<node *>::iterator i = nodes.begin(); i!=nodes.end(); i++) {
 		if(DEBUG)
 			cout << "graph::dump: printing: " << (*i)->bg->to_string() << endl;
 		string rr = "root";
 
-		string dc = "";
+		string dc = "shape = none, ";
 
 		if((*i)->terminal)
-			dc = "shape = doublecircle, color=darkolivegreen3, style=filled, ";
+			dc = "shape = doubleoctagon, color=darkolivegreen3, style=filled, ";
 
-		out << "N_" << (*i)->hash << " [ " << dc << "label=\"" << (*i)->bg->get_root(0)->to_string() << "\"];" << endl;
+		//out << "N_" << (*i)->hash << " [ " << dc << "label=\"" << (*i)->bg->get_root(0)->to_string() << "\"];" << endl;
+		out << "N_" << (*i)->hash << " [ " << dc << "label=\"" << (*i)->hash << "\"];" << endl;
 
 		for(set<pair<node *, reactionrule *> >::iterator j = (*i)->target.begin();
 			j != (*i)->target.end(); j++) {

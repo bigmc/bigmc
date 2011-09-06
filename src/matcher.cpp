@@ -587,7 +587,7 @@ set <match *> matcher::try_match(term *t, reactionrule *r) {
 
 	term *p = t->next();
 	while(p != NULL) {
-		if(p->active_context()) {
+		if(p->parent == NULL || p->parent->active_context()) {
 			match *nm = new match(r);
 			matches = match::merge(matches, try_match(p, r->redex, nm));
 		}

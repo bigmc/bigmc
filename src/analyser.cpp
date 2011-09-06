@@ -78,11 +78,13 @@ void analyser::interference() {
 	map<reactionrule *, map<reactionrule *, set<control> > > infset;
 
 	for(set<reactionrule*>::iterator k = rules.begin(); k!=rules.end(); k++) {
+		cout << "Rule: " << (*k)->to_string() << endl;
 		for(set<reactionrule*>::iterator j = rules.begin(); j!=rules.end(); j++) {
 			if(interferes((*k)->reactum, (*j)->redex)) {
-				cout << "Interference: " << (*k)->to_string() << " with " << (*j)->to_string() << endl;
+				cout << " + Can cause: " << (*j)->to_string() << endl;
+				(*k)->causes(*j);
 			} else {
-				cout << "No Interference: " << (*k)->to_string() << " with " << (*j)->to_string() << endl;
+				cout << " - Cannot cause: " << (*j)->to_string() << endl;
 			}
 		}
 	}
@@ -177,55 +179,92 @@ list<list<term *> > all_paths(term *t) {
 	return partial;
 }
 
-bool pref_cmp(term *t, term *u) {
+bool pref_cmp(term *t, term *u, bool subs, bool pref) {
+	if(t->type == TNIL && u->type == TNIL) return true;
+
+	//if(subs && t->type == THOLE) return true;
+
+	//if(pref && u->type == THOLE) return true;
+
+	if(t->type == THOLE && u->type == THOLE) return true;
+
 	if(t->type != TPREF || u->type != TPREF) return false;
 
 	return ((prefix*)t)->get_control() == ((prefix*)u)->get_control();
 }
 
-// Determines whether some redex could possibly be found in an agent consisting of a reactum and
-// given a decomposition C o R' o d
-bool analyser::interferes(term *reactum, term *redex) {
-	list<list<term*> > redpaths = all_paths(redex);
-	list<list<term*> > reacpaths = all_paths(reactum);
+bool path_cmp(list<term *> p, const list<term *>& q, list<term*>::iterator j, bool subs, bool pref) {
+	list<term *>::iterator i = p.begin();
+	
+	while(i != p.end()) {
+		if(j == q.end()) return false;
 
-	for(list<list<term *> >::iterator i = redpaths.begin(); i!=redpaths.end(); i++) {
-		for(list<list<term*> >::iterator j = reacpaths.begin(); j!=reacpaths.end(); j++) {
-			for(list<term*>::iterator k = i->begin(); k!= i->end(); k++) {
-				// k is the head of the redex path we need to check,
-				// by iterating over it we start checking from every position,
-				// Equivalent to matching every suffix.
-				list<term*>::iterator m = j->begin();
-				int pathlen = 0;
+		if(DEBUG)
+			cout << "path_cmp: " << (*i)->to_string() << " with " << (*j)->to_string() << ": ";
 
-				for(list<term*>::iterator l = k; l!=i->end(); l++) {
-					if(m == j->end()) break;
+		if((*i)->type == THOLE || (q.size() == 1 && (*j)->type == THOLE)) { 
+			if(DEBUG) cout << "Only holes!" << endl;
+			return true;
+		}
 
-					if((*m)->type == TPREF && (*l)->type == TPREF) {
-						if(!pref_cmp(*m,*l))
-							break;
+		if(!pref_cmp(*i,*j,subs,pref)) {
+			if(DEBUG) cout << "Path does not match" << endl;
+			return false;
+		} else {
+			if(DEBUG) cout << "Path matches" << endl;
+		}
 
-						pathlen++;
-					}
+		i++;
+		j++;
+	}
 
-					if((*m)->type == TNIL && (*l)->type == TNIL) {
-						// We found a full path and therefore interference.
-						return true;
-					}
+	//cout << "Escaped loop: " << (j == q.end()) << endl;
+	return j == q.end();
+}
 
-					if((*l)->type == THOLE) {
-						if(pathlen == 0) break;
-
-						if(pathlen > 0) return true;
-					}
-
-					m++;
-				}
+bool path_exists(list<term *> t, list<list<term *> > l) {
+	for(list<list<term *> >::iterator i = l.begin(); i!=l.end(); i++) {
+		for(list<term*>::iterator j = i->begin(); j != i->end(); j++) {
+			if(path_cmp(t, *i, j, true, true)) {
+				return true;
 			}
 		}
 	}
 
 	return false;
+}
+
+bool analyser::orthogonalas(term *r1, term *r2) {
+	/* R \perp' R' \defeq & \lnot\exists p.nil \in P(R). p.nil \in \suff (R') \land \\
+	 & \lnot\exists p \in \pref (R). p\$n \in \suff (R') \land \\
+	 &\lnot\exists p\$n \in P(R). p \in \subs (R') \land \\
+	 &\lnot\exists p\$n \in P(R). p\$n \in \suff (R') */
+	
+	if(r1->type == TREGION || r2->type == TREGION) return false;
+	if(r1->type == THOLE || r2->type == THOLE) return false;
+	
+	list<list<term*> > p1 = all_paths(r1);
+	list<list<term*> > p2 = all_paths(r2);
+
+
+
+	for(list<list<term *> >::iterator p = p1.begin(); p != p1.end(); p++) {
+		if(path_exists(*p, p2)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool analyser::orthogonal(term *r1, term *r2) {
+	return orthogonalas(r1,r2) && orthogonalas(r2,r1);
+}
+
+// Determines whether some redex could possibly be found in an agent consisting of a reactum and
+// given a decomposition C o R' o d
+bool analyser::interferes(term *reactum, term *redex) {
+	return !orthogonal(reactum, redex);
 }
 
 controlvisitor::controlvisitor() {

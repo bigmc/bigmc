@@ -96,3 +96,10 @@ string reactionrule::get_name() {
 	return name;
 }
 
+set<reactionrule *> reactionrule::get_causation() {
+	return causation;
+}
+
+void reactionrule::causes(reactionrule *r) {
+	causation.insert(r);
+}

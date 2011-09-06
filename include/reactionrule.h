@@ -25,6 +25,7 @@
 class reactionrule {
 	static int u_ctx;
 	string name;
+	set<reactionrule *> causation;
 public:
 	term *redex;
 	term *reactum;
@@ -35,6 +36,8 @@ public:
 	void contextify();
 	void set_name(string n);
 	string get_name();
+	set<reactionrule *> get_causation();
+	void causes(reactionrule *r);
 };
 
 #endif
