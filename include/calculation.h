@@ -19,35 +19,22 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 * USA.
 *********************************************************************************/
-#ifndef _SUBTREE_H
-#define _SUBTREE_H
+#ifndef _CALCULATION_H
+#define _CALCULATION_H
 
-#include <string>
-#include <sstream>
-#include <deque>
-#include <vector>
+#define OP_SUM 1
+#define OP_PROD 2
+#define OP_SUB 3
+#define OP_DIV 4
 
-class st_el {
+// An implementation of Debois' calculational BRSs
+class calculation {
 public:
-	st_el(term *t, string n);
-	~st_el();
-	term *data;
-	string name;
-	bool operator <(st_el &l);
-};
-
-class subtree {
-public:
-	static list<st_el*> preorder_string(term *t);
-	static list<st_el*> preorder_string(prefix *t);
-	static list<st_el*> preorder_string(parallel *t);
-	static list<st_el*> preorder_string(nil *t);
-	static list<st_el*> preorder_string(hole *t);
-	static list<st_el*> preorder_string(num *t);
-
-	static string fports(vector<name> prt);
-
-	static string ordered_string(term *t);
+	static term *calculate(prefix *t, int op);
+	static term *calculate(parallel *t, int op);
+	static term *calculate(term *t, int op);
+	static bigraph *apply(bigraph *b);
 };
 
 #endif
+

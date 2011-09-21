@@ -46,7 +46,15 @@ struct mc_id {
 map<string,query*> mc::properties;
 set<match *> mc::match_discard;
 
+void add_calculation(bigraph *b) {
+	;
+}
+
 mc::mc(bigraph *b) {
+	if(global_cfg.calculation) {
+		add_calculation(b);
+	}
+
 	node *n = new node(b,NULL,NULL);
 	g = new graph(n);
 	workqueue.push_back(n);
@@ -199,6 +207,8 @@ bool mc::step(int id) {
 	node *n = workqueue.front();
 	workqueue.pop_front();
 
+	cout << "Hash: " << n->hash << " for: " << n->bg->to_string() << endl;
+
 	if(checked.find(n->hash) != checked.end()) {
 		return true;
 	}
@@ -228,7 +238,9 @@ bool mc::step(int id) {
 		reactionrule *rr = (*it)->get_rule();
 		
 		bigraph *b2 = b->apply_match(*it);
-		
+	
+		b2->root = calculation::calculate(b2->root);
+	
 		// It's important not to touch the match object again after this --
 		// apply_match destroys it!
 

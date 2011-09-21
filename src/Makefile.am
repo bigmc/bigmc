@@ -17,6 +17,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	match.cpp \
 	mc.cpp \
 	node.cpp \
+	calculation.cpp \
 	globals.cpp \
 	parsenode.cpp \
 	predicate.cpp \
@@ -30,6 +31,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	terms/prefix.cpp \
 	terms/hole.cpp \
 	terms/nil.cpp \
+	terms/num.cpp \
 	predicates/pred_size.cpp \
 	predicates/pred_empty.cpp \
 	predicates/pred_matches.cpp \
@@ -44,6 +46,7 @@ libbigmc_a_SOURCES = bgparser.ypp \
 	../include/match.h \
 	../include/mc.h \
 	../include/node.h \
+	../include/calculation.h \
 	../include/parsenode.h \
 	../include/parser.h \
 	../include/predicate.h \
@@ -65,6 +68,7 @@ noinst_HEADERS = ../include/bigmc.h \
 	../include/match.h \
 	../include/mc.h \
 	../include/node.h \
+	../include/calculation.h \
 	../include/parsenode.h \
 	../include/parser.h \
 	../include/predicate.h \

@@ -546,6 +546,19 @@ set<match *> matcher::try_match(term *t, hole *r, match *m) {
 	return match::singleton(m);
 }
 
+set<match *> matcher::try_match(num *t, num *r, match *m) {
+	if(t->value == r->value) {
+		if(m->root == NULL) {
+			m->root = t;
+		}
+
+		m->success();
+		return match::singleton(m);
+	}
+
+	return m->failure();
+}
+
 set<match *> matcher::try_match(nil *t, term *r, match *m) {
 	if(r->type == TNIL) {
 		m->add_match(r,t);
@@ -569,6 +582,8 @@ set<match *> matcher::try_match(term *t, term *r, match *m) {
 		return try_match((prefix*)t, (parallel*)r, m);
 	if(t->type == TPAR && r->type == TPAR)
 		return try_match((parallel*)t, (parallel*)r, m);
+	if(t->type == TNUM && r->type == TNUM)
+		return try_match((num*)t, (num*)r, m);
 	if(r->type == TREGION)
 		return try_match(t, (regions*)r, m);
 	if(r->type == THOLE)

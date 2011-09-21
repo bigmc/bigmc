@@ -32,6 +32,7 @@
 #define THOLE	4
 #define TNIL	8
 #define TREGION 16
+#define TNUM	32
 
 class termvisitor;
 
@@ -134,6 +135,21 @@ public:
 
 };
 
+class num : public term {
+public:
+	num(int val);
+	virtual ~num();
+	string to_string();
+	set<match *> find_matches(match *m);
+	int value;
+	term *apply_match(match *m);
+	term *instantiate(match *m);
+	unsigned int size();
+	void accept(termvisitor *t);
+
+};
+
+
 class nil : public term {
 public:
 	nil();
@@ -155,6 +171,7 @@ public:
 	virtual void visit(prefix *t);
 	virtual void visit(hole *t);
 	virtual void visit(nil *t);
+	virtual void visit(num *t);
 };
 
 #endif

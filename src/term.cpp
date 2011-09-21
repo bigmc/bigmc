@@ -146,6 +146,8 @@ term *term::next() {
 			break;
 		case TNIL:
 			break;
+		case TNUM:
+			break;
 		default:
 			cerr << "Matching encountered invalid term type " << t->type << endl;
 			exit(1);
@@ -239,3 +241,6 @@ void termvisitor::visit(nil *t) {
 
 }
 
+void termvisitor::visit(num *t) {
+
+}

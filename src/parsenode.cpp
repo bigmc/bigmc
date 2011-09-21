@@ -61,7 +61,10 @@ prefixnode::prefixnode(controlnode *p, parsenode *q) {
 }
 
 prefixnode::prefixnode(parsenode *p, parsenode *q) {
-	prefix = dynamic_cast<controlnode *>(p);
+	if(p->type == NODE_NUM)
+		prefix = (numnode *)p;
+	else
+		prefix = dynamic_cast<controlnode *>(p);
 	assert(prefix != NULL);
 	suffix = q;
 	type = NODE_PREFIX;

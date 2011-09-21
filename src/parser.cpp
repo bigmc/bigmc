@@ -77,6 +77,12 @@ void parser_add_result(parsenode *p) {
 	g_parsetree.push_back(p);
 }
 
+void parser_import(char *module) {
+	if(strcmp(module, "calculation") == 0) {
+		global_cfg.calculation = true;
+	}
+}
+
 void check_warn() {
 	fprintf(stderr, "Error: your model file doesn't have a '%%check' directive, so it won't do anything! Exiting...\n");
 }
@@ -199,6 +205,10 @@ term *parser::bg_mknode(prefixnode *p) {
 	if(DEBUG) fprintf(stderr, "BUG: parser::bg_mknode(prefixnode): ");
 	assert(p != NULL);
 
+	if(p->prefix->type == NODE_NUM) {
+		return new num(((numnode*)p->prefix)->data);
+	}
+
 	controlnode *cn = dynamic_cast<controlnode *>(p->prefix);
 	assert(cn != NULL);
 
@@ -275,6 +285,13 @@ term *parser::bg_mknode(nilnode *p) {
 	if(DEBUG) fprintf(stderr, "BUG: parser::bg_mknode(nilnode): ");
 
 	return new nil();
+}
+
+
+term *parser::bg_mknode(numnode *p) {
+	if(DEBUG) fprintf(stderr, "BUG: parser::bg_mknode(numnode): ");
+
+	return new num(p->data);
 }
 
 vector<name> parser::bg_names(seqnode *p) {
@@ -355,6 +372,9 @@ term *parser::bg_mknode(parsenode *p) {
 		return bg_mknode(pp);
 		break;
 	}
+	case NODE_NUM:
+		return bg_mknode((numnode *) p);
+		break;
 	default:
 		fprintf(stderr, "Malformed term structure: ");
 		cerr << p->to_string() << endl;
@@ -456,7 +476,7 @@ bigraph *parser::finish() {
 				break;
 			}
 			case NODE_REGION: case NODE_PREFIX: case NODE_PARALLEL: 
-			case NODE_HOLE: case NODE_CONTROL: {
+			case NODE_HOLE: case NODE_CONTROL: case NODE_NUM: {
 				b->set_root(bg_mknode(*it));
 				break;
 			}

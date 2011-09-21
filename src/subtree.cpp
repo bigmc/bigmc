@@ -54,6 +54,7 @@ list<st_el*> subtree::preorder_string(term *t) {
 		case TPAR:  return preorder_string((parallel *)t);
 		case THOLE: return preorder_string((hole *)t);
 		case TNIL:  return preorder_string((nil *)t);
+		case TNUM:  return preorder_string((num *)t);
 		default: return list<st_el*>();
 	}
 }
@@ -92,6 +93,9 @@ list<st_el*> subtree::preorder_string(parallel *t) {
 		case THOLE:
 			sorted_ch.push_back(new st_el(*i, "[-]"));
 			break;
+		case TNUM:
+			sorted_ch.push_back(new st_el(*i, (*i)->to_string()));
+			break;
 		case TNIL:
 			break;
 		}
@@ -111,6 +115,12 @@ list<st_el*> subtree::preorder_string(parallel *t) {
 list<st_el*> subtree::preorder_string(hole *t) {
 	list<st_el*> l;
 	l.push_back(new st_el(t, "[-]"));
+	return l;
+}
+
+list<st_el*> subtree::preorder_string(num *t) {
+	list<st_el*> l;
+	l.push_back(new st_el(t, t->to_string()));
 	return l;
 }
 

@@ -29,6 +29,7 @@ class parser {
 	static term		*bg_mknode(holenode *p);
 	static term		*bg_mknode(nilnode *p);
 	static term		*bg_mknode(parsenode *p);
+	static term		*bg_mknode(numnode *p);
 	static term		*bg_mknode(controlnode *p);
 	static term		*bg_mknode(regionnode *p);
 	static control		bg_mkctrl(controlnode *p);
@@ -54,6 +55,7 @@ public:
 extern vector<parsenode *> g_declaration;
 int parser_next_char();
 void parser_add_result(parsenode *p);
+void parser_import(char *module);
 int yylex();
 int yyparse();
 

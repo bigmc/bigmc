@@ -87,7 +87,7 @@ public:
 
 class prefixnode : public parsenode {
 public:
-	controlnode *prefix;
+	parsenode *prefix;
 	parsenode *suffix;
 	prefixnode(parsenode *p, parsenode *q);
 	prefixnode(controlnode *p, parsenode *q);

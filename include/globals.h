@@ -34,6 +34,7 @@ struct global_config {
 	int threads;
 	bool print_mode;
 	bool analyse_only;
+	bool calculation;
 };
 
 extern global_config global_cfg; 

@@ -28,6 +28,7 @@ public:
 	static set<match *> try_match(parallel *t, prefix *r, match *m);
 	static set<match *> try_match(prefix *t, parallel *r, match *m);
 	static set<match *> try_match(parallel *t, parallel *r, match *m);
+	static set<match *> try_match(num *t, num *r, match *m);
 	static set<match *> try_match(term *t, regions *r, match *m);
 	static set<match *> try_match(term *t, hole *r, match *m);
 	static set<match *> try_match(nil *t, term *r, match *m);

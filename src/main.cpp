@@ -161,6 +161,7 @@ int main(int argc, char**argv) {
 	global_cfg.threads = 2;
 	global_cfg.print_mode = false;
 	global_cfg.analyse_only = false;
+	global_cfg.calculation = false;
 
 	while ((c = getopt (argc, argv, "hvVAlpdm:G:r:t:")) != -1)
 		switch (c) {
