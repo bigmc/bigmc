@@ -23,9 +23,17 @@
 #include <iostream>
 #include <fstream>
 #include <bigmc.h>
+#include <stdio.h>
+#include <string.h>
 
 void yyerror (const char *error);
 int  yylex ();
+
+char *numtostr(int i) {
+	char str[64];
+	sprintf(str,"num:%d",i);
+	return strdup(str);
+}
 
 %}
 
@@ -39,7 +47,7 @@ int  yylex ();
 
 %token UNKNOWN
 %token SEMI ARROW PAR PREF COMMA LSQ RSQ LPAR RPAR
-%token INNER OUTER DPAR UNLINKED RULE
+%token INNER OUTER DPAR UNLINKED RULE IMPORT
 %token ACTIVE PASSIVE COLON HOLE IDENT NUM
 %token PROPERTY LAND LOR LNOT FORALL EXISTS NIL
 %token LEQ GEQ LT GT EQ NEQ DOLLAR BTRUE BFALSE IF THEN ELSE
@@ -67,6 +75,7 @@ dec
 | PASSIVE IDENT COLON NUM	{ $$ = new signaturenode(new namenode($2),false,$4); }
 | PROPERTY IDENT property	{ $$ = new propertynode($2,$3); }
 | RULE IDENT reaction		{ ((reactionnode*)$3)->name = string(strdup($2)); $$ = $3; }
+| IMPORT IDENT			{ $$ = NULL; }
 | reaction			{ $$ = $1; }
 | exp				{ $$ = $1; }
 ;
@@ -92,6 +101,7 @@ expel
 prefix
 : IDENT LSQ names RSQ		{ $$ = new controlnode(new namenode($1), $3); }
 | IDENT				{ $$ = new controlnode(new namenode($1), NULL); }
+| NUM				{ $$ = new controlnode(new namenode(numtostr($1)), NULL); }
 ;
 
 names
