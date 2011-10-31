@@ -47,8 +47,8 @@ int yycolumn = 1;
 %x COMMENT
 
 DIGIT	[0-9]
-IDENT1	[a-zA-Z+\-*/<>=!]
-IDENTR	[a-zA-Z0-9_+\-*/<>=!]
+IDENT1	[a-zA-Z+\-*/<>=]
+IDENTR	[a-zA-Z0-9_+\-*/<>=]
 
 %%
 

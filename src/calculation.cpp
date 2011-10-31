@@ -43,7 +43,7 @@ using namespace std;
 
 term *calculation::calculate(prefix *t, int op) {
 	if(t->get_control() == bigraph::control_from_string("+")) {
-		return calculate(t->suffix, OP_SUM);
+		return calculate(t->get_suffix(), OP_SUM);
 	}
 
 	return t;
@@ -56,7 +56,8 @@ term *calculation::calculate(parallel *t, int op) {
 	for(set<term*>::iterator i = terms.begin(); i  != terms.end(); i++) {
 		term *nt = calculate(*i,0);
 		if(nt->type == TNUM)
-			sum += nt->value;
+			//sum += nt->value;
+			sum = sum;
 		else {
 			cout << "Error: invalid calculational BRS term: " << t->to_string() << endl;
 			exit(1);

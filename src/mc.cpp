@@ -207,7 +207,8 @@ bool mc::step(int id) {
 	node *n = workqueue.front();
 	workqueue.pop_front();
 
-	cout << "Hash: " << n->hash << " for: " << n->bg->to_string() << endl;
+	if(DEBUG)
+		cout << "Hash: " << n->hash << " for: " << n->bg->to_string() << endl;
 
 	if(checked.find(n->hash) != checked.end()) {
 		return true;
@@ -239,7 +240,7 @@ bool mc::step(int id) {
 		
 		bigraph *b2 = b->apply_match(*it);
 	
-		b2->root = calculation::calculate(b2->root);
+		//b2->get_root(0) = calculation::calculate(b2->root);
 	
 		// It's important not to touch the match object again after this --
 		// apply_match destroys it!

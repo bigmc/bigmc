@@ -45,6 +45,7 @@
 # Two example passengers
 %name Bob;
 %name Joe;
+%name Jane;
 
 ############################## Reaction Rules ####################################
 
@@ -63,7 +64,7 @@ Gate[x].(Pax[y] | $0) -> Gate[x].$0;
 ############################## Airport Model  ####################################
 
 Landside.(
-	Zone[-,CheckIn].(Pax[Bob] | Pax[Joe]) | 
+	Zone[-,CheckIn].(Pax[Bob] | Pax[Joe] | Pax[Jane]) | 
 	Zone[CheckIn,Security]
 ) | 
 Airside.(
@@ -77,7 +78,8 @@ Gates.(
 	Gate[SK101]
 ) | DB.(
 	PaxRecord[Joe,SK100] |
-	PaxRecord[Bob,SK101]
+	PaxRecord[Bob,SK101] |
+    PaxRecord[Jane,SK100]
 );
 
 %check
