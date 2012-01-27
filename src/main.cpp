@@ -221,13 +221,15 @@ int main(int argc, char**argv) {
 	if(!modelfile) {
 		parser::init(NULL);
 	} else {
-		FILE *fp = fopen(modelfile, "r");
-		if(fp == NULL) {
-			perror("Cannot read model file");
-			return 1;
-		} else
-			fclose(fp);
-
+		if (strcmp(modelfile, "-") != 0) {
+			FILE *fp = fopen(modelfile, "r");
+			if(fp == NULL) {
+				perror("Cannot read model file");
+				return 1;
+			} else
+				fclose(fp);
+		}
+		
 		global_cfg.model_file = modelfile;
 		parser::init(modelfile);
 	}

@@ -172,11 +172,13 @@ void parser::init(char *file) {
 		g_fp = NULL;
 		using_history();
 	} else {
-		g_fp = fopen(file,"r");
-		if(g_fp == NULL) {
-			perror("Cannot open model file");
-			exit(1);
-		}
+		if (strcmp(file, "-") != 0) {
+			g_fp = fopen(file,"r");
+			if(g_fp == NULL) {
+				perror("Cannot open model file");
+				exit(1);
+			}
+		} else g_fp = stdin;
 	}
 }
 
