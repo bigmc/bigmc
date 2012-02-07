@@ -237,15 +237,33 @@ bool mc::step(int id) {
 
 	for(set<match *>::iterator it = matches.begin(); it != matches.end(); ++it) {
 		reactionrule *rr = (*it)->get_rule();
-		
-		bigraph *b2 = b->apply_match(*it);
 	
+		if(DEBUG) {
+			cout << "========================================================" << endl;
+			cout << "BUG: mc: applied rule: " << rr->to_string() << endl;
+			cout << "BUG: mc: match: " << (*it)->to_string() << endl;
+		}
+	
+		bigraph *b2 = b->apply_match(*it);
+
+		termconsistencyvisitor *tcv = new termconsistencyvisitor();
+
+		tcv->visit(b2->get_root(0));
+	
+		delete tcv;
+
 		//b2->get_root(0) = calculation::calculate(b2->root);
 	
 		// It's important not to touch the match object again after this --
 		// apply_match destroys it!
 
 		node *n2 = new node(b2,n,rr);
+
+		if(DEBUG) {
+			cout << "BUG: mc: to: " << b->to_string() << endl;
+			cout << "BUG: mc: result: " << b2->to_string() << endl;
+			cout << "========================================================" << endl;
+		}
 
 		if(!global_cfg.check_local) {
 			node *n3 = g->get(n2->hash);

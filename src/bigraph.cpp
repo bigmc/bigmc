@@ -115,7 +115,7 @@ void bigraph::add_rule(reactionrule *r) {
 	rwarning("bigraph::add_rule") << "=================================================================================\n";
 	rwarning("bigraph::add_rule") << "Warning: the redex of reaction rule:\n";
 	rwarning("bigraph::add_rule") << r->to_string() << "\n";
-	rwarning("bigraph::add_rule") << "matches the reactum reactum of the rule itself.\n";
+	rwarning("bigraph::add_rule") << "matches the reactum of the rule itself.\n";
 	rwarning("bigraph::add_rule") << "This is very likely to result in an infinite state space to explore through\n";
 	rwarning("bigraph::add_rule") << "repeated application of this rule. You'd be better off replacing this rule, or\n";
 	rwarning("bigraph::add_rule") << "contributing better symbolic checking to BigMC right now.  You have been warned.\n";
@@ -191,6 +191,8 @@ bigraph *bigraph::apply_match(match *m) {
 		b->inner = inner;
 		b->outer = outer;
 		b->rules = rules;
+
+		if(DEBUG) cout << "BUG: result:\n" << b->to_string() << endl;
 
 		// destroy the match -- we're done with it
 		mc::match_mark_delete(m);

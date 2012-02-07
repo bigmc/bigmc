@@ -1,0 +1,18 @@
+%active s : 0;
+%active z : 0;
+%active c : 0;
+%active l : 0;
+%active r : 0;
+%active LEFT : 0;
+%active RIGHT : 0;
+%active DONE : 0;
+
+LEFT.(l.s.s.z | r.s.s.z) | RIGHT.(l.s.z | r.s.z) ;
+
+l.$0 | r.s.$1 -> l.s.$0 | r.$1;
+s.s.s.$0 -> DONE;
+
+%property bug !matches(RIGHT.(l.s.s.s.s.z.nil | r.z.nil));
+
+%check;
+

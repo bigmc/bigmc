@@ -1,0 +1,20 @@
+# Minimal regression test contributed by Wang Wusheng
+
+# Controls
+%active IN:0; # for Increase or add
+%active L:0;
+%active R:0;
+%active Succ:0;
+%active Zero:0;
+
+# Reaction Rules
+
+IN.(L.$1|R.Zero)->$1;
+IN.(L.$1|R.Succ.$2)->IN.(L.Succ.$1|R.$2);
+
+IN.(L.Succ.Succ.Zero|R.Succ.Succ.Zero)|IN.(L.Succ.Zero|R.Succ.Succ.Zero);
+
+# properties
+#%property workable !terminal();
+
+%check;

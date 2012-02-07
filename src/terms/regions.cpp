@@ -107,7 +107,7 @@ term *regions::instantiate(match *m) {
 		n.push_back((*i)->instantiate(m));
 	}
 
-	regions *pp = new regions(id,n);
+	regions *pp = new regions(term::u_term++,n);
 	return pp;
 }
 

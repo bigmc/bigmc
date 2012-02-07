@@ -174,6 +174,18 @@ public:
 	virtual void visit(num *t);
 };
 
+class termconsistencyvisitor : public termvisitor {
+	set<term *> visited;
+public:
+	void visit(term *t);
+	void visit(parallel *t);
+	void visit(regions *t);
+	void visit(prefix *t);
+	void visit(hole *t);
+	void visit(nil *t);
+	void visit(num *t);
+};
+
 #endif
 
 

@@ -52,7 +52,7 @@ Gate[x].Pax[y] -> Gate[x];
 
 # Passengers can spontaneously spawn
 
-Zone[-,CheckIn] -> Zone[-,CheckIn].Pax[Gian];
+#Zone[-,CheckIn] -> Zone[-,CheckIn].Pax[Gian];
 
 # Airport Model:
 

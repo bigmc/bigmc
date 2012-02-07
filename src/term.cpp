@@ -244,3 +244,74 @@ void termvisitor::visit(nil *t) {
 void termvisitor::visit(num *t) {
 
 }
+
+// This is debugging code
+// It checks to see if we are accidentally sharing sub-trees within the same term.
+
+void termconsistencyvisitor::visit(term *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+void termconsistencyvisitor::visit(parallel *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+void termconsistencyvisitor::visit(regions *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+void termconsistencyvisitor::visit(prefix *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+void termconsistencyvisitor::visit(hole *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+void termconsistencyvisitor::visit(nil *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+void termconsistencyvisitor::visit(num *t) {
+	if(visited.find(t) != visited.end()) {
+		rerror("termconsistencyvisitor::visit") << t->to_string() << ": found duplicate sub-term." << endl;
+		exit(1);
+	}
+
+	visited.insert(t);
+}
+
+
+
+
+

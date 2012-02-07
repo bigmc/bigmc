@@ -87,7 +87,16 @@ string prefix::to_string() {
 		}
 
 		if(nm != "") nm = "[" + nm + "]";
+
+		
 	}
+
+	if(DEBUG) {
+		stringstream out;
+		out << "@" << id;
+		nm = out.str();
+	}
+
 	if(suffix != NULL)
 		return bigraph::control_to_string(ctrl) + nm + "." + suffix->to_string();
 	else
@@ -190,7 +199,8 @@ term *prefix::instantiate(match *m) {
 	set<term *> n;
 
 	if(m == NULL) {
-		return new prefix(id,ctrl,port,suffix->instantiate(m));
+		if(DEBUG) cout << "prefix::instantiate(NULL): " << to_string() << endl;
+		return new prefix(term::u_term++,ctrl,port,suffix->instantiate(m));
 	}
 
 	vector<name> nport (port.size());
@@ -200,8 +210,10 @@ term *prefix::instantiate(match *m) {
 		if(DEBUG)
 			cout << "prefix::instantiate: nport[" << i << "] = getname(" << port[i] << ") == " << nport[i] << endl;
 	}
+	
+	if(DEBUG) cout << "prefix::instantiate(!NULL): " << to_string() << endl;
 
-	return new prefix(id,ctrl,nport,suffix->instantiate(m));
+	return new prefix(term::u_term++,ctrl,nport,suffix->instantiate(m));
 }
 
 unsigned int prefix::size() {

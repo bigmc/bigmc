@@ -81,7 +81,7 @@ term *hole::instantiate(match *m) {
 	if(t == NULL)
 		t = new nil();
 
-	if(DEBUG) cout << "BUG: hole::instantiate(): " << t << endl;
+	if(DEBUG) cout << "BUG: hole::instantiate(): $" << index << " with " << t << endl;
 	if(DEBUG) cout << "BUG: hole::instantiate(): " << t->to_string() << endl;
 
 	// we can safely instantiate the parameter using instantiate(), because it should be ground.

@@ -304,7 +304,7 @@ term *parallel::instantiate(match *m) {
 		}
 	}
 
-	parallel *pp = new parallel(id,n);
+	parallel *pp = new parallel(term::u_term++,n);
 	pp->flatten();
 	return pp;
 }
