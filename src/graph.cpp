@@ -28,6 +28,7 @@ using namespace std;
 #include <algorithm>
 #include <assert.h>
 #include <bigmc.h>
+#include <stdio.h>
 
 graph::graph(node *initial) {
 	root = initial;
