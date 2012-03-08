@@ -23,6 +23,7 @@
 #define _BIGMC_H
 
 using namespace std;
+#include <algorithm>
 #include <set>
 #include <vector>
 #include <map>
