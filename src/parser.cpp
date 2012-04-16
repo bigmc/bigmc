@@ -31,6 +31,7 @@ using namespace std;
 #ifndef _WIN32
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <unistd.h> /* for isatty(3) */
 #else
 
 #include <stdlib.h>
@@ -166,17 +167,25 @@ int parser_next_char() {
 }
 
 void parser::init(char *file) {
-	if(file == NULL) {
+	bool tty;
+#ifndef _WIN32
+	tty = isatty(fileno(stdin));
+#else
+	tty = true;
+#endif
+	if (tty && file == NULL) {
 		print_version();
 		cout << "Hint: remember to enter 'check' once you have finished entering your model!" << endl;
 		g_fp = NULL;
 		using_history();
 	} else {
-		g_fp = fopen(file,"r");
-		if(g_fp == NULL) {
-			perror("Cannot open model file");
-			exit(1);
-		}
+		if (file != NULL && strcmp(file, "-") != 0) {
+			g_fp = fopen(file,"r");
+			if(g_fp == NULL) {
+				perror("Cannot open model file");
+				exit(1);
+			}
+		} else g_fp = stdin;
 	}
 }
 
