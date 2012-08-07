@@ -29,9 +29,12 @@ using namespace std;
 #include "bgparser.h"
 
 #ifndef _WIN32
+#include <unistd.h> /* for isatty(3) */
+#endif /* !_WIN32 */
+
+#ifdef USE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <unistd.h> /* for isatty(3) */
 #else
 
 #include <stdlib.h>

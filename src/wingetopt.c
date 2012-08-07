@@ -1,77 +1,132 @@
+/*	$NetBSD: getopt.c,v 1.26 2003/08/07 16:43:40 agc Exp $	*/
+
 /*
-POSIX getopt for Windows
+ * Copyright (c) 1987, 1993, 1994
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 
-AT&T Public License
+/* begin BigMC changes */
 
-Code given out at the 1985 UNIFORUM conference in Dallas.  
-*/
-
-#ifndef __GNUC__
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "wingetopt.h"
-#include <stdio.h>
 
-#define NULL	0
-#define EOF	(-1)
-#define ERR(s, c)	if(opterr){\
-	char errbuf[2];\
-	errbuf[0] = c; errbuf[1] = '\n';\
-	fputs(argv[0], stderr);\
-	fputs(s, stderr);\
-	fputc(c, stderr);}
-	//(void) write(2, argv[0], (unsigned)strlen(argv[0]));\
-	//(void) write(2, s, (unsigned)strlen(s));\
-	//(void) write(2, errbuf, 2);}
+#define _getprogname() nargv[0]
 
-int	opterr = 1;
-int	optind = 1;
-int	optopt;
-char	*optarg;
+/* end BigMC changes */
 
+int	opterr = 1,		/* if error message should be printed */
+	optind = 1,		/* index into parent argv vector */
+	optopt,			/* character checked for validity */
+	optreset;		/* reset getopt */
+char	*optarg;		/* argument associated with option */
+
+#define	BADCH	(int)'?'
+#define	BADARG	(int)':'
+#define	EMSG	""
+
+/*
+ * getopt --
+ *	Parse argc/argv argument vector.
+ */
 int
-getopt(argc, argv, opts)
-int	argc;
-char	**argv, *opts;
+getopt(nargc, nargv, ostr)
+	int nargc;
+	char * const nargv[];
+	const char *ostr;
 {
-	static int sp = 1;
-	register int c;
-	register char *cp;
+	static char *place = EMSG;		/* option letter processing */
+	char *oli;				/* option letter list index */
 
-	if(sp == 1)
-		if(optind >= argc ||
-		   argv[optind][0] != '-' || argv[optind][1] == '\0')
-			return(EOF);
-		else if(strcmp(argv[optind], "--") == NULL) {
-			optind++;
-			return(EOF);
+	if (optreset || *place == 0) {		/* update scanning pointer */
+		optreset = 0;
+		place = nargv[optind];
+		if (optind >= nargc || *place++ != '-') {
+			/* Argument is absent or is not an option */
+			place = EMSG;
+			return (-1);
 		}
-	optopt = c = argv[optind][sp];
-	if(c == ':' || (cp=strchr(opts, c)) == NULL) {
-		ERR(": illegal option -- ", c);
-		if(argv[optind][++sp] == '\0') {
-			optind++;
-			sp = 1;
+		optopt = *place++;
+		if (optopt == '-' && *place == 0) {
+			/* "--" => end of options */
+			++optind;
+			place = EMSG;
+			return (-1);
 		}
-		return('?');
+		if (optopt == 0) {
+			/* Solitary '-', treat as a '-' option
+			   if the program (eg su) is looking for it. */
+			place = EMSG;
+			if (strchr(ostr, '-') == NULL)
+				return (-1);
+			optopt = '-';
+		}
+	} else
+		optopt = *place++;
+
+	/* See if option letter is one the caller wanted... */
+	if (optopt == ':' || (oli = strchr(ostr, optopt)) == NULL) {
+		if (*place == 0)
+			++optind;
+		if (opterr && *ostr != ':')
+			(void)fprintf(stderr,
+			    "%s: illegal option -- %c\n", _getprogname(),
+			    optopt);
+		return (BADCH);
 	}
-	if(*++cp == ':') {
-		if(argv[optind][sp+1] != '\0')
-			optarg = &argv[optind++][sp+1];
-		else if(++optind >= argc) {
-			ERR(": option requires an argument -- ", c);
-			sp = 1;
-			return('?');
-		} else
-			optarg = argv[optind++];
-		sp = 1;
-	} else {
-		if(argv[optind][++sp] == '\0') {
-			sp = 1;
-			optind++;
-		}
+
+	/* Does this option need an argument? */
+	if (oli[1] != ':') {
+		/* don't need argument */
 		optarg = NULL;
+		if (*place == 0)
+			++optind;
+	} else {
+		/* Option-argument is either the rest of this argument or the
+		   entire next argument. */
+		if (*place)
+			optarg = place;
+		else if (nargc > ++optind)
+			optarg = nargv[optind];
+		else {
+			/* option-argument absent */
+			place = EMSG;
+			if (*ostr == ':')
+				return (BADARG);
+			if (opterr)
+				(void)fprintf(stderr,
+				    "%s: option requires an argument -- %c\n",
+				    _getprogname(), optopt);
+			return (BADCH);
+		}
+		place = EMSG;
+		++optind;
 	}
-	return(c);
+	return (optopt);			/* return option letter */
 }
-
-#endif  /* __GNUC__ */
