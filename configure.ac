@@ -31,12 +31,30 @@ AC_ARG_WITH(
 
 LIBREADLINE=
 AS_IF([test "x$with_readline" != xno],
-	[AC_SEARCH_LIBS(
-		[readline], [readline],
-		[AC_SUBST([LIBREADLINE], ["-lreadline"]) AC_DEFINE([HAVE_LIBREADLINE], [1], [Define if you have libreadline])],
-		[if test "x$with_readline" != xcheck; then
-			AC_MSG_FAILURE([readline test failed (--without-readline to disable)])
-		fi], [])])
+	[
+		AC_CHECK_HEADER(
+			[readline/readline.h],
+			[
+				AC_SEARCH_LIBS(
+					[readline],
+					[readline],
+					[
+						AC_SUBST([LIBREADLINE], ["-lreadline"])
+						AC_DEFINE(HAVE_LIBREADLINE, [1], [Define if you have libreadline])
+					], [
+						if test "x$with_readline" != xcheck; then
+							AC_MSG_FAILURE([readline test failed (--without-readline to disable)])
+						fi
+					]
+				)
+			], [
+				if test "x$with_readline" != xcheck; then
+					AC_MSG_FAILURE([readline test failed (--without-readline to disable)])
+				fi
+			]
+		)
+	]
+)
 
 AC_HEADER_ASSERT
 
