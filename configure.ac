@@ -1,4 +1,4 @@
-AC_INIT([BigMC], [20120207], [gdpe@itu.dk], [bigmc], [http://bigraph.org/bigmc/])
+AC_INIT([BigMC], [20120807], [gdpe@itu.dk], [bigmc], [http://bigraph.org/bigmc/])
 AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.10 no-define])
 AC_CONFIG_HEADERS([config.h])
@@ -21,13 +21,24 @@ doc/Makefile
 
 AC_PROG_LEX
 AC_PROG_YACC
-AC_CHECK_LIB([readline], [readline])
 #AC_CHECK_LIB([pthread], [pthread_create])
 #AC_CHECK_LIB([tcmalloc], [malloc])
-AC_HEADER_ASSERT
 
-AC_CHECK_HEADER([readline/readline.h],[],AC_MSG_ERROR([Missing readline/readline.h... is GNU Readline installed correctly?]))
-AC_CHECK_HEADER([readline/history.h],[],AC_MSG_ERROR([Missing readline/history.h... is GNU Readline installed correctly?]))
+AC_ARG_WITH(
+	[readline],
+	[AS_HELP_STRING([--with-readline], [enable support for readline])],
+	[], [with_readline=check])
+
+LIBREADLINE=
+AS_IF([test "x$with_readline" != xno],
+	[AC_SEARCH_LIBS(
+		[readline], [readline],
+		[AC_SUBST([LIBREADLINE], ["-lreadline"]) AC_DEFINE([HAVE_LIBREADLINE], [1], [Define if you have libreadline])],
+		[if test "x$with_readline" != xcheck; then
+			AC_MSG_FAILURE([readline test failed (--without-readline to disable)])
+		fi], [])])
+
+AC_HEADER_ASSERT
 
 #AX_PTHREAD
 

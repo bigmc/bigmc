@@ -10,8 +10,11 @@ using namespace std;
 
 #include <bigmc.h>
 
+/* getopt */
 #ifdef _WIN32
 #include <wingetopt.h>
+#else
+#include <unistd.h>
 #endif
 
 void print_usage(char **argv) {
