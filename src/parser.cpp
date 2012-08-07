@@ -33,7 +33,6 @@ using namespace std;
 #endif /* !_WIN32 */
 
 #ifdef HAVE_LIBREADLINE
-#warning READLING!!
 #include <readline/readline.h>
 #include <readline/history.h>
 #else
