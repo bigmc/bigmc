@@ -32,7 +32,8 @@ using namespace std;
 #include <unistd.h> /* for isatty(3) */
 #endif /* !_WIN32 */
 
-#ifdef USE_READLINE
+#ifdef HAVE_LIBREADLINE
+#warning READLING!!
 #include <readline/readline.h>
 #include <readline/history.h>
 #else
