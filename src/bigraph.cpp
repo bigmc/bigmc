@@ -36,7 +36,7 @@ map<control,bool> bigraph::activity_map;
 map<control,int> bigraph::arity_map;
 set<name> bigraph::names;
 
-bigraph::bigraph(int roots = 1) {
+bigraph::bigraph(int roots) {
 	root = NULL;
 	nregions = 1;
 }

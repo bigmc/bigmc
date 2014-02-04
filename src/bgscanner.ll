@@ -22,7 +22,7 @@
 *********************************************************************************/
 #include<sstream>
 #include "bigmc.h"
-#include "bgparser.h"
+#include "bgparser.hpp"
 
 int line = 0;
 int column = 0;

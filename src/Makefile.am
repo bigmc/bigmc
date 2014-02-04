@@ -1,6 +1,6 @@
 AM_YFLAGS = -y -d
 
-BUILT_SOURCES = bgparser.h
+BUILT_SOURCES = bgparser.hpp
 
 bin_PROGRAMS = bigmc
 

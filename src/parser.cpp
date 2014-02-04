@@ -26,7 +26,7 @@ using namespace std;
 #include <assert.h>
 
 #include <bigmc.h>
-#include "bgparser.h"
+#include "bgparser.hpp"
 
 #ifndef _WIN32
 #include <unistd.h> /* for isatty(3) */
